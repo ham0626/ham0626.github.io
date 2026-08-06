@@ -20,19 +20,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 20px; }  .map-wrapper {     flex: 2;     min-width: 300px;     height: 500">
+    <meta name="description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height: 6">
 <meta property="og:type" content="website">
 <meta property="og:title" content="足迹地图">
 <meta property="og:url" content="http://example.com/travel/index.html">
 <meta property="og:site_name" content="Ham">
-<meta property="og:description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 20px; }  .map-wrapper {     flex: 2;     min-width: 300px;     height: 500">
+<meta property="og:description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height: 6">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://picsum.photos/600/400?random=1">
-<meta property="article:published_time" content="2026-08-04T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-06T05:47:29.170Z">
+<meta property="og:image" content="https://picsum.photos/400/300?random=1">
+<meta property="article:published_time" content="2026-08-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-06T06:11:22.129Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://picsum.photos/600/400?random=1">
+<meta name="twitter:image" content="https://picsum.photos/400/300?random=1">
 
 
 <link rel="canonical" href="http://example.com/travel/">
@@ -117,7 +117,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -130,7 +130,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">🌍 足迹地图</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -184,185 +183,269 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .map-wrapper {
-    flex: 2;
-    min-width: 300px;
-    height: 500px;
+    flex: 2.5;
+    min-width: 320px;
+    height: 600px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.12);
 }
 
-#map {
-    width: 100%;
-    height: 100%;
-}
+#map { width: 100%; height: 100%; }
 
 .info-panel {
-    flex: 1;
-    min-width: 220px;
+    flex: 1.5;
+    min-width: 260px;
     background: #f8f9fa;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: all 0.3s ease;
-    min-height: 300px;
+    max-height: 600px;
+    overflow-y: auto;
+    transition: all 0.2s;
 }
 
 .info-panel .placeholder {
-    color: #999;
+    color: #aaa;
     text-align: center;
     font-size: 16px;
+    margin-top: 40%;
 }
 
-.info-panel .place-name {
-    font-size: 24px;
+.city-name {
+    font-size: 28px;
     font-weight: 700;
-    margin-bottom: 6px;
     color: #222;
+    margin-bottom: 16px;
+    border-bottom: 3px solid #4CAF50;
+    padding-bottom: 8px;
 }
 
-.info-panel .place-desc {
-    font-size: 15px;
-    color: #555;
-    margin-bottom: 12px;
-    line-height: 1.6;
+.spot-item {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: 0.2s;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
 }
 
-.info-panel .place-img {
-    width: 100%;
-    max-height: 220px;
+.spot-item:hover { background: #f0f0f0; }
+
+.spot-img {
+    width: 80px;
+    height: 80px;
     object-fit: cover;
     border-radius: 8px;
-    margin-top: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.spot-info {
+    flex: 1;
+}
+.spot-info .spot-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+}
+.spot-info .spot-desc {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
 }
 
 @media (max-width: 700px) {
     .travel-container { flex-direction: column; }
-    .map-wrapper { height: 380px; }
-    .info-panel { min-height: 180px; }
+    .map-wrapper { height: 400px; }
+    .info-panel { max-height: 400px; }
+    .spot-item { flex-direction: column; align-items: center; }
+    .spot-img { width: 100%; height: 120px; }
 }
 </style>
 
-<h2>🌍 足迹地图</h2>
-<p>点击地图上的标记，查看对应地点信息 👇</p>
+<p style="margin-bottom: 16px; color: #555;">点击地图上的标记，查看该城市的所有景点 👇</p>
 
 <div class="travel-container">
-    <div class="map-wrapper">
-        <div id="map"></div>
-    </div>
+    <div class="map-wrapper"><div id="map"></div></div>
     <div class="info-panel" id="infoPanel">
-        <div class="placeholder">👆 点击地图上的图钉<br>查看详情</div>
+        <div class="placeholder">👆 点击图钉<br>查看城市景点</div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ========== 你的全球地点数据 ==========
-    // 注意：不要填写出生地或上学地，只写你想去或有意义的地方
-    var locations = [
+    // ========== 景点数据（按城市分组） ==========
+    // 每个景点必须包含 city（城市名）、name（景点名）、lat、lng、desc、img
+    var spots = [
+        // --- 巴黎 ---
         {
-            name: "巴黎 · 埃菲尔铁塔",
-            lat: 48.8584,
-            lng: 2.2945,
+            city: "巴黎",
+            name: "埃菲尔铁塔",
+            lat: 48.8584, lng: 2.2945,
             desc: "浪漫之都的象征，夜景璀璨。",
-            img: "https://picsum.photos/seed/paris/600/400"
+            img: "https://picsum.photos/seed/eiffel/400/300"
         },
         {
-            name: "东京 · 浅草寺",
-            lat: 35.7148,
-            lng: 139.7967,
-            desc: "东京最古老的寺庙，感受江户风情。",
-            img: "https://picsum.photos/seed/tokyo/600/400"
+            city: "巴黎",
+            name: "卢浮宫",
+            lat: 48.8606, lng: 2.3376,
+            desc: "世界四大博物馆之一，藏品无数。",
+            img: "https://picsum.photos/seed/louvre/400/300"
+        },
+        // --- 东京 ---
+        {
+            city: "东京",
+            name: "浅草寺",
+            lat: 35.7148, lng: 139.7967,
+            desc: "东京最古老的寺庙，江户风情。",
+            img: "https://picsum.photos/seed/asakusa/400/300"
         },
         {
-            name: "纽约 · 时代广场",
-            lat: 40.7580,
-            lng: -73.9855,
-            desc: "世界的十字路口，永不眠的城市。",
-            img: "https://picsum.photos/seed/nyc/600/400"
+            city: "东京",
+            name: "东京塔",
+            lat: 35.6586, lng: 139.7454,
+            desc: "东京地标，俯瞰都市夜景。",
+            img: "https://picsum.photos/seed/tokyotower/400/300"
+        },
+        // --- 纽约 ---
+        {
+            city: "纽约",
+            name: "时代广场",
+            lat: 40.7580, lng: -73.9855,
+            desc: "世界的十字路口，永不眠。",
+            img: "https://picsum.photos/seed/timessquare/400/300"
         },
         {
-            name: "悉尼 · 歌剧院",
-            lat: -33.8568,
-            lng: 151.2153,
+            city: "纽约",
+            name: "中央公园",
+            lat: 40.7829, lng: -73.9654,
+            desc: "曼哈顿的绿肺，城市中的自然。",
+            img: "https://picsum.photos/seed/centralpark/400/300"
+        },
+        // --- 悉尼 ---
+        {
+            city: "悉尼",
+            name: "悉尼歌剧院",
+            lat: -33.8568, lng: 151.2153,
             desc: "南半球的地标，海滨帆影。",
-            img: "https://picsum.photos/seed/sydney/600/400"
+            img: "https://picsum.photos/seed/opera/400/300"
         },
         {
-            name: "开普敦 · 桌山",
-            lat: -33.9249,
-            lng: 18.4241,
+            city: "悉尼",
+            name: "邦迪海滩",
+            lat: -33.8915, lng: 151.2767,
+            desc: "悉尼最著名的海滩，冲浪天堂。",
+            img: "https://picsum.photos/seed/bondi/400/300"
+        },
+        // --- 开普敦 ---
+        {
+            city: "开普敦",
+            name: "桌山",
+            lat: -33.9249, lng: 18.4241,
             desc: "上帝的餐桌，俯瞰南非。",
-            img: "https://picsum.photos/seed/capetown/600/400"
+            img: "https://picsum.photos/seed/tablemountain/400/300"
         },
         {
-            name: "里约 · 基督像",
-            lat: -22.9519,
-            lng: -43.2105,
-            desc: "世界新七大奇迹之一。",
-            img: "https://picsum.photos/seed/rio/600/400"
+            city: "开普敦",
+            name: "好望角",
+            lat: -34.3581, lng: 18.4718,
+            desc: "非洲大陆最西南端，大洋交汇。",
+            img: "https://picsum.photos/seed/capepoint/400/300"
         },
+        // --- 伦敦 ---
         {
-            name: "伦敦 · 大本钟",
-            lat: 51.5007,
-            lng: -0.1246,
+            city: "伦敦",
+            name: "大本钟",
+            lat: 51.5007, lng: -0.1246,
             desc: "英国政治与历史的象征。",
-            img: "https://picsum.photos/seed/london/600/400"
+            img: "https://picsum.photos/seed/bigben/400/300"
+        },
+        {
+            city: "伦敦",
+            name: "伦敦塔桥",
+            lat: 51.5055, lng: -0.0754,
+            desc: "泰晤士河上的标志性开合桥。",
+            img: "https://picsum.photos/seed/towerbridge/400/300"
         }
-        // ===== 你可以继续加，格式同上 =====
     ];
 
-    // ========== 初始化地图，视野设为全球 ==========
+    // ========== 初始化地图 ==========
     var map = L.map('map').setView([20, 0], 2);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 主图源（OpenStreetMap）
+    var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // ========== 自定义图钉 ==========
+    // 备用图源（如果主图源加载失败）
+    setTimeout(function() {
+        if (!map.hasLayer(tileLayer)) {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© CartoDB'
+            }).addTo(map);
+        }
+    }, 5000);
+
+    // ========== 添加标记 ==========
     var redIcon = L.icon({
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41]
     });
 
-    // ========== 添加标记 ==========
-    locations.forEach(function(loc) {
-        var marker = L.marker([loc.lat, loc.lng], { icon: redIcon }).addTo(map);
+    // 为每个景点创建一个标记
+    spots.forEach(function(spot) {
+        var marker = L.marker([spot.lat, spot.lng], { icon: redIcon }).addTo(map);
 
-        // 点击时更新右侧面板
         marker.on('click', function() {
-            document.getElementById('infoPanel').innerHTML = `
-                <div class="place-name">${loc.name}</div>
-                <div class="place-desc">${loc.desc}</div>
-                <img class="place-img" src="${loc.img}" alt="${loc.name}" onerror="this.src='https://picsum.photos/600/400?random=1'">
-            `;
+            // 找出该城市的所有景点
+            var citySpots = spots.filter(s => s.city === spot.city);
+            renderCity(spot.city, citySpots);
         });
     });
 
-    // 让地图自动适应所有标记的范围，并保留全球视野（如果标记分散的话）
+    // ========== 渲染右侧面板 ==========
+    function renderCity(cityName, spotsList) {
+        var html = `<div class="city-name">📍 ${cityName}</div>`;
+        spotsList.forEach(function(s) {
+            html += `
+                <div class="spot-item">
+                    <img class="spot-img" src="${s.img}" alt="${s.name}" onerror="this.src='https://picsum.photos/400/300?random=1'">
+                    <div class="spot-info">
+                        <div class="spot-name">${s.name}</div>
+                        <div class="spot-desc">${s.desc}</div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('infoPanel').innerHTML = html;
+        // 滚动到顶部
+        document.getElementById('infoPanel').scrollTop = 0;
+    }
+
+    // 自适应视野
     var group = L.featureGroup(
-        locations.map(function(loc) {
-            return L.marker([loc.lat, loc.lng]);
+        spots.map(function(s) {
+            return L.marker([s.lat, s.lng]);
         })
     );
-    map.fitBounds(group.getBounds().pad(0.3));
+    map.fitBounds(group.getBounds().pad(0.2));
 
 });
 </script>
 
 <p style="color: gray; font-size: 14px; margin-top: 20px;">
-💡不断更新中。
+💡 未完待续……
 </p>
       </div>
       
