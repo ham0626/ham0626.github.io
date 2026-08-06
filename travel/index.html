@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://picsum.photos/400/300?random=1">
 <meta property="article:published_time" content="2026-08-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-06T06:21:56.794Z">
+<meta property="article:modified_time" content="2026-08-06T06:28:19.266Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://picsum.photos/400/300?random=1">
@@ -377,35 +377,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     ];
 
-    // ========== 初始化地图 ==========
+       // ========== 初始化地图 ==========
     var map = L.map('map').setView([20, 0], 2);
 
-// ===== 图源1: OpenStreetMap（默认） =====
-    var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 图源1：高德地图（普通街道图，国内稳定）
+    var tileLayer1 = L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
         maxZoom: 18,
-        attribution: '© OpenStreetMap'
+        attribution: '© 高德地图'
     }).addTo(map);
 
-    // ===== 图源2: CartoDB 浅色（备选1） =====
-    var tileLayer2 = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    // 图源2：高德地图（卫星图，备选）
+    var tileLayer2 = L.tileLayer('https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
         maxZoom: 18,
-        attribution: '© CartoDB'
+        attribution: '© 高德地图'
     });
 
-    // ===== 图源3: Esri 卫星图（备选2） =====
-    var tileLayer3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    // 图源3：腾讯地图（备选）
+    var tileLayer3 = L.tileLayer('https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={y}&styleid=3&version=118', {
         maxZoom: 18,
-        attribution: '© Esri'
+        attribution: '© 腾讯地图'
     });
 
-    // 检测主图源是否加载成功，失败则切换
-    var tileLoaded = false;
-    tileLayer.on('load', function() {
-        tileLoaded = true;
-    });
-    tileLayer.on('tileerror', function() {
-        if (!tileLoaded) {
-            map.removeLayer(tileLayer);
+    // 检测高德是否加载成功，失败则切换
+    var loaded = false;
+    tileLayer1.on('load', function() { loaded = true; });
+    tileLayer1.on('tileerror', function() {
+        if (!loaded) {
+            map.removeLayer(tileLayer1);
             tileLayer2.addTo(map);
             tileLayer2.on('tileerror', function() {
                 map.removeLayer(tileLayer2);
@@ -414,10 +412,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 5秒后如果主图源还没加载出来，强制切换
+    // 5秒后强制切换（防止卡死）
     setTimeout(function() {
-        if (!tileLoaded) {
-            map.removeLayer(tileLayer);
+        if (!loaded) {
+            map.removeLayer(tileLayer1);
             tileLayer2.addTo(map);
             setTimeout(function() {
                 if (!map.hasLayer(tileLayer2)) {
