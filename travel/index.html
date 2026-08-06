@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://picsum.photos/400/300?random=1">
 <meta property="article:published_time" content="2026-08-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-06T06:11:22.129Z">
+<meta property="article:modified_time" content="2026-08-06T06:21:56.794Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://picsum.photos/400/300?random=1">
@@ -380,19 +380,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========== 初始化地图 ==========
     var map = L.map('map').setView([20, 0], 2);
 
-    // 主图源（OpenStreetMap）
+// ===== 图源1: OpenStreetMap（默认） =====
     var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // 备用图源（如果主图源加载失败）
+    // ===== 图源2: CartoDB 浅色（备选1） =====
+    var tileLayer2 = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© CartoDB'
+    });
+
+    // ===== 图源3: Esri 卫星图（备选2） =====
+    var tileLayer3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
+        attribution: '© Esri'
+    });
+
+    // 检测主图源是否加载成功，失败则切换
+    var tileLoaded = false;
+    tileLayer.on('load', function() {
+        tileLoaded = true;
+    });
+    tileLayer.on('tileerror', function() {
+        if (!tileLoaded) {
+            map.removeLayer(tileLayer);
+            tileLayer2.addTo(map);
+            tileLayer2.on('tileerror', function() {
+                map.removeLayer(tileLayer2);
+                tileLayer3.addTo(map);
+            });
+        }
+    });
+
+    // 5秒后如果主图源还没加载出来，强制切换
     setTimeout(function() {
-        if (!map.hasLayer(tileLayer)) {
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: '© CartoDB'
-            }).addTo(map);
+        if (!tileLoaded) {
+            map.removeLayer(tileLayer);
+            tileLayer2.addTo(map);
+            setTimeout(function() {
+                if (!map.hasLayer(tileLayer2)) {
+                    tileLayer3.addTo(map);
+                }
+            }, 3000);
         }
     }, 5000);
 
