@@ -20,16 +20,16 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height: 6">
+    <meta name="description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height:">
 <meta property="og:type" content="website">
 <meta property="og:title" content="足迹地图">
 <meta property="og:url" content="http://example.com/travel/index.html">
 <meta property="og:site_name" content="Ham">
-<meta property="og:description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height: 6">
+<meta property="og:description" content="* { box-sizing: border-box; }  .travel-container {     display: flex;     flex-wrap: wrap;     gap: 20px;     margin-top: 10px; }  .map-wrapper {     flex: 2.5;     min-width: 320px;     height:">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://picsum.photos/400/300?random=1">
 <meta property="article:published_time" content="2026-08-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-06T06:28:19.266Z">
+<meta property="article:modified_time" content="2026-08-06T06:42:18.000Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://picsum.photos/400/300?random=1">
@@ -175,6 +175,7 @@
       <div class="post-body">
           <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
 * { box-sizing: border-box; }
@@ -216,13 +217,24 @@
     margin-top: 40%;
 }
 
+.city-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 3px solid #4CAF50;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
 .city-name {
     font-size: 28px;
     font-weight: 700;
     color: #222;
-    margin-bottom: 16px;
-    border-bottom: 3px solid #4CAF50;
-    padding-bottom: 8px;
+}
+.city-stats {
+    font-size: 14px;
+    color: #888;
+    font-weight: normal;
 }
 
 .spot-item {
@@ -254,11 +266,43 @@
     font-weight: 600;
     font-size: 16px;
     color: #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .spot-info .spot-desc {
     font-size: 14px;
     color: #666;
-    margin-top: 4px;
+    margin-top: 2px;
+}
+.spot-info .spot-meta {
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.spot-info .spot-meta .song {
+    color: #4CAF50;
+    font-weight: 500;
+}
+.spot-info .spot-meta .date {
+    color: #555;
+}
+.spot-info .spot-meta .status-badge {
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+.status-done {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.status-plan {
+    background: #ffebee;
+    color: #c62828;
 }
 
 @media (max-width: 700px) {
@@ -270,7 +314,7 @@
 }
 </style>
 
-<p style="margin-bottom: 16px; color: #555;">点击地图上的标记，查看该城市的所有景点 👇</p>
+<p style="margin-bottom: 16px; color: #555;">🟢 绿色图钉 = 已打卡 &nbsp;|&nbsp; 🔴 红色图钉 = 计划中</p>
 
 <div class="travel-container">
     <div class="map-wrapper"><div id="map"></div></div>
@@ -282,8 +326,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ========== 景点数据（按城市分组） ==========
-    // 每个景点必须包含 city（城市名）、name（景点名）、lat、lng、desc、img
+    // ================================================================
+    // 1. 你的数据（已打卡 / 未打卡 + 日期 + 歌曲）
+    // ================================================================
     var spots = [
         // --- 巴黎 ---
         {
@@ -291,14 +336,20 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "埃菲尔铁塔",
             lat: 48.8584, lng: 2.2945,
             desc: "浪漫之都的象征，夜景璀璨。",
-            img: "https://picsum.photos/seed/eiffel/400/300"
+            img: "https://picsum.photos/seed/eiffel/400/300",
+            song: "Paris - Taylor Swift",
+            visited: true,
+            date: "2026-07-15"
         },
         {
             city: "巴黎",
             name: "卢浮宫",
             lat: 48.8606, lng: 2.3376,
             desc: "世界四大博物馆之一，藏品无数。",
-            img: "https://picsum.photos/seed/louvre/400/300"
+            img: "https://picsum.photos/seed/louvre/400/300",
+            song: "Paris - Taylor Swift",
+            visited: false,
+            date: null
         },
         // --- 东京 ---
         {
@@ -306,14 +357,20 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "浅草寺",
             lat: 35.7148, lng: 139.7967,
             desc: "东京最古老的寺庙，江户风情。",
-            img: "https://picsum.photos/seed/asakusa/400/300"
+            img: "https://picsum.photos/seed/asakusa/400/300",
+            song: "Tokyo Night - 坂本龙一",
+            visited: true,
+            date: "2026-08-01"
         },
         {
             city: "东京",
             name: "东京塔",
             lat: 35.6586, lng: 139.7454,
             desc: "东京地标，俯瞰都市夜景。",
-            img: "https://picsum.photos/seed/tokyotower/400/300"
+            img: "https://picsum.photos/seed/tokyotower/400/300",
+            song: "东京塔 - 陈奕迅",
+            visited: false,
+            date: null
         },
         // --- 纽约 ---
         {
@@ -321,14 +378,20 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "时代广场",
             lat: 40.7580, lng: -73.9855,
             desc: "世界的十字路口，永不眠。",
-            img: "https://picsum.photos/seed/timessquare/400/300"
+            img: "https://picsum.photos/seed/timessquare/400/300",
+            song: "New York - Alicia Keys",
+            visited: true,
+            date: "2026-06-20"
         },
         {
             city: "纽约",
             name: "中央公园",
             lat: 40.7829, lng: -73.9654,
             desc: "曼哈顿的绿肺，城市中的自然。",
-            img: "https://picsum.photos/seed/centralpark/400/300"
+            img: "https://picsum.photos/seed/centralpark/400/300",
+            song: "Central Park - Norah Jones",
+            visited: false,
+            date: null
         },
         // --- 悉尼 ---
         {
@@ -336,14 +399,20 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "悉尼歌剧院",
             lat: -33.8568, lng: 151.2153,
             desc: "南半球的地标，海滨帆影。",
-            img: "https://picsum.photos/seed/opera/400/300"
+            img: "https://picsum.photos/seed/opera/400/300",
+            song: "Down Under - Men at Work",
+            visited: true,
+            date: "2026-01-10"
         },
         {
             city: "悉尼",
             name: "邦迪海滩",
             lat: -33.8915, lng: 151.2767,
             desc: "悉尼最著名的海滩，冲浪天堂。",
-            img: "https://picsum.photos/seed/bondi/400/300"
+            img: "https://picsum.photos/seed/bondi/400/300",
+            song: "Bondi - Xavier Rudd",
+            visited: false,
+            date: null
         },
         // --- 开普敦 ---
         {
@@ -351,14 +420,10 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "桌山",
             lat: -33.9249, lng: 18.4241,
             desc: "上帝的餐桌，俯瞰南非。",
-            img: "https://picsum.photos/seed/tablemountain/400/300"
-        },
-        {
-            city: "开普敦",
-            name: "好望角",
-            lat: -34.3581, lng: 18.4718,
-            desc: "非洲大陆最西南端，大洋交汇。",
-            img: "https://picsum.photos/seed/capepoint/400/300"
+            img: "https://picsum.photos/seed/tablemountain/400/300",
+            song: "Table Mountain - Freshlyground",
+            visited: false,
+            date: null
         },
         // --- 伦敦 ---
         {
@@ -366,99 +431,132 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "大本钟",
             lat: 51.5007, lng: -0.1246,
             desc: "英国政治与历史的象征。",
-            img: "https://picsum.photos/seed/bigben/400/300"
+            img: "https://picsum.photos/seed/bigben/400/300",
+            song: "London Boy - Taylor Swift",
+            visited: true,
+            date: "2025-12-25"
         },
         {
             city: "伦敦",
             name: "伦敦塔桥",
             lat: 51.5055, lng: -0.0754,
             desc: "泰晤士河上的标志性开合桥。",
-            img: "https://picsum.photos/seed/towerbridge/400/300"
+            img: "https://picsum.photos/seed/towerbridge/400/300",
+            song: "Bridge Over Troubled Water - Simon & Garfunkel",
+            visited: false,
+            date: null
+        },
+        // --- 罗马 ---
+        {
+            city: "罗马",
+            name: "斗兽场",
+            lat: 41.8902, lng: 12.4922,
+            desc: "古罗马文明的象征，两千年的震撼。",
+            img: "https://picsum.photos/seed/colosseum/400/300",
+            song: "Roman Holiday - H.E.R.",
+            visited: false,
+            date: null
         }
     ];
 
-       // ========== 初始化地图 ==========
+    // ================================================================
+    // 2. 初始化地图 + 高德底图（国内稳定）
+    // ================================================================
     var map = L.map('map').setView([20, 0], 2);
 
-    // 图源1：高德地图（普通街道图，国内稳定）
     var tileLayer1 = L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
         maxZoom: 18,
         attribution: '© 高德地图'
     }).addTo(map);
 
-    // 图源2：高德地图（卫星图，备选）
-    var tileLayer2 = L.tileLayer('https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
-        maxZoom: 18,
-        attribution: '© 高德地图'
-    });
-
-    // 图源3：腾讯地图（备选）
-    var tileLayer3 = L.tileLayer('https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={y}&styleid=3&version=118', {
+    var tileLayer2 = L.tileLayer('https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={y}&styleid=3&version=118', {
         maxZoom: 18,
         attribution: '© 腾讯地图'
     });
 
-    // 检测高德是否加载成功，失败则切换
     var loaded = false;
     tileLayer1.on('load', function() { loaded = true; });
     tileLayer1.on('tileerror', function() {
         if (!loaded) {
             map.removeLayer(tileLayer1);
             tileLayer2.addTo(map);
-            tileLayer2.on('tileerror', function() {
-                map.removeLayer(tileLayer2);
-                tileLayer3.addTo(map);
-            });
         }
     });
-
-    // 5秒后强制切换（防止卡死）
     setTimeout(function() {
         if (!loaded) {
             map.removeLayer(tileLayer1);
             tileLayer2.addTo(map);
-            setTimeout(function() {
-                if (!map.hasLayer(tileLayer2)) {
-                    tileLayer3.addTo(map);
-                }
-            }, 3000);
         }
     }, 5000);
 
-    // ========== 添加标记 ==========
-    var redIcon = L.icon({
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    });
+    // ================================================================
+    // 3. 自定义图钉（绿色 = 已打卡，红色 = 未打卡）
+    // ================================================================
+    function createIcon(color) {
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `<i class="fas fa-map-pin" style="color:${color};font-size:34px;text-shadow:0 2px 6px rgba(0,0,0,0.3);"></i>`,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41]
+        });
+    }
 
-    // 为每个景点创建一个标记
+    var iconVisited = createIcon('#2ecc71');   // 绿色
+    var iconUnvisited = createIcon('#e74c3c'); // 红色
+
+    // ================================================================
+    // 4. 添加标记并绑定点击事件
+    // ================================================================
     spots.forEach(function(spot) {
-        var marker = L.marker([spot.lat, spot.lng], { icon: redIcon }).addTo(map);
+        var marker = L.marker([spot.lat, spot.lng], {
+            icon: spot.visited ? iconVisited : iconUnvisited
+        }).addTo(map);
 
         marker.on('click', function() {
-            // 找出该城市的所有景点
             var citySpots = spots.filter(s => s.city === spot.city);
             renderCity(spot.city, citySpots);
         });
     });
 
-    // ========== 渲染右侧面板 ==========
+    // ================================================================
+    // 5. 渲染右侧面板（包含歌曲、日期、进度统计）
+    // ================================================================
     function renderCity(cityName, spotsList) {
-        var html = `<div class="city-name">📍 ${cityName}</div>`;
+        var total = spotsList.length;
+        var done = spotsList.filter(s => s.visited).length;
+
+        var html = `
+            <div class="city-header">
+                <span class="city-name">📍 ${cityName}</span>
+                <span class="city-stats">已打卡 ${done}/${total}</span>
+            </div>
+        `;
+
         spotsList.forEach(function(s) {
+            var statusText = s.visited ? '✅ 已打卡' : '⏳ 计划中';
+            var statusClass = s.visited ? 'status-done' : 'status-plan';
+            var dateDisplay = s.visited ? `📅 ${s.date}` : '📅 未定';
+            var songDisplay = s.song || '🎵 暂无推荐';
+
             html += `
                 <div class="spot-item">
                     <img class="spot-img" src="${s.img}" alt="${s.name}" onerror="this.src='https://picsum.photos/400/300?random=1'">
                     <div class="spot-info">
-                        <div class="spot-name">${s.name}</div>
+                        <div class="spot-name">
+                            ${s.name}
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
                         <div class="spot-desc">${s.desc}</div>
+                        <div class="spot-meta">
+                            <span class="song">🎵 ${songDisplay}</span>
+                            <span class="date">${dateDisplay}</span>
+                        </div>
                     </div>
                 </div>
             `;
         });
+
         document.getElementById('infoPanel').innerHTML = html;
-        // 滚动到顶部
         document.getElementById('infoPanel').scrollTop = 0;
     }
 
@@ -474,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <p style="color: gray; font-size: 14px; margin-top: 20px;">
-💡 未完待续……
+💡 未完待续…… 🟢 绿色 = 已打卡 &nbsp;|&nbsp; 🔴 红色 = 计划中
 </p>
       </div>
       
