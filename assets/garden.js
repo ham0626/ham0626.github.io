@@ -1,6 +1,6 @@
 /* garden.js —— 油画草甸引擎（纯 Canvas 2D，零依赖、零贴图）
    装配（按 class 自动识别）：
-     .hero__meadow  首页：晨曦油画草甸（笔触 + 色点花） + 三层花海 + 坐在花海中画油画的背影
+     .hero__meadow  首页：夜色油画草甸（厚涂笔触 + 色点小花） + 两层小花 + 坐在花海中画油画的背影
    天空（云 / 雪山 / 闪耀星球）由 index.html 的 SVG 负责，本引擎只画地平线以下。
    降级：prefers-reduced-motion → 只渲染一帧静态画面 */
 (function () {
@@ -39,10 +39,10 @@
     ctx.bezierCurveTo(W * 0.92 + tipX * 0.4, -L * 0.78, W, -L * 0.34, 0, 0);
     ctx.closePath();
   }
-  /* 花头：tone 0 远 → 1 近；日光调色板（晨曦：粉 / 奶油 / 金 / 淡紫） */
+  /* 花头：tone 0 远 → 1 近；夜色调色板（受星光照亮的冷粉 / 奶白 / 淡金 / 淡紫） */
   function head(ctx, kind, s, r, tone) {
-    const L1 = 58 + tone * 9, L2 = 74 + tone * 9, L3 = 91 + tone * 5;
-    const S1 = 38 + tone * 26, S2 = 52 + tone * 26, S3 = 66 + tone * 22;
+    const L1 = (0.42 + tone * 0.20) * 100, L2 = (0.62 + tone * 0.16) * 100, L3 = (0.86 + tone * 0.08) * 100;
+    const S1 = (0.45 + tone * 0.30) * 100, S2 = (0.60 + tone * 0.28) * 100, S3 = (0.74 + tone * 0.22) * 100;
     if (kind === 'daisy') {
       const n = 13 + ((r() * 4) | 0), h = pick(r, [46, 40, 350]);
       for (let i = 0; i < n; i++) {
@@ -54,9 +54,9 @@
         ctx.restore();
       }
       const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.3);
-      cg.addColorStop(0, hsl(45, 92, 66 + tone * 8)); cg.addColorStop(1, hsl(36, 78, 46 + tone * 8));
+      cg.addColorStop(0, hsl(45, 92, 62 + tone * 10)); cg.addColorStop(1, hsl(38, 74, 42 + tone * 10));
       ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(0, 0, s * 0.28, 0, TAU); ctx.fill();
-      ctx.strokeStyle = 'rgba(150,96,32,.42)'; ctx.lineWidth = Math.max(0.3, s * 0.03);
+      ctx.strokeStyle = 'rgba(120,72,20,.45)'; ctx.lineWidth = Math.max(0.3, s * 0.03);
       for (let i = 0; i < 8; i++) {
         ctx.beginPath(); ctx.arc((r() - 0.5) * s * 0.3, (r() - 0.5) * s * 0.3, s * 0.045, 0, TAU); ctx.stroke();
       }
@@ -74,9 +74,9 @@
         ctx.restore();
       }
       const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.34);
-      cg.addColorStop(0, 'rgba(46,26,30,.88)'); cg.addColorStop(1, 'rgba(60,34,38,0)');
+      cg.addColorStop(0, 'rgba(22,14,20,.9)'); cg.addColorStop(1, 'rgba(30,18,26,0)');
       ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(0, 0, s * 0.34, 0, TAU); ctx.fill();
-      ctx.strokeStyle = 'rgba(255,246,206,.72)'; ctx.lineWidth = Math.max(0.3, s * 0.028);
+      ctx.strokeStyle = 'rgba(250,224,150,.7)'; ctx.lineWidth = Math.max(0.3, s * 0.028);
       for (let i = 0; i < 11; i++) {
         const a = r() * TAU, rr = s * (0.16 + r() * 0.14);
         ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); ctx.stroke();
@@ -107,8 +107,8 @@
         for (let k = -1; k <= 1; k += 2) {
           ctx.save(); ctx.translate(k * sp * 0.42, y); ctx.rotate(k * 0.5);
           const g = ctx.createLinearGradient(0, 0, 0, -sp);
-          g.addColorStop(0, hsl(h, 58, 52 + p * 16 + tone * 6));
-          g.addColorStop(1, hsl(h + 6, 68, 74 + p * 12 + tone * 6));
+          g.addColorStop(0, hsl(h, 62, 40 + p * 16 + tone * 8));
+          g.addColorStop(1, hsl(h + 6, 74, 62 + p * 14 + tone * 8));
           ctx.fillStyle = g; petalPath(ctx, sp, sp * 0.4, 0); ctx.fill();
           ctx.restore();
         }
@@ -120,9 +120,9 @@
       for (let i = 0; i < n; i++) {
         const a = r() * TAU, d = s * (0.25 + r() * 0.95);
         const x = Math.cos(a) * d, y = Math.sin(a) * d * 0.72 - s * 0.4, rr = s * (0.09 + r() * 0.07);
-        ctx.fillStyle = hsl(pick(r, [44, 352, 300]), 26, 88 + tone * 8, 0.94);
+        ctx.fillStyle = hsl(pick(r, [40, 350, 300]), 22, 82 + tone * 10, 0.92);
         ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.fillStyle = 'rgba(255,255,255,.5)';
         ctx.beginPath(); ctx.arc(x - rr * 0.25, y - rr * 0.25, rr * 0.4, 0, TAU); ctx.fill();
       }
       return;
@@ -135,13 +135,13 @@
       const g = ctx.createLinearGradient(0, 0, tx, -l);
       g.addColorStop(0, hsl(h, S1, L1)); g.addColorStop(0.5, hsl(h, S2, L2)); g.addColorStop(1, hsl(h, S3, L3));
       ctx.fillStyle = g; petalPath(ctx, l, w, tx); ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,' + (0.14 + tone * 0.14).toFixed(2) + ')';
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.10 + tone * 0.16).toFixed(2) + ')';
       ctx.lineWidth = Math.max(0.3, s * 0.02);
       ctx.beginPath(); ctx.moveTo(0, -l * 0.2); ctx.lineTo(tx * 0.5, -l * 0.88); ctx.stroke();
       ctx.restore();
     }
-    ctx.fillStyle = hsl(44, 82, 62 + tone * 10); ctx.beginPath(); ctx.arc(0, 0, s * 0.14, 0, TAU); ctx.fill();
-    ctx.fillStyle = hsl(34, 74, 44 + tone * 8); ctx.beginPath(); ctx.arc(0, 0, s * 0.07, 0, TAU); ctx.fill();
+    ctx.fillStyle = hsl(42, 78, 58 + tone * 12); ctx.beginPath(); ctx.arc(0, 0, s * 0.14, 0, TAU); ctx.fill();
+    ctx.fillStyle = hsl(36, 70, 40 + tone * 8); ctx.beginPath(); ctx.arc(0, 0, s * 0.07, 0, TAU); ctx.fill();
   }
 
   /* ------------------------------------------------------------- 一株植物 */
@@ -154,7 +154,7 @@
       for (let i = 0; i < 5 + ((r() * 4) | 0); i++) {
         const a = (i / 6 - 0.5) * 1.5 + (r() - 0.5) * 0.3, bl = h * (0.6 + r() * 0.5);
         const gg = ctx.createLinearGradient(0, 0, 0, -bl);
-        gg.addColorStop(0, hsl(126, 40, 26 + tone * 6)); gg.addColorStop(1, hsl(104, 46, 40 + tone * 14));
+        gg.addColorStop(0, hsl(145, 44, 7 + tone * 7)); gg.addColorStop(1, hsl(120, 40, 16 + tone * 16));
         ctx.strokeStyle = gg; ctx.lineWidth = Math.max(0.6, bl * 0.022);
         ctx.beginPath(); ctx.moveTo(0, 0);
         ctx.quadraticCurveTo(Math.sin(a) * bl * 0.3, -bl * 0.6, Math.sin(a) * bl * 0.62, -bl);
@@ -163,7 +163,7 @@
       ctx.restore(); return;
     }
     const sg = ctx.createLinearGradient(0, 0, 0, -stemL);
-    sg.addColorStop(0, hsl(128, 38, 24 + tone * 7)); sg.addColorStop(1, hsl(112, 42, 34 + tone * 12));
+    sg.addColorStop(0, hsl(140, 42, 8 + tone * 8)); sg.addColorStop(1, hsl(132, 40, 14 + tone * 14));
     ctx.strokeStyle = sg; ctx.lineWidth = Math.max(0.5, s * 0.075); ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(0, 0);
     ctx.quadraticCurveTo(stemL * 0.12, -stemL * 0.55, (r() - 0.5) * stemL * 0.16, -stemL); ctx.stroke();
@@ -173,7 +173,7 @@
       ctx.save(); ctx.translate(lx, ly); ctx.rotate(side * (0.75 + r() * 0.55));
       const ll = s * (0.85 + r() * 0.5), lw = ll * 0.3;
       const lg = ctx.createLinearGradient(0, 0, 0, -ll);
-      lg.addColorStop(0, hsl(130, 42, 25 + tone * 8)); lg.addColorStop(1, hsl(110, 46, 38 + tone * 13));
+      lg.addColorStop(0, hsl(142, 46, 9 + tone * 9)); lg.addColorStop(1, hsl(128, 44, 17 + tone * 15));
       ctx.fillStyle = lg;
       ctx.beginPath(); ctx.moveTo(0, 0);
       ctx.quadraticCurveTo(lw, -ll * 0.45, 0, -ll); ctx.quadraticCurveTo(-lw, -ll * 0.45, 0, 0);
@@ -208,14 +208,14 @@
     for (const it of items) plant(g, it.x, it.by, it.hh, it.kind, it.s, it.rng, o.tone);
     if (o.dark) {
       g.globalCompositeOperation = 'source-atop';
-      g.fillStyle = 'rgba(28,44,58,' + o.dark + ')'; g.fillRect(0, 0, cv.width, h);
+      g.fillStyle = 'rgba(5,24,20,' + o.dark + ')'; g.fillRect(0, 0, cv.width, h);
       g.globalCompositeOperation = 'source-over';
     }
     if (o.rim) {
       g.globalCompositeOperation = 'source-atop';
       const rg = g.createLinearGradient(0, 0, 0, h);
-      rg.addColorStop(0, 'rgba(255,238,206,.34)');
-      rg.addColorStop(0.6, 'rgba(255,232,196,.06)');
+      rg.addColorStop(0, 'rgba(196,255,228,.30)');
+      rg.addColorStop(0.6, 'rgba(150,240,205,.05)');
       rg.addColorStop(1, 'rgba(0,0,0,0)');
       g.fillStyle = rg; g.fillRect(0, 0, cv.width, h);
       g.globalCompositeOperation = 'source-over';
@@ -269,14 +269,14 @@
     }
     g.lineTo(w, h); g.closePath(); g.clip();
 
-    /* 底色：远（雾化青绿）→ 近（晨光金） */
+    /* 底色：远处被地平线微光擦亮（冷青），近处沉入夜色（墨松绿） */
     const bg = g.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, '#9fbfb0');
-    bg.addColorStop(0.10, '#a9cc96');
-    bg.addColorStop(0.30, '#bad17c');
-    bg.addColorStop(0.55, '#d3ce74');
-    bg.addColorStop(0.80, '#e6bd6c');
-    bg.addColorStop(1, '#d0a35c');
+    bg.addColorStop(0, '#2a6b58');
+    bg.addColorStop(0.10, '#22604e');
+    bg.addColorStop(0.30, '#1a5040');
+    bg.addColorStop(0.55, '#14402f');
+    bg.addColorStop(0.80, '#0e3226');
+    bg.addColorStop(1, '#08201a');
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
 
     /* 厚涂笔触 */
@@ -287,9 +287,9 @@
       const y = 6 + p * (h - 6), x = r() * w;
       const len = (5 + r() * 17) * (0.45 + p * 1.55);
       const ang = -0.66 + r() * 1.32;
-      const hue = 94 - p * 48 + (r() - 0.5) * 26;
-      const sat = 24 + r() * 34;
-      const li = 30 + p * 21 + r() * 20;
+      const hue = 152 + (r() - 0.5) * 22;
+      const sat = 26 + r() * 32;
+      const li = 9 + (1 - p) * 14 + r() * 13;
       g.strokeStyle = hsl(hue, sat, li, 0.42 + r() * 0.34);
       g.lineWidth = 1 + r() * 2.7;
       g.beginPath();
@@ -297,7 +297,7 @@
       g.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len * 0.55);
       g.stroke();
       if (r() < 0.48) {
-        g.strokeStyle = hsl(hue + 7, sat * 0.7, li + 17, 0.28);
+        g.strokeStyle = hsl(hue + 7, sat * 0.7, li + 15, 0.28);
         g.lineWidth = 0.8 + r() * 1.4;
         g.beginPath();
         g.moveTo(x + 1.6, y - 1.3);
@@ -306,39 +306,32 @@
       }
     }
 
-    /* 色点花：远处的花海只是色点（油画花甸的关键） */
-    const dots = Math.round(w * h / 118);
+    /* 色点小花：远处的花海只是色点，夜色里像被星光照亮的碎光。
+       指数 1.25 把色点往远处压，近处留白，画面才不糊 */
+    const dots = Math.round(w * h / 205);
     for (let i = 0; i < dots; i++) {
-      const p = Math.pow(r(), 0.82);
+      const p = Math.pow(r(), 1.25);
       const y = 6 + p * (h - 6), x = r() * w;
-      const sz = (0.7 + r() * 1.5) * (0.5 + p * 2.7);
+      const sz = (0.7 + r() * 1.5) * (0.45 + p * 2.4);
       const hue = pick(r, [340, 352, 8, 42, 48, 300, 286, 202, 30]);
-      const sat = 20 + p * 54 + r() * 16;
-      const li = 62 + p * 15 + r() * 16;
-      g.fillStyle = hsl(hue, sat, li, 0.5 + p * 0.4);
+      const sat = 22 + p * 46 + r() * 16;
+      const li = 50 + p * 16 + r() * 16;
+      g.fillStyle = hsl(hue, sat, li, 0.40 + p * 0.40);
       g.beginPath(); g.ellipse(x, y, sz, sz * 0.74, r() * TAU, 0, TAU); g.fill();
     }
 
-    /* 空气透视：远处被晨雾吃掉 */
-    const fog = g.createLinearGradient(0, 0, 0, h * 0.32);
-    fog.addColorStop(0, 'rgba(228,238,246,.70)');
-    fog.addColorStop(0.45, 'rgba(220,234,244,.26)');
-    fog.addColorStop(1, 'rgba(220,234,244,0)');
-    g.fillStyle = fog; g.fillRect(0, 0, w, h * 0.32);
-
-    /* 晨光洒在近处草甸上 */
-    g.globalCompositeOperation = 'lighter';
-    const warm = g.createLinearGradient(0, h * 0.42, 0, h);
-    warm.addColorStop(0, 'rgba(255,214,150,0)');
-    warm.addColorStop(1, 'rgba(255,208,142,.15)');
-    g.fillStyle = warm; g.fillRect(0, h * 0.42, w, h * 0.58);
-    g.globalCompositeOperation = 'source-over';
+    /* 空气透视：远处融进地平线的青绿微光里 */
+    const fog = g.createLinearGradient(0, 0, 0, h * 0.34);
+    fog.addColorStop(0, 'rgba(126,240,196,.26)');
+    fog.addColorStop(0.45, 'rgba(110,225,180,.10)');
+    fog.addColorStop(1, 'rgba(110,225,180,0)');
+    g.fillStyle = fog; g.fillRect(0, 0, w, h * 0.34);
 
     /* 底部压暗，衔接页脚 */
-    const vg = g.createLinearGradient(0, h * 0.70, 0, h);
-    vg.addColorStop(0, 'rgba(48,34,26,0)');
-    vg.addColorStop(1, 'rgba(48,34,26,.36)');
-    g.fillStyle = vg; g.fillRect(0, h * 0.70, w, h * 0.30);
+    const vg = g.createLinearGradient(0, h * 0.62, 0, h);
+    vg.addColorStop(0, 'rgba(2,14,12,0)');
+    vg.addColorStop(1, 'rgba(2,14,12,.5)');
+    g.fillStyle = vg; g.fillRect(0, h * 0.62, w, h * 0.38);
 
     g.restore();
     return { cv: cv, w: w, h: h, top: top };
@@ -353,7 +346,6 @@
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, hor = 0, t = 0;
     let meadow = null, far = null, midA = null, midB = null;
-    let nearP = { blurList: [], sharpList: [], blurCount: 0 };
     let bokeh = [], motes = [], petals = [];
     let fig = null, figOk = false;
     const FIG = { cx: 0, feet: 0, ph: 0, fw: 0 };
@@ -374,13 +366,13 @@
 
     function build() {
       const seed = 20261005;
-      /* 人物：坐在草甸里画油画的背影（右侧，避开左上文案）
-         窄屏没有"左侧"可让，改为缩小并下移，让文字与人物在竖直方向错开 */
+      /* 人物：坐在花海中画油画的背影 —— 居中，落在标题正下方的草甸里。
+         头顶压在地平线上，文案(上收至 10u)与她在竖直方向错开。 */
       const narrow = W < 860;
-      FIG.ph = H * (narrow ? 0.36 : 0.46);
+      FIG.ph = H * (narrow ? 0.35 : 0.50);
       FIG.fw = FIG.ph * 1.243;                       // ham-painter.png 1268×1020
-      FIG.cx = W * (narrow ? 0.58 : 0.70);
-      FIG.feet = H * (narrow ? 0.86 : 0.83);
+      FIG.cx = W * 0.5;
+      FIG.feet = H * 0.945;
 
       meadow = buildMeadow(W, hor, H, seed);
 
@@ -392,55 +384,39 @@
         sizeMin: 3, sizeMax: 6.6, hMin: 0.35, hMax: 1,
         tone: 0.16, dark: 0.34, rim: true
       }, seed);
-      /* 中景两层 */
+      /* 中景两层：全部压成小花（用户要"只留下小花"，前景大株不再画） */
       midA = buildLayer({
-        W: W, baseScreenY: H * 0.68, maxH: H * 0.11, bottomPad: H * 0.04,
-        count: Math.max(130, Math.round(W * 0.40)),
-        mix: ['cosmos', 'daisy', 'spike', 'poppy', 'gyp', 'grass'],
-        sizeMin: 4.5, sizeMax: 10, hMin: 0.22, hMax: 0.62,
-        tone: 0.46, dark: 0.20, rim: true
+        W: W, baseScreenY: H * 0.66, maxH: H * 0.062, bottomPad: H * 0.03,
+        count: Math.max(150, Math.round(W * 0.46)),
+        mix: ['cosmos', 'daisy', 'spike', 'gyp', 'grass', 'grass'],
+        sizeMin: 3.4, sizeMax: 6.4, hMin: 0.24, hMax: 0.7,
+        tone: 0.40, dark: 0.28, rim: true
       }, seed + 11);
       midB = buildLayer({
-        W: W, baseScreenY: H * 0.82, maxH: H * 0.18, bottomPad: H * 0.05,
+        W: W, baseScreenY: H * 0.94, maxH: H * 0.085, bottomPad: H * 0.05,
         count: Math.max(110, Math.round(W * 0.30)),
-        mix: ['cosmos', 'cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
-        sizeMin: 8, sizeMax: 17, hMin: 0.26, hMax: 1,
-        tone: 0.76, dark: 0.06, rim: true
+        mix: ['cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
+        sizeMin: 5, sizeMax: 9, hMin: 0.26, hMax: 0.85,
+        tone: 0.70, dark: 0.10, rim: true
       }, seed + 23);
 
-      /* 最近层：逐株独立摆动。人物正前方的花压矮，别把她挡死 */
       const r = mk(seed + 37);
-      const blurList = [], sharpList = [];
-      const nNear = Math.max(22, Math.round(W * 0.055));
-      const half = FIG.fw * 0.30;
-      for (let i = 0; i < nNear; i++) {
-        const x = r() * W;
-        let hh = H * (0.15 + r() * 0.20);
-        if (Math.abs(x - FIG.cx) < half) hh *= 0.55;
-        const p = {
-          x: x, by: H * (0.99 + r() * 0.13), hh: hh,
-          kind: pick(r, ['cosmos', 'cosmos', 'daisy', 'poppy', 'rose', 'rose', 'gyp', 'grass']),
-          s: 12 + r() * 18, ph: r() * TAU, sp: 0.10 + r() * 0.16, rng: r
-        };
-        (r() < 0.32 ? blurList : sharpList).push(p);
-      }
-      nearP = { blurList: blurList, sharpList: sharpList, blurCount: blurList.length };
 
-      /* 焦外光斑（晨光金 / 花粉玫瑰） */
+      /* 焦外光斑（青绿 / 暖粉） */
       bokeh = [];
       for (let i = 0; i < 24; i++) {
         bokeh.push({
-          x: r() * W, y: H * (0.46 + r() * 0.42), rr: 5 + r() * 22,
-          a: 0.05 + r() * 0.10, ph: r() * TAU, warm: r() > 0.35
+          x: r() * W, y: H * (0.44 + r() * 0.44), rr: 5 + r() * 22,
+          a: 0.04 + r() * 0.10, ph: r() * TAU, warm: r() > 0.5
         });
       }
-      /* 上升的花粉 / 晨尘 */
+      /* 上升的花粉 / 微尘 */
       motes = [];
       for (let i = 0; i < 42; i++) {
         motes.push({
           x: r() * W, y: H * (0.34 + r() * 0.66), rr: 0.6 + r() * 1.7,
           vy: -(0.05 + r() * 0.20), vx: (r() - 0.5) * 0.16,
-          a: 0.16 + r() * 0.36, ph: r() * TAU
+          a: 0.14 + r() * 0.36, ph: r() * TAU
         });
       }
       /* 飘落花瓣 */
@@ -470,12 +446,12 @@
       ctx.beginPath(); ctx.ellipse(cx, feet + ph * 0.015, fw * 0.48, ph * 0.042, 0, 0, TAU); ctx.fill();
       ctx.restore();
 
-      /* 晨光包裹（暖金 + 玫瑰），弱化抠图边界 */
+      /* 星球清辉包裹（青绿 + 玫瑰），弱化抠图边界 */
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       const hg = ctx.createRadialGradient(cx, fy + ph * 0.42, 0, cx, fy + ph * 0.42, fw * 1.02);
-      hg.addColorStop(0, 'rgba(255,228,180,.20)');
-      hg.addColorStop(0.45, 'rgba(255,188,198,.08)');
-      hg.addColorStop(1, 'rgba(255,188,198,0)');
+      hg.addColorStop(0, 'rgba(160,250,220,.18)');
+      hg.addColorStop(0.45, 'rgba(246,184,200,.08)');
+      hg.addColorStop(1, 'rgba(246,184,200,0)');
       ctx.fillStyle = hg;
       ctx.beginPath(); ctx.ellipse(cx, fy + ph * 0.42, fw * 1.02, ph * 0.70, 0, 0, TAU); ctx.fill();
       ctx.restore();
@@ -510,35 +486,12 @@
 
       drawLayer(ctx, far, br * 0.6, br * 0.00015, 1);
       drawLayer(ctx, midA, s1 * 1.2, s1 * 0.00025, 0);
-      drawLayer(ctx, midB, s2 * 1.8, s2 * 0.00035, 1);
 
-      /* 背影：坐在花海中画油画 */
+      /* 背影：坐在花海中画油画（居中，标题正下方） */
       drawFigure();
 
-      /* 最近层：虚焦组降到 0.35 倍再放大（省算力），清晰组逐株绘制 */
-      if (nearP.blurCount) {
-        const bw = Math.max(1, (W * 0.35) | 0), bh = Math.max(1, (H * 0.35) | 0);
-        const c = tmp(bw, bh), c2 = c.getContext('2d');
-        c2.setTransform(1, 0, 0, 1, 0, 0);
-        c2.clearRect(0, 0, bw, bh);
-        c2.save(); c2.scale(0.35, 0.35);
-        for (const p of nearP.blurList) {
-          const sw = reduce ? 0 : Math.sin(t * p.sp + p.ph) * 0.008;
-          c2.save(); c2.translate(p.x, 0); c2.rotate(sw);
-          plant(c2, 0, p.by, p.hh, p.kind, p.s, p.rng, 1);
-          c2.restore();
-        }
-        c2.restore();
-        ctx.drawImage(c, 0, 0, bw, bh, 0, 0, W, H);
-      }
-      for (const p of nearP.sharpList) {
-        const sw = reduce ? 0 : Math.sin(t * p.sp * 0.55 + p.ph) * 0.008;
-        ctx.save();
-        ctx.translate(p.x + (reduce ? 0 : Math.sin(t * p.sp * 0.4 + p.ph) * 1.0), 0);
-        ctx.rotate(sw);
-        plant(ctx, 0, p.by, p.hh, p.kind, p.s, p.rng, 1);
-        ctx.restore();
-      }
+      /* 脚边那一圈小花压在她身前 —— "坐在花海里"的包裹感 */
+      drawLayer(ctx, midB, s2 * 1.8, s2 * 0.00035, 1);
 
       /* 焦外光斑 */
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
@@ -546,9 +499,9 @@
         const y = b.y + (reduce ? 0 : Math.sin(t * 0.34 + b.ph) * 4);
         const a = b.a * (0.62 + 0.38 * Math.sin(t * 0.55 + b.ph));
         const g = ctx.createRadialGradient(b.x, y, 0, b.x, y, b.rr);
-        g.addColorStop(0, b.warm ? 'rgba(255,232,188,' + a.toFixed(3) + ')' : 'rgba(255,214,224,' + a.toFixed(3) + ')');
-        g.addColorStop(0.7, b.warm ? 'rgba(255,214,158,' + (a * 0.4).toFixed(3) + ')' : 'rgba(255,192,214,' + (a * 0.4).toFixed(3) + ')');
-        g.addColorStop(1, 'rgba(255,206,190,0)');
+        g.addColorStop(0, b.warm ? 'rgba(255,226,186,' + a.toFixed(3) + ')' : 'rgba(255,214,232,' + a.toFixed(3) + ')');
+        g.addColorStop(0.7, b.warm ? 'rgba(255,206,150,' + (a * 0.4).toFixed(3) + ')' : 'rgba(255,190,220,' + (a * 0.4).toFixed(3) + ')');
+        g.addColorStop(1, 'rgba(255,200,220,0)');
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, y, b.rr, 0, TAU); ctx.fill();
       }
       ctx.restore();
@@ -558,18 +511,18 @@
         p.y += p.vy; p.x += p.vx + (reduce ? 0 : Math.sin(t * 0.6 + p.rot) * 0.24); p.rot += p.vr;
         if (p.y > H + 8) { p.y = H * 0.30; p.x = Math.random() * W; }
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-        ctx.fillStyle = hsl(p.h, 60, 86, 0.66);
+        ctx.fillStyle = hsl(p.h, 62, 84, 0.7);
         ctx.beginPath(); ctx.ellipse(0, 0, p.s, p.s * 0.55, 0, 0, TAU); ctx.fill();
         ctx.restore();
       }
 
-      /* 上升花粉 */
+      /* 上升花粉 / 微尘 */
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const m of motes) {
         m.y += m.vy; m.x += m.vx + (reduce ? 0 : Math.sin(t * 0.55 + m.ph) * 0.16);
         if (m.y < -10) { m.y = H * 0.98; m.x = Math.random() * W; }
-        ctx.globalAlpha = m.a * (0.58 + 0.42 * Math.sin(t * 1.0 + m.ph));
-        ctx.fillStyle = 'rgba(255,240,208,1)';
+        ctx.globalAlpha = m.a * (0.55 + 0.45 * Math.sin(t * 1.0 + m.ph));
+        ctx.fillStyle = 'rgba(255,238,206,1)';
         ctx.beginPath(); ctx.arc(m.x, m.y, m.rr, 0, TAU); ctx.fill();
       }
       ctx.restore();

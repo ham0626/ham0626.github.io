@@ -27,26 +27,28 @@ a{color:inherit}
 .nav a:hover{background:rgba(255,255,255,.14);opacity:1}
 .nav a.cur{background:rgba(63,174,126,.28);opacity:1}
 
-/* ===== HERO（晨曦油画草甸）===== */
+/* ===== HERO（夜色油画草甸）===== */
 .hero{position:relative;height:100vh;height:100dvh;min-height:620px;width:100%;overflow:hidden;
   display:flex;flex-direction:column;
-  /* 天幕兜底渐变：高空夜蓝 → 晨曦暖金（SVG 未加载时也不塌） */
+  /* 天幕兜底渐变：镜像对称，地平线(=中线)最亮（SVG 未加载时也不塌） */
   background:linear-gradient(180deg,
-    #6e9ac8 0%,#82a8ce 16%,#9dbcd6 30%,#c1d2d8 38%,#dfd8c8 44%,#efdfbe 49%,#f6e6c4 100%)}
+    #02060f 0%,#04101f 13%,#071f2e 27%,#0a3a3b 39%,#10513f 46%,#17704f 50%,
+    #10513f 54%,#0a3a3b 61%,#071f2e 73%,#04101f 87%,#02060f 100%)}
 .hero__sky{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block}
-/* 星场/流星：叠在天空之上，向下渐隐。白天调色：暖白星点 + 低不透明度 */
-.hero__space{position:absolute;inset:0;z-index:2;display:block;pointer-events:none;opacity:.62;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 26%,rgba(0,0,0,.30) 44%,transparent 60%);
-  mask-image:linear-gradient(180deg,#000 0%,#000 26%,rgba(0,0,0,.30) 44%,transparent 60%)}
+/* 星场/流星：叠在天空之上，向下渐隐（低空被山雾吃掉） */
+.hero__space{position:absolute;inset:0;z-index:2;display:block;pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.45) 58%,transparent 74%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.45) 58%,transparent 74%)}
 .hero__meadow{position:absolute;inset:0;z-index:3;display:block;pointer-events:none}
 .hero__scrim{position:absolute;inset:0;z-index:4;pointer-events:none;
   background:
-    radial-gradient(62% 42% at 50% 22%,rgba(24,38,66,.44) 0%,rgba(24,38,66,.18) 58%,rgba(24,38,66,0) 100%),
-    linear-gradient(180deg,rgba(20,34,60,.28) 0%,rgba(20,34,60,.07) 30%,rgba(20,34,60,0) 48%),
-    linear-gradient(180deg,rgba(60,44,28,0) 58%,rgba(60,44,28,.20) 82%,rgba(60,44,28,.38) 100%)}
+    radial-gradient(46% 34% at 50% 26%,rgba(2,6,14,.56) 0%,rgba(2,6,14,.26) 58%,rgba(2,6,14,0) 100%),
+    linear-gradient(180deg,rgba(2,6,14,.34) 0%,rgba(2,6,14,.06) 30%,rgba(2,6,14,0) 46%),
+    radial-gradient(122% 92% at 50% 54%,rgba(2,6,14,0) 44%,rgba(2,6,14,.34) 78%,rgba(2,6,14,.62) 100%)}
+/* 文案上收：给正下方的人物让出草甸 */
 .hero__inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:flex-start;text-align:center;
-  padding:calc(var(--u)*14) calc(var(--u)*3) 0}
+  padding:calc(var(--u)*10) calc(var(--u)*3) 0}
 .hero__quote{margin-bottom:calc(var(--u)*2)}
 .badge{display:inline-flex;align-items:center;gap:calc(var(--u)*1);
   padding:calc(var(--u)*1) calc(var(--u)*2);background:rgba(255,255,255,.12);
@@ -68,13 +70,11 @@ a{color:inherit}
   font-family:"Cormorant Garamond","Noto Serif SC",serif;
   font-size:13px;letter-spacing:.14em;color:var(--mint);opacity:.8}
 .hero__quote cite::before{content:"—— "}
-.hero__rule{width:46px;height:1px;margin:calc(var(--u)*3) auto 0;
-  background:linear-gradient(90deg,transparent,rgba(159,240,200,.7),transparent)}
 @media(max-height:700px){.badge{margin-bottom:calc(var(--u)*2.5)}.hero__title{margin-bottom:calc(var(--u)*2)}}
-/* 窄屏：文案与人物分开站位，避免标题压在人物身上 */
+/* 窄屏：文案上收 + 收窄，避免与正下方的人物打架 */
 @media(max-width:860px){
-  .hero__inner{padding:calc(var(--u)*17) calc(var(--u)*2.5) 0}
-  .hero__title{font-size:clamp(26px,7.4vw,38px)}
+  .hero__inner{padding:calc(var(--u)*12) calc(var(--u)*2.5) 0}
+  .hero__title{font-size:clamp(26px,7.2vw,38px)}
   .hero__quote p{font-size:clamp(13px,3.5vw,16px)}
 }
 
