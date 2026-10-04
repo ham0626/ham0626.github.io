@@ -7,8 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Noto+Serif+SC:ital,wght@0,500;1,500;1,600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/site.css" />
+<link rel="stylesheet" href="../assets/travel.css" />
 </head>
-<body>
+<body class="page-travel">
 <header class="subhero">
   <canvas class="subhero__space"></canvas>
   <nav class="nav" aria-label="主导航">
@@ -25,20 +26,80 @@
   <div class="wrap">
     <div class="crumb">Home / Travel</div>
     <h1 class="serif">足迹地图</h1>
-    <p>这一板块还在搭建中。</p>
+    <p>把走过的经纬度收成一枚枚图钉。拖动可以让地球转起来，点开图钉读当时的事。</p>
   </div>
 </header>
-<section class="block" style="background:linear-gradient(180deg,#0c1f1a,#081712)">
-  <div class="wrap">
-    <div class="empty">
-      <div class="emoji">🗺️</div>
-      <h3 class="serif">足迹地图待填充</h3>
-      <p>走过的城市、校园与研学营路线，会慢慢标在这张地图上。</p>
-      <span class="hint">路线采集中</span>
+
+<section class="block travel">
+  <div class="wrap travel__wrap">
+
+    <!-- ============ 地球仪 ============ -->
+    <div class="globe">
+      <div class="globe__frame">
+        <div id="globe" class="globe__stage" role="img"
+             aria-label="可交互的三维地球仪，标有你去过的国家；按 Tab 后用下方列表访问每个地点"></div>
+        <div class="globe__hud" aria-hidden="true">
+          <span class="globe__hint">拖动旋转 · 滚轮缩放 · 点击图钉</span>
+        </div>
+      </div>
+      <div class="globe__bar">
+        <button class="btn-ghost" type="button" onclick="window.__globeReset && window.__globeReset()">↺ 回到全球视角</button>
+        <span class="globe__stat"><b>11</b> 国 · <b>20</b> 座城市</span>
+      </div>
     </div>
+
+    <!-- ============ 侧栏：地点清单（键盘/读屏入口） ============ -->
+    <aside class="tlist" aria-label="地点清单">
+      <h2 class="tlist__h serif">去过的国家</h2>
+      <ul class="tlist__ul">
+        <li><button type="button" data-goto="fr"><span class="flagbox" data-flag="FR"></span><b>法国</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="be"><span class="flagbox" data-flag="BE"></span><b>比利时</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="ch"><span class="flagbox" data-flag="CH"></span><b>瑞士</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="it"><span class="flagbox" data-flag="IT"></span><b>意大利</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="de"><span class="flagbox" data-flag="DE"></span><b>德国</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="lu"><span class="flagbox" data-flag="LU"></span><b>卢森堡</b><i>2026.7</i></button></li>
+        <li><button type="button" data-goto="ae"><span class="flagbox" data-flag="AE"></span><b>阿联酋</b><i>2023.7</i></button></li>
+        <li><button type="button" data-goto="jp"><span class="flagbox" data-flag="JP"></span><b>日本</b><i>2017.8</i></button></li>
+        <li><button type="button" data-goto="my"><span class="flagbox" data-flag="MY"></span><b>马来西亚</b><i>2011–2017</i></button></li>
+        <li><button type="button" data-goto="th"><span class="flagbox" data-flag="TH"></span><b>泰国</b><i>2011–2017</i></button></li>
+        <li class="tlist__cn">
+          <button type="button" data-goto="cn"><span class="flagbox" data-flag="CN"></span><b>中国</b><i>常驻</i><em>点击放大 →</em></button>
+          <ul class="tlist__sub">
+            <li><button type="button" data-goto="cn" data-sub="1">成都</button></li>
+            <li><button type="button" data-goto="cn" data-sub="2">南京</button></li>
+            <li><button type="button" data-goto="cn" data-sub="3">北京</button></li>
+            <li><button type="button" data-goto="cn" data-sub="4">上海</button></li>
+            <li><button type="button" data-goto="cn" data-sub="5">苏州</button></li>
+            <li><button type="button" data-goto="cn" data-sub="6">广州</button></li>
+            <li><button type="button" data-goto="cn" data-sub="7">潮州</button></li>
+            <li><button type="button" data-goto="cn" data-sub="8">桂林</button></li>
+            <li><button type="button" data-goto="cn" data-sub="9">北海</button></li>
+            <li><button type="button" data-goto="cn" data-sub="10">普洱</button></li>
+          </ul>
+        </li>
+      </ul>
+      <p class="tlist__foot">键盘操作：<kbd>Tab</kbd> 选地点 · <kbd>Enter</kbd> 打开 · <kbd>Esc</kbd> 关闭</p>
+    </aside>
+
   </div>
 </section>
+
+<!-- ============ 地点卡片 ============ -->
+<div id="travelCard" class="tcard" role="dialog" aria-modal="false" aria-label="地点详情" aria-hidden="true"></div>
+
+<!-- ============ 图片灯箱 ============ -->
+<div id="travelLightbox" class="tlightbox" role="dialog" aria-modal="true" aria-label="照片查看" aria-hidden="true">
+  <button type="button" aria-label="关闭照片">×</button>
+  <img src="" alt="" />
+</div>
+
 <footer>© 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="./">回到首页 ↑</a></footer>
+
 <script src="../assets/space.js"></script>
+<script src="../assets/lib/three.min.js"></script>
+<script src="../assets/flags.js"></script>
+<script src="../assets/travel-data.js"></script>
+<script src="../assets/globe.js"></script>
+<script>if (window.fillFlags) window.fillFlags();</script>
 </body>
 </html>
