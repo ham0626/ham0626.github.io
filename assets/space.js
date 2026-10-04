@@ -6,7 +6,7 @@
    自动降级：prefers-reduced-motion 时静态渲染一帧。 */
 (function () {
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const canvases = Array.from(document.querySelectorAll('.hero__space, .subhero__space, .stage__space'));
+  const canvases = Array.from(document.querySelectorAll('.hero__space, .subhero__space'));
   if (!canvases.length) return;
 
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -21,8 +21,10 @@
   }, { passive: true });
 
   function init(canvas) {
-    // subhero__space 为普通星场；hero / stage 为 voyage（星场在湖面镜像倒影）
-    const voyage = !canvas.classList.contains('subhero__space');
+    // subhero__space 为普通星场；hero 为 voyage（星场在湖面镜像倒影）
+    // day = 晨曦白天场景：不画水面倒影（草甸没有水），星点偏暖
+    const voyage = !canvas.classList.contains('subhero__space') && !canvas.classList.contains('day');
+    const day = canvas.classList.contains('day');
     const ctx = canvas.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, mid = 0, stars = [], dust = [], shooting = null, t = 0;
@@ -39,11 +41,11 @@
     function build() {
       // 星场：三层景深；天空区（上半）更密
       stars = [];
-      const density = voyage ? 3600 : 5200;
+      const density = voyage ? 3600 : (day ? 4200 : 5200);
       const n = Math.min(760, Math.round((W * H) / density));
       for (let i = 0; i < n; i++) {
         const depth = Math.random();               // 0 远 → 1 近
-        const yMax = voyage ? H * 0.60 : H * 0.92;
+        const yMax = voyage ? H * 0.60 : (day ? H * 0.56 : H * 0.92);
         stars.push({
           x: Math.random() * W,
           y: Math.random() * yMax,
@@ -110,7 +112,7 @@
       // 星点（含湖面倒影）
       for (const s of stars) {
         s.x += s.vx; if (s.x > W + 2) s.x = -2; if (s.x < -2) s.x = W + 2;
-        const a = reduce ? s.base : s.base * (0.58 + 0.42 * Math.sin(t * s.tws + s.tw));
+        const a = (reduce ? s.base : s.base * (0.58 + 0.42 * Math.sin(t * s.tws + s.tw))) * (day ? 0.78 : 1);
         const x = px(s), y = py(s);
         drawStar(x, y, s.r, a, s.flare);
         if (voyage) {

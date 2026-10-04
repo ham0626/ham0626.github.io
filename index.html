@@ -8,260 +8,317 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Noto+Serif+SC:ital,wght@0,500;1,500;1,600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/site.css?v=13" />
+<link rel="stylesheet" href="assets/site.css?v=14" />
 </head>
 <body>
 
 <header class="hero" id="home">
-  <!-- 星场 / 尘埃 / 流星 / 鼠标视差（Canvas，位于 SVG 之下） -->
-  <canvas class="hero__space" id="space"></canvas>
-
-  <!-- 太空场景（内联 SVG）：镜像对称，地平线压中线
-       层次：星云/极光/轨道环 → 行星 → 地平线光晕 → 远丘/近丘 → 湖面倒影 → 岸边花丛 -->
-  <svg class="hero__ground scene-breathe" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <!-- ============ 天空：晨曦 · 白云 · 雪山 · 闪耀星球（SVG）============ -->
+  <svg class="hero__sky" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
-      <radialGradient id="nebPink" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#f6b8c8" stop-opacity=".38"/>
-        <stop offset="60%" stop-color="#c47f9c" stop-opacity=".13"/>
-        <stop offset="100%" stop-color="#c47f9c" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="nebTeal" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#4fd7a6" stop-opacity=".32"/>
-        <stop offset="62%" stop-color="#2b8f7e" stop-opacity=".11"/>
-        <stop offset="100%" stop-color="#2b8f7e" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="auroraGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#8ad8ff" stop-opacity="0"/>
-        <stop offset="48%" stop-color="#5fe3b0" stop-opacity=".55"/>
-        <stop offset="78%" stop-color="#3fae7e" stop-opacity=".28"/>
-        <stop offset="100%" stop-color="#2f7d5b" stop-opacity="0"/>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#79a2cc"/>
+        <stop offset="0.16" stop-color="#8fb2d4"/>
+        <stop offset="0.30" stop-color="#acc8dc"/>
+        <stop offset="0.38" stop-color="#cbd9dc"/>
+        <stop offset="0.44" stop-color="#e4dcca"/>
+        <stop offset="0.49" stop-color="#f2e2c2"/>
+        <stop offset="1"    stop-color="#f8e9c8"/>
       </linearGradient>
-      <radialGradient id="planetGrad" cx="33%" cy="27%" r="86%">
-        <stop offset="0%" stop-color="#7cecc0"/>
-        <stop offset="34%" stop-color="#37b98d"/>
-        <stop offset="68%" stop-color="#1a6e54"/>
-        <stop offset="100%" stop-color="#08251c"/>
+
+      <radialGradient id="dawnGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0"   stop-color="#ffeecb" stop-opacity=".88"/>
+        <stop offset="0.42" stop-color="#fbd0a8" stop-opacity=".38"/>
+        <stop offset="1"   stop-color="#fbd0a8" stop-opacity="0"/>
       </radialGradient>
-      <linearGradient id="termGrad" x1=".12" y1=".04" x2=".96" y2=".98">
-        <stop offset="0%" stop-color="#02060f" stop-opacity="0"/>
-        <stop offset="46%" stop-color="#02060f" stop-opacity=".14"/>
-        <stop offset="100%" stop-color="#02060f" stop-opacity=".92"/>
+
+      <!-- 云：厚涂油画云。顶部受晨光（暖奶油），底部背光（冷紫灰） -->
+      <linearGradient id="cloudG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff8ec"/>
+        <stop offset="0.26" stop-color="#ffeed6"/>
+        <stop offset="0.54" stop-color="#f2cfc0"/>
+        <stop offset="0.78" stop-color="#c3aec6"/>
+        <stop offset="1"    stop-color="#8a8fbe"/>
+      </linearGradient>
+      <linearGradient id="cloudG2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff2e2"/>
+        <stop offset="0.38" stop-color="#f7d6bf"/>
+        <stop offset="0.72" stop-color="#cdb4c4"/>
+        <stop offset="1"    stop-color="#9691bb"/>
+      </linearGradient>
+      <linearGradient id="cloudG3" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fffdf7"/>
+        <stop offset="0.45" stop-color="#fff0da"/>
+        <stop offset="1"    stop-color="#e6c8c0"/>
+      </linearGradient>
+      <radialGradient id="cloudRim" cx="74%" cy="22%" r="60%">
+        <stop offset="0"   stop-color="#fff3d8" stop-opacity=".95"/>
+        <stop offset="1"   stop-color="#fff3d8" stop-opacity="0"/>
+      </radialGradient>
+
+      <linearGradient id="mtRock" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"   stop-color="#bcc9de"/>
+        <stop offset="0.5" stop-color="#8399bc"/>
+        <stop offset="1"   stop-color="#58709a"/>
+      </linearGradient>
+      <linearGradient id="mtLit" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fff0cf" stop-opacity=".74"/>
+        <stop offset="0.45" stop-color="#ffd0ae" stop-opacity=".22"/>
+        <stop offset="1"    stop-color="#ffd0ae" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="mtSnow" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#fffdf8" stop-opacity=".98"/>
+        <stop offset="0.30" stop-color="#fff5e8" stop-opacity=".84"/>
+        <stop offset="0.60" stop-color="#eee6ee" stop-opacity=".26"/>
+        <stop offset="1"    stop-color="#eee6ee" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="mtFar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"   stop-color="#c2d2e6"/>
+        <stop offset="1"   stop-color="#a8bbd8"/>
+      </linearGradient>
+      <linearGradient id="footFog" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#f3f6f8" stop-opacity="0"/>
+        <stop offset="0.55" stop-color="#f3f6f8" stop-opacity=".6"/>
+        <stop offset="1"    stop-color="#f8f0dc" stop-opacity=".95"/>
+      </linearGradient>
+
+      <!-- 星球（Creative Matter）：暖金高光 → 玫瑰 → 青绿 → 夜蓝 -->
+      <radialGradient id="planetGrad" cx="31%" cy="25%" r="88%">
+        <stop offset="0"    stop-color="#ffeacb"/>
+        <stop offset="0.26" stop-color="#f7b6c6"/>
+        <stop offset="0.58" stop-color="#6fc9b4"/>
+        <stop offset="1"    stop-color="#1e3c5e"/>
+      </radialGradient>
+      <linearGradient id="termGrad" x1=".10" y1=".02" x2=".96" y2=".98">
+        <stop offset="0"    stop-color="#0b1a30" stop-opacity="0"/>
+        <stop offset="0.44" stop-color="#0b1a30" stop-opacity=".12"/>
+        <stop offset="1"    stop-color="#0b1a30" stop-opacity=".88"/>
       </linearGradient>
       <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#9ff0c8" stop-opacity="0"/>
-        <stop offset="22%" stop-color="#9ff0c8" stop-opacity=".85"/>
-        <stop offset="52%" stop-color="#f6b8c8" stop-opacity=".9"/>
-        <stop offset="80%" stop-color="#9ff0c8" stop-opacity=".8"/>
-        <stop offset="100%" stop-color="#9ff0c8" stop-opacity="0"/>
+        <stop offset="0"    stop-color="#ffe3b8" stop-opacity="0"/>
+        <stop offset="0.22" stop-color="#ffe3b8" stop-opacity=".9"/>
+        <stop offset="0.52" stop-color="#f6b8c8" stop-opacity=".95"/>
+        <stop offset="0.80" stop-color="#9ff0d8" stop-opacity=".85"/>
+        <stop offset="1"    stop-color="#9ff0d8" stop-opacity="0"/>
       </linearGradient>
-      <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#1d5f4a"/><stop offset="100%" stop-color="#0a2620"/>
+      <linearGradient id="swirlGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#ffd6e8" stop-opacity="0"/>
+        <stop offset="0.30" stop-color="#ffc4dc" stop-opacity=".9"/>
+        <stop offset="0.58" stop-color="#a0fad6" stop-opacity=".95"/>
+        <stop offset="1"   stop-color="#ffe9bd" stop-opacity="0"/>
       </linearGradient>
-      <linearGradient id="hillNear" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0d3a2b"/><stop offset="100%" stop-color="#04120d"/>
-      </linearGradient>
-      <radialGradient id="horizonGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#7ef0c4" stop-opacity=".48"/>
-        <stop offset="60%" stop-color="#3fae7e" stop-opacity=".15"/>
-        <stop offset="100%" stop-color="#3fae7e" stop-opacity="0"/>
+      <radialGradient id="planetHalo" cx="50%" cy="50%" r="50%">
+        <stop offset="0"    stop-color="#ffe6bd" stop-opacity=".55"/>
+        <stop offset="0.45" stop-color="#f6b8c8" stop-opacity=".20"/>
+        <stop offset="1"    stop-color="#f6b8c8" stop-opacity="0"/>
       </radialGradient>
-      <radialGradient id="cosmosGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ffd9a0" stop-opacity=".95"/>
-        <stop offset="52%" stop-color="#f6b8c8" stop-opacity=".34"/>
-        <stop offset="100%" stop-color="#f6b8c8" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="emberGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ff9a63" stop-opacity=".95"/>
-        <stop offset="42%" stop-color="#e0552e" stop-opacity=".5"/>
-        <stop offset="100%" stop-color="#e0552e" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="waterShade" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#020a0e" stop-opacity=".34"/>
-        <stop offset="55%" stop-color="#020a0e" stop-opacity=".56"/>
-        <stop offset="100%" stop-color="#020a0e" stop-opacity=".74"/>
-      </linearGradient>
-      <linearGradient id="lightColumn" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#bffbe0" stop-opacity=".2"/>
-        <stop offset="46%" stop-color="#7ef0c4" stop-opacity=".08"/>
-        <stop offset="100%" stop-color="#7ef0c4" stop-opacity="0"/>
-      </linearGradient>
-      <filter id="blurSm"><feGaussianBlur stdDeviation="2.4"/></filter>
+
       <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
       <filter id="blurMid"><feGaussianBlur stdDeviation="4.5"/></filter>
       <filter id="blurBig"><feGaussianBlur stdDeviation="15"/></filter>
-      <linearGradient id="swirlGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#ffd6e8" stop-opacity="0"/>
-        <stop offset="30%" stop-color="#ffc4dc" stop-opacity=".85"/>
-        <stop offset="58%" stop-color="#a0fad6" stop-opacity=".9"/>
-        <stop offset="100%" stop-color="#a0fad6" stop-opacity="0"/>
-      </linearGradient>
+      <filter id="blurSm"><feGaussianBlur stdDeviation="2.4"/></filter>
+
       <path id="sp4" d="M0,-11 Q1.5,-1.5 11,0 Q1.5,1.5 0,11 Q-1.5,1.5 -11,0 Q-1.5,-1.5 0,-11 Z"/>
-      <clipPath id="planetClip"><circle cx="768" cy="252" r="148"/></clipPath>
-      <clipPath id="ringFrontClip"><rect x="400" y="330" width="740" height="320"/></clipPath>
+
+      <!-- 积云 A：厚涂蓬松（宽 ~560，高 ~200，原点左上） -->
+      <g id="cloudA">
+        <path d="M14,196
+                 C-16,182 -20,146 6,130
+                 C-4,96 18,64 54,60
+                 C58,26 92,2 132,10
+                 C146,-18 190,-30 224,-10
+                 C248,-36 296,-34 318,-6
+                 C352,-26 396,-14 412,16
+                 C452,4 496,22 508,56
+                 C546,52 574,80 570,114
+                 C604,120 618,152 600,176
+                 C626,190 622,214 598,222
+                 L46,222
+                 C26,222 16,212 14,196 Z"/>
+        <!-- 团块结构线与受光高光（厚涂质感） -->
+        <path d="M6,130 C60,116 118,140 168,126 C226,110 274,132 330,122 C388,112 452,132 508,56"
+              fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="5" stroke-linecap="round"/>
+        <path d="M60,182 C132,158 214,178 288,158 C356,140 440,158 512,140"
+              fill="none" stroke="#c2aec6" stroke-opacity=".45" stroke-width="6" stroke-linecap="round"/>
+        <path d="M132,10 C168,34 214,42 262,32" fill="none" stroke="#ffffff" stroke-opacity=".55"
+              stroke-width="6" stroke-linecap="round"/>
+        <path d="M318,-6 C352,22 398,32 448,26" fill="none" stroke="#ffffff" stroke-opacity=".42"
+              stroke-width="6" stroke-linecap="round"/>
+        <ellipse cx="330" cy="66" rx="150" ry="34" fill="#fff3d8" opacity=".45"/>
+      </g>
+      <!-- 积云 B：小朵（宽 ~290，高 ~120） -->
+      <g id="cloudB">
+        <path d="M8,104 C-12,92 -12,68 8,58 C4,34 24,14 50,18 C58,-2 88,-10 110,4
+                 C128,-10 158,-4 170,14 C196,8 220,24 222,46 C246,50 258,70 248,88
+                 L36,120 C24,120 14,114 8,104 Z"/>
+        <path d="M8,58 C48,44 92,58 132,48 C168,40 200,50 222,46" fill="none"
+              stroke="#ffffff" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="140" cy="46" rx="80" ry="20" fill="#fff6e4" opacity=".5"/>
+      </g>
+
+      <clipPath id="mtClip">
+        <path d="M120,512 L300,398 L408,318 L470,352 L560,268 L636,336 L724,318 L806,392 L960,470 L1120,512 Z"/>
+      </clipPath>
+      <clipPath id="planetClip"><circle cx="1188" cy="228" r="116"/></clipPath>
+      <clipPath id="ringFrontClip"><rect x="900" y="300" width="600" height="300"/></clipPath>
     </defs>
 
-    <!-- ========== 天空（上半）========== -->
-    <!-- 星云 -->
-    <ellipse cx="358" cy="176" rx="452" ry="200" fill="url(#nebPink)"/>
-    <ellipse cx="1188" cy="126" rx="410" ry="184" fill="url(#nebTeal)"/>
-    <ellipse cx="742" cy="332" rx="580" ry="152" fill="url(#nebTeal)" opacity=".8"/>
+    <!-- 天幕 -->
+    <rect x="0" y="0" width="1536" height="1024" fill="url(#skyGrad)"/>
 
-    <!-- 极光 -->
-    <path class="aurora" d="M-60,250 C200,206 420,286 680,246 C930,208 1150,282 1600,236 L1600,352 C1150,398 930,324 680,362 C420,400 200,320 -60,364 Z"
-          fill="url(#auroraGrad)" filter="url(#soft)"/>
-    <path class="aurora aurora--2" d="M-60,356 C220,320 430,392 700,356 C950,324 1160,390 1600,348 L1600,432 C1160,474 950,408 700,440 C430,472 220,400 -60,436 Z"
-          fill="url(#auroraGrad)" opacity=".55" filter="url(#soft)"/>
+    <!-- 晨曦地平线辉光 -->
+    <ellipse cx="768" cy="512" rx="920" ry="176" fill="url(#dawnGlow)"/>
 
-    <!-- 轨道环 -->
-    <g transform="translate(768,252)">
-      <ellipse class="orbit-ring" rx="334" ry="100" fill="none" stroke="#9ff0c8" stroke-width="1.1"
-               opacity=".26" stroke-dasharray="6 11"/>
-      <ellipse class="orbit-ring" rx="452" ry="138" fill="none" stroke="#f6b8c8" stroke-width="1.1"
-               opacity=".17" stroke-dasharray="5 16"/>
+    <!-- ============ 云（缓慢横漂）============
+         云底一律落在 ~y=430 以下，别把雪山（y268~512）盖住 -->
+    <g class="cloud cloud--a" opacity=".95">
+      <g transform="translate(30,50) scale(1.18,0.72)">
+        <use href="#cloudA" fill="url(#cloudG)"/>
+      </g>
+    </g>
+    <g class="cloud cloud--b" opacity=".8">
+      <g transform="translate(1108,166) scale(0.76,0.5) rotate(-3)">
+        <use href="#cloudA" fill="url(#cloudG2)"/>
+      </g>
+    </g>
+    <g class="cloud cloud--c" opacity=".66">
+      <g transform="translate(-150,318) scale(0.9,0.45)">
+        <use href="#cloudB" fill="url(#cloudG3)"/>
+      </g>
+    </g>
+    <g class="cloud cloud--d" opacity=".56">
+      <g transform="translate(1338,306) scale(0.7,0.4)">
+        <use href="#cloudB" fill="url(#cloudG2)"/>
+      </g>
+    </g>
+    <g class="cloud cloud--e" opacity=".42">
+      <g transform="translate(556,352) scale(0.5,0.32)">
+        <use href="#cloudB" fill="url(#cloudG3)"/>
+      </g>
+    </g>
+    <!-- 山腰低云（横向雾带） -->
+    <g opacity=".72" filter="url(#soft)">
+      <ellipse cx="300" cy="452" rx="360" ry="30" fill="#f6e2d4" opacity=".58"/>
+      <ellipse cx="1010" cy="440" rx="400" ry="26" fill="#f4e6dc" opacity=".52"/>
+      <ellipse cx="1440" cy="462" rx="300" ry="24" fill="#f8e6d6" opacity=".48"/>
     </g>
 
-    <!-- 行星：后环 → 脉冲光环 → 大气辉光 → 本体 → 陆块 → 明暗界线 → 镜面高光
-              → 边缘扫光 → 流光丝带 → 星芒 → 前环 -->
-    <g class="planet">
-      <ellipse cx="768" cy="252" rx="252" ry="60" fill="none" stroke="url(#ringGrad)" stroke-width="9"
-               opacity=".42" transform="rotate(-13 768 252)"/>
+    <!-- ============ 远山（雾化冷蓝）============ -->
+    <path d="M-40,512 L-40,470 C120,442 250,458 372,474 C486,489 566,452 706,446 C846,440 956,472 1086,464 C1216,456 1370,444 1580,458 L1580,512 Z"
+          fill="url(#mtFar)" opacity=".62" filter="url(#blurSm)"/>
 
-      <!-- 脉冲光环：向外一圈圈扩散 -->
+    <!-- ============ 主雪山 ============ -->
+    <path d="M120,512 L300,398 L408,318 L470,352 L560,268 L636,336 L724,318 L806,392 L960,470 L1120,512 Z"
+          fill="url(#mtRock)"/>
+    <g clip-path="url(#mtClip)">
+      <!-- 右侧受晨光 -->
+      <path d="M120,512 L300,398 L408,318 L470,352 L560,268 L636,336 L724,318 L806,392 L960,470 L1120,512 Z"
+            fill="url(#mtLit)"/>
+      <!-- 雪冠：自上而下自然消融 -->
+      <rect x="100" y="240" width="1040" height="290" fill="url(#mtSnow)"/>
+      <!-- 岩脊与雪沟 -->
+      <g stroke="#54688c" stroke-width="2.4" opacity=".34" fill="none" stroke-linecap="round">
+        <path d="M560,276 L536,352 L566,404 L540,470"/>
+        <path d="M724,326 L742,388 L716,448 L744,500"/>
+        <path d="M408,326 L392,382 L416,432"/>
+      </g>
+      <g stroke="#fffaf2" stroke-width="2.2" opacity=".5" fill="none" stroke-linecap="round">
+        <path d="M560,272 L548,318"/>
+        <path d="M636,340 L622,376"/>
+        <path d="M470,356 L458,392"/>
+      </g>
+    </g>
+    <!-- 山脊受光线 -->
+    <path d="M120,512 L300,398 L408,318 L470,352 L560,268 L636,336 L724,318 L806,392 L960,470 L1120,512"
+          fill="none" stroke="#fff4e2" stroke-width="1.8" opacity=".46"/>
+
+    <!-- 山脚雾：把山根吃掉，草甸从此处接上 -->
+    <rect x="0" y="440" width="1536" height="86" fill="url(#footFog)"/>
+
+    <!-- ============ 闪耀星球（Creative Matter）============ -->
+    <g class="planet">
+      <!-- 后环 -->
+      <ellipse cx="1188" cy="228" rx="200" ry="48" fill="none" stroke="url(#ringGrad)" stroke-width="8"
+               opacity=".46" transform="rotate(-13 1188 228)"/>
+
+      <!-- 脉冲光环 -->
       <g class="planet-ping">
-        <circle class="ping" cx="768" cy="252" r="152" fill="none" stroke="#bffbe0" stroke-width="1.3"/>
-        <circle class="ping ping--2" cx="768" cy="252" r="152" fill="none" stroke="#f6b8c8" stroke-width="1.1"/>
-        <circle class="ping ping--3" cx="768" cy="252" r="152" fill="none" stroke="#bffbe0" stroke-width=".9"/>
+        <circle class="ping" cx="1188" cy="228" r="120" fill="none" stroke="#ffeecb" stroke-width="1.3"/>
+        <circle class="ping ping--2" cx="1188" cy="228" r="120" fill="none" stroke="#f6b8c8" stroke-width="1.1"/>
+        <circle class="ping ping--3" cx="1188" cy="228" r="120" fill="none" stroke="#9ff0d8" stroke-width=".9"/>
       </g>
 
       <!-- 大气辉光（双层，反相呼吸） -->
-      <circle class="planet-glow" cx="768" cy="252" r="176" fill="none" stroke="#7ef0c4"
-              stroke-width="16" opacity=".5" filter="url(#blurBig)"/>
-      <circle class="planet-glow planet-glow--2" cx="768" cy="252" r="196" fill="none" stroke="#f6b8c8"
-              stroke-width="22" opacity=".3" filter="url(#blurBig)"/>
+      <circle cx="1188" cy="228" r="150" fill="url(#planetHalo)" opacity=".9"/>
+      <circle class="planet-glow" cx="1188" cy="228" r="140" fill="none" stroke="#ffe3b8"
+              stroke-width="15" opacity=".55" filter="url(#blurBig)"/>
+      <circle class="planet-glow planet-glow--2" cx="1188" cy="228" r="158" fill="none" stroke="#f6b8c8"
+              stroke-width="21" opacity=".3" filter="url(#blurBig)"/>
 
-      <circle cx="768" cy="252" r="148" fill="url(#planetGrad)"/>
+      <!-- 本体 -->
+      <circle cx="1188" cy="228" r="116" fill="url(#planetGrad)"/>
       <g clip-path="url(#planetClip)">
-        <ellipse cx="692" cy="268" rx="88" ry="36" fill="#2fae86" opacity=".45"/>
-        <ellipse cx="822" cy="362" rx="72" ry="30" fill="#0f5240" opacity=".55"/>
-        <ellipse cx="792" cy="228" rx="54" ry="22" fill="#4fd7a6" opacity=".3"/>
+        <ellipse cx="1120" cy="242" rx="70" ry="28" fill="#f9d9a8" opacity=".38"/>
+        <ellipse cx="1242" cy="318" rx="58" ry="24" fill="#1c4460" opacity=".5"/>
+        <ellipse cx="1206" cy="196" rx="42" ry="17" fill="#8fe0c8" opacity=".28"/>
       </g>
-      <circle cx="768" cy="252" r="148" fill="url(#termGrad)"/>
+      <circle cx="1188" cy="228" r="116" fill="url(#termGrad)"/>
 
-      <!-- 镜面高光：星球受光面的一点亮斑 -->
-      <ellipse class="spec" cx="700" cy="248" rx="48" ry="27" fill="#ffffff" opacity=".18"
-               filter="url(#blurMid)" transform="rotate(-26 700 248)"/>
-      <circle cx="768" cy="252" r="148" fill="none" stroke="#a9f5d2" stroke-width="1.6" opacity=".5"/>
+      <!-- 镜面高光 -->
+      <ellipse class="spec" cx="1128" cy="176" rx="38" ry="21" fill="#ffffff" opacity=".26"
+               filter="url(#blurMid)" transform="rotate(-26 1128 176)"/>
+      <circle cx="1188" cy="228" r="116" fill="none" stroke="#ffe7c4" stroke-width="1.6" opacity=".6"/>
 
-      <!-- 边缘扫光：沿星球轮廓巡游的一小段亮弧 -->
-      <circle class="rim-sweep" cx="768" cy="252" r="146" fill="none" stroke="#ffffff"
-              stroke-width="3.2" stroke-linecap="round" stroke-dasharray="46 872" opacity=".75"/>
+      <!-- 边缘扫光 -->
+      <circle class="rim-sweep" cx="1188" cy="228" r="114" fill="none" stroke="#fffaf0"
+              stroke-width="3.2" stroke-linecap="round" stroke-dasharray="38 678" opacity=".8"/>
 
-      <!-- 流光丝带（Creative Matter）：环绕星球的丝质流光 -->
+      <!-- 流光丝带 -->
       <g class="matter" filter="url(#blurMid)">
-        <path class="matter__ribbon" d="M556,224 C604,140 706,108 768,130 C862,158 950,196 994,252"
-              fill="none" stroke="url(#swirlGrad)" stroke-width="7" stroke-linecap="round" opacity=".5"/>
-        <path class="matter__ribbon matter__ribbon--2" d="M556,286 C622,366 722,392 790,366 C882,332 962,302 1002,252"
-              fill="none" stroke="url(#swirlGrad)" stroke-width="6" stroke-linecap="round" opacity=".42"/>
-        <path class="matter__ribbon matter__ribbon--3" d="M636,116 C718,80 842,82 918,130"
-              fill="none" stroke="url(#swirlGrad)" stroke-width="4.5" stroke-linecap="round" opacity=".34"/>
+        <path class="matter__ribbon" d="M1016,204 C1058,138 1146,112 1198,130 C1274,154 1346,186 1382,228"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="7" stroke-linecap="round" opacity=".55"/>
+        <path class="matter__ribbon matter__ribbon--2" d="M1016,256 C1070,320 1152,342 1208,320 C1284,292 1352,266 1388,228"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="6" stroke-linecap="round" opacity=".45"/>
+        <path class="matter__ribbon matter__ribbon--3" d="M1080,140 C1150,110 1256,112 1320,152"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="4.5" stroke-linecap="round" opacity=".36"/>
       </g>
 
-      <!-- 星芒：贴着星球边缘闪烁 -->
-      <g class="sparks" fill="#ffffff">
-        <g transform="translate(642,240)"><g class="sp sp--1"><use href="#sp4"/></g></g>
-        <g transform="translate(896,246)"><g class="sp sp--2" ><use href="#sp4"/></g></g>
-        <g transform="translate(912,382)"><g class="sp sp--3"><use href="#sp4"/></g></g>
-        <g transform="translate(668,404)"><g class="sp sp--4"><use href="#sp4"/></g></g>
-        <g transform="translate(770,164)"><g class="sp sp--5"><use href="#sp4"/></g></g>
-        <g transform="translate(1014,296)"><g class="sp sp--6"><use href="#sp4"/></g></g>
+      <!-- 星芒 -->
+      <g class="sparks" fill="#fffdf6">
+        <g transform="translate(1078,214)"><g class="sp sp--1"><use href="#sp4"/></g></g>
+        <g transform="translate(1296,222)"><g class="sp sp--2"><use href="#sp4"/></g></g>
+        <g transform="translate(1310,338)"><g class="sp sp--3"><use href="#sp4"/></g></g>
+        <g transform="translate(1096,356)"><g class="sp sp--4"><use href="#sp4"/></g></g>
+        <g transform="translate(1190,102)"><g class="sp sp--5"><use href="#sp4"/></g></g>
+        <g transform="translate(1400,268)"><g class="sp sp--6"><use href="#sp4"/></g></g>
       </g>
 
+      <!-- 前环（正确的遮挡关系） -->
       <g clip-path="url(#ringFrontClip)">
-        <ellipse cx="768" cy="252" rx="252" ry="60" fill="none" stroke="url(#ringGrad)" stroke-width="9"
-                 opacity=".72" transform="rotate(-13 768 252)"/>
+        <ellipse cx="1188" cy="228" rx="200" ry="48" fill="none" stroke="url(#ringGrad)" stroke-width="8"
+                 opacity=".78" transform="rotate(-13 1188 228)"/>
       </g>
-    </g>
-
-    <!-- 盆栽火星（余烬） -->
-    <g class="ember" transform="translate(1268,170)">
-      <circle r="48" fill="url(#emberGlow)"/>
-      <circle r="7" fill="#ffb38a"/>
-      <rect x="-5" y="7" width="10" height="10" rx="2" fill="#6b4a32" opacity=".8"/>
-    </g>
-
-    <!-- ========== 湖面倒影（静态镜像，不参与动画，保持滤镜缓存）========== -->
-    <g transform="scale(1,-1) translate(0,-1024)" opacity=".5" filter="url(#blurSm)">
-      <ellipse cx="358" cy="176" rx="452" ry="200" fill="url(#nebPink)"/>
-      <ellipse cx="1188" cy="126" rx="410" ry="184" fill="url(#nebTeal)"/>
-      <ellipse cx="742" cy="332" rx="580" ry="152" fill="url(#nebTeal)" opacity=".7"/>
-      <path d="M-60,250 C200,206 420,286 680,246 C930,208 1150,282 1600,236 L1600,352 C1150,398 930,324 680,362 C420,400 200,320 -60,364 Z"
-            fill="url(#auroraGrad)" opacity=".5"/>
-      <g transform="translate(768,252)">
-        <ellipse rx="334" ry="100" fill="none" stroke="#9ff0c8" stroke-width="1" opacity=".18" stroke-dasharray="6 11"/>
-      </g>
-      <circle cx="768" cy="252" r="148" fill="url(#planetGrad)" opacity=".72"/>
-      <circle cx="768" cy="252" r="148" fill="url(#termGrad)" opacity=".7"/>
-      <circle cx="768" cy="252" r="148" fill="none" stroke="#a9f5d2" stroke-width="1.4" opacity=".35"/>
-      <g class="ember" transform="translate(1268,170)" opacity=".5">
-        <circle r="48" fill="url(#emberGlow)"/>
-      </g>
-    </g>
-
-    <!-- 湖水整体压暗：让倒影比天空更暗，一眼读成"水" -->
-    <rect x="0" y="512" width="1536" height="512" fill="url(#waterShade)"/>
-
-    <!-- ========== 地平线 ========== -->
-    <ellipse class="horizon-glow" cx="768" cy="512" rx="880" ry="118" fill="url(#horizonGlow)"/>
-    <rect x="0" y="510.6" width="1536" height="2.2" fill="#c8f7e2" opacity=".38"/>
-
-    <!-- ========== 丘陵剪影（贴近地平线）========== -->
-    <path d="M0,512 L0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442 L1536,512 Z"
-          fill="url(#hillFar)" opacity=".82"/>
-    <g transform="scale(1,-1) translate(0,-1024)" opacity=".28" filter="url(#blurSm)">
-      <path d="M0,512 L0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442 L1536,512 Z"
-            fill="url(#hillFar)"/>
-    </g>
-    <path d="M0,512 L0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482 L1536,512 Z"
-          fill="url(#hillNear)"/>
-    <g transform="scale(1,-1) translate(0,-1024)" opacity=".24" filter="url(#blurSm)">
-      <path d="M0,512 L0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482 L1536,512 Z"
-            fill="url(#hillNear)"/>
-    </g>
-
-    <!-- 山脊受光边（让地平线剪影可读） -->
-    <path d="M0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442"
-          fill="none" stroke="#7ef0c4" stroke-width="1.6" opacity=".4"/>
-    <path d="M0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482"
-          fill="none" stroke="#a9f5d2" stroke-width="1.3" opacity=".26"/>
-
-    <!-- 行星在水面的光路 -->
-    <rect x="694" y="512" width="148" height="330" fill="url(#lightColumn)" filter="url(#blurSm)"/>
-
-    <!-- 湖面微光 -->
-    <g class="water-lines" stroke="#9ff0c8" stroke-width="1.2" stroke-linecap="round" opacity=".22">
-      <line x1="360" y1="540" x2="556" y2="540"/>
-      <line x1="946" y1="552" x2="1178" y2="552"/>
-      <line x1="556" y1="572" x2="702" y2="572"/>
-      <line x1="892" y1="526" x2="1006" y2="526"/>
-      <line x1="640" y1="600" x2="900" y2="600"/>
     </g>
   </svg>
 
-  <!-- 花海 / 涟漪 / 倒影层（Canvas）：地平线之下为花海，之上为远岸花带 -->
-  <canvas class="hero__flora" aria-hidden="true"></canvas>
+  <!-- 星场 / 尘埃 / 流星 / 鼠标视差（Canvas）：叠在天空之上，向下渐隐 -->
+  <canvas class="hero__space day" id="space"></canvas>
+
+  <!-- 油画草甸：笔触 + 花海 + 坐在花海中画油画的背影（Canvas） -->
+  <canvas class="hero__meadow" aria-hidden="true"></canvas>
 
   <div class="hero__scrim"></div>
 
   <nav class="nav" aria-label="主导航">
-    <a href="./" class="cur">首页</a>
-    <a href="about/">关于我</a>
-    <a href="bookfilm/">书影记录</a>
-    <a href="blog/">成长日志</a>
-    <a href="travel/">足迹地图</a>
-    <a href="academic/">学术之路</a>
-    <a href="portfolio/">项目作品</a>
-    <a href="vision/">理想与规划</a>
-    <a href="links/">友链</a>
+    <a href="index.html" class="cur">首页</a>
+    <a href="about.html">关于我</a>
+    <a href="bookfilm.html">书影记录</a>
+    <a href="blog.html">成长日志</a>
+    <a href="travel.html">足迹地图</a>
+    <a href="academic.html">学术之路</a>
+    <a href="portfolio.html">项目作品</a>
+    <a href="vision.html">理想与规划</a>
+    <a href="links.html">友链</a>
   </nav>
 
   <div class="hero__inner">
@@ -275,25 +332,11 @@
   </div>
 </header>
 
-<!-- ================= 形象舞台：花海 · 湖面 · 倒影 ================= -->
-<section class="stage" id="portrait">
-  <canvas class="stage__space" aria-hidden="true"></canvas>
-  <canvas class="stage__scene" aria-hidden="true"></canvas>
-  <div class="stage__scrim"></div>
-  <div class="stage__inner">
-    <div class="stage__cap">
-      <span class="eyebrow">Portrait · 2026</span>
-      <h2 class="serif">黄安萌 <i>Ham</i></h2>
-      <p>东南大学 BME → CS · 在旷野与代码之间，种一株温柔的野性</p>
-    </div>
-  </div>
-</section>
-
 <footer>
-  © 2026 黄安萌 · Ham &nbsp;·&nbsp; 在旷野与代码之间生长 &nbsp;·&nbsp; <a href="./">回到顶部 ↑</a>
+  © 2026 黄安萌 · Ham &nbsp;·&nbsp; 在旷野与代码之间生长 &nbsp;·&nbsp; <a href="index.html">回到顶部 ↑</a>
 </footer>
 
-<script src="assets/space.js?v=13"></script>
-<script src="assets/garden.js?v=13"></script>
+<script src="assets/space.js?v=14"></script>
+<script src="assets/garden.js?v=14"></script>
 </body>
 </html>
