@@ -42,10 +42,14 @@
   var GEO = window.WORLDGEO || { land: [], ctry: {} };
 
   /* 已到访国家配色（夜色友好的低饱和调），按 ISO 3166-1 alpha-2 索引 */
+  /* 色相体系照着 FILL 的上色（见 buildTexture），只把明度和饱和抬一档 ——
+     否则测出来三个国家凑到同一个色上去，谁是谁就分不出来了：
+       FR 蓝 212° / BE 紫 288° / LU 215°（淡化版）/ CH 偏红 4° / IT 绿 155°
+       DE 紫 260° / JP 玫红 337° / MY 黄绿 96° / TH 橙 32° / AE 金 41° / CN 橘红 15° */
   var FILL_VISITED = {
-    FR: '#6b93c4', BE: '#ab79a6', LU: '#8d9cb4', CH: '#c96b62',
-    IT: '#6fae8b', DE: '#9a89bb', JP: '#c67b95', MY: '#9ab873',
-    TH: '#cfa963', AE: '#bfa05f', CN: '#d97b5e'
+    FR: '#7aa9d8', BE: '#b478ad', LU: '#a8bdd0', CH: '#d97a6c',
+    IT: '#7cc9a2', DE: '#a795d1', JP: '#dc85a2', MY: '#aecb78',
+    TH: '#dcb46b', AE: '#d4b060', CN: '#e07b52'
   };
 
   /* ============================================================ 程序化世界贴图 */
