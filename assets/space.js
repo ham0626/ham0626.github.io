@@ -6,7 +6,7 @@
    自动降级：prefers-reduced-motion 时静态渲染一帧。 */
 (function () {
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const canvases = Array.from(document.querySelectorAll('.hero__space, .subhero__space'));
+  const canvases = Array.from(document.querySelectorAll('.hero__space, .subhero__space, .stage__space'));
   if (!canvases.length) return;
 
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -21,8 +21,8 @@
   }, { passive: true });
 
   function init(canvas) {
-    // voyage = 星场在水面做镜像倒影（需显式加 .reflect；草甸版首页没有水，不启用）
-    const voyage = canvas.classList.contains('reflect');
+    // subhero__space 为普通星场；hero / stage 为 voyage（星场在湖面镜像倒影）
+    const voyage = !canvas.classList.contains('subhero__space');
     const ctx = canvas.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, mid = 0, stars = [], dust = [], shooting = null, t = 0;
@@ -39,11 +39,11 @@
     function build() {
       // 星场：三层景深；天空区（上半）更密
       stars = [];
-      const density = 4600;
+      const density = voyage ? 3600 : 5200;
       const n = Math.min(760, Math.round((W * H) / density));
       for (let i = 0; i < n; i++) {
         const depth = Math.random();               // 0 远 → 1 近
-        const yMax = voyage ? H * 0.60 : H * 0.80;
+        const yMax = voyage ? H * 0.60 : H * 0.92;
         stars.push({
           x: Math.random() * W,
           y: Math.random() * yMax,
@@ -110,7 +110,7 @@
       // 星点（含湖面倒影）
       for (const s of stars) {
         s.x += s.vx; if (s.x > W + 2) s.x = -2; if (s.x < -2) s.x = W + 2;
-        const a = (reduce ? s.base : s.base * (0.58 + 0.42 * Math.sin(t * s.tws + s.tw))) ;
+        const a = reduce ? s.base : s.base * (0.58 + 0.42 * Math.sin(t * s.tws + s.tw));
         const x = px(s), y = py(s);
         drawStar(x, y, s.r, a, s.flare);
         if (voyage) {

@@ -1,7 +1,9 @@
-/* garden.js —— 油画草甸引擎（纯 Canvas 2D，零依赖、零贴图）
-   装配（按 class 自动识别）：
-     .hero__meadow  首页：夜色油画草甸（厚涂笔触 + 色点小花） + 两层小花 + 坐在花海中画油画的背影
-   天空（云 / 雪山 / 闪耀星球）由 index.html 的 SVG 负责，本引擎只画地平线以下。
+/* garden.js —— 花园引擎（纯 Canvas 2D，零依赖、零贴图）
+   装配：.hero__flora / .hero__meadow  首页
+     · 远岸花海 + 湖面倒影与涟漪 + 中景小花
+     · 居中坐在花海里画油画的背影（正对上方那颗大星球，脚下被花海盖住）
+     · 飘落花瓣 / 上升花粉 / 焦外光斑
+   天空（星云 / 极光 / 轨道环 / 大星球 / 丘陵 / 湖面倒影）由 index.html 的 SVG 负责。
    降级：prefers-reduced-motion → 只渲染一帧静态画面 */
 (function () {
   'use strict';
@@ -39,7 +41,7 @@
     ctx.bezierCurveTo(W * 0.92 + tipX * 0.4, -L * 0.78, W, -L * 0.34, 0, 0);
     ctx.closePath();
   }
-  /* 花头：tone 0 远 → 1 近；夜色调色板（受星光照亮的冷粉 / 奶白 / 淡金 / 淡紫） */
+  /* 花头：tone 0 远 → 1 近（空气透视：越远越暗越灰） */
   function head(ctx, kind, s, r, tone) {
     const L1 = (0.42 + tone * 0.20) * 100, L2 = (0.62 + tone * 0.16) * 100, L3 = (0.86 + tone * 0.08) * 100;
     const S1 = (0.45 + tone * 0.30) * 100, S2 = (0.60 + tone * 0.28) * 100, S3 = (0.74 + tone * 0.22) * 100;
@@ -49,7 +51,7 @@
         ctx.save(); ctx.rotate(i * TAU / n + (r() - 0.5) * 0.2);
         const l = s * (0.85 + r() * 0.3), w = s * 0.105;
         const g = ctx.createLinearGradient(0, 0, 0, -l);
-        g.addColorStop(0, hsl(h, 22, L1 * 0.94)); g.addColorStop(1, hsl(h, 16, Math.min(98, L3)));
+        g.addColorStop(0, hsl(h, 20, L1 * 0.92)); g.addColorStop(1, hsl(h, 12, Math.min(97, L3 + 3)));
         ctx.fillStyle = g; petalPath(ctx, l, w, (r() - 0.5) * l * 0.16); ctx.fill();
         ctx.restore();
       }
@@ -63,13 +65,13 @@
       return;
     }
     if (kind === 'poppy') {
-      const h = pick(r, [6, 352, 24, 340]), n = 4 + ((r() * 2) | 0);
+      const h = pick(r, [6, 350, 24, 340]), n = 4 + ((r() * 2) | 0);
       for (let i = 0; i < n; i++) {
         ctx.save(); ctx.rotate(i * TAU / n + (r() - 0.5) * 0.3);
         const l = s * (0.9 + r() * 0.25), w = s * 0.62;
         const g = ctx.createLinearGradient(0, 0, 0, -l);
-        g.addColorStop(0, hsl(h, S1 + 8, L1 * 0.84));
-        g.addColorStop(0.45, hsl(h, S2 + 6, L2)); g.addColorStop(1, hsl(h + 6, S3, L3));
+        g.addColorStop(0, hsl(h, S1 + 10, L1 * 0.82));
+        g.addColorStop(0.45, hsl(h, S2 + 8, L2)); g.addColorStop(1, hsl(h + 6, S3, L3));
         ctx.fillStyle = g; petalPath(ctx, l, w, (r() - 0.5) * l * 0.1); ctx.fill();
         ctx.restore();
       }
@@ -91,9 +93,9 @@
         for (let i = 0; i < cnt; i++) {
           ctx.save(); ctx.rotate(i * TAU / cnt + k * 0.42 + (r() - 0.5) * 0.16);
           const g = ctx.createLinearGradient(0, 0, 0, -L);
-          g.addColorStop(0, hsl(h, S1, (L1 / 100 + k * 0.035) * 96));
-          g.addColorStop(0.6, hsl(h + 2, S2, (L2 / 100 + k * 0.04) * 100));
-          g.addColorStop(1, hsl(h + 4, S3, Math.min(97, L3 + k * 3)));
+          g.addColorStop(0, hsl(h, S1, (L1 / 100 + k * 0.05) * 92));
+          g.addColorStop(0.6, hsl(h + 2, S2, (L2 / 100 + k * 0.055) * 100));
+          g.addColorStop(1, hsl(h + 4, S3, Math.min(96, L3 + k * 4)));
           ctx.fillStyle = g; petalPath(ctx, L, W, (r() - 0.5) * L * 0.2); ctx.fill();
           ctx.restore();
         }
@@ -220,7 +222,7 @@
       g.fillStyle = rg; g.fillRect(0, 0, cv.width, h);
       g.globalCompositeOperation = 'source-over';
     }
-    return { cv: cv, w: cv.width, h: h, pad: pad, baseY: baseY, dstY: o.baseScreenY - baseY, base: o.baseScreenY, tone: o.tone };
+    return { cv: cv, w: cv.width, h: h, pad: pad, baseY: baseY, dstY: o.baseScreenY - baseY, base: o.baseScreenY };
   }
   function drawLayer(ctx, L, dx, rot, soft) {
     ctx.save();
@@ -229,15 +231,18 @@
     ctx.translate(-L.w / 2, -(L.dstY + L.baseY));
     const ox = -L.pad, oy = L.dstY;
     if (soft) {
+      /* 注意：渐变必须建在临时画布 c2 的坐标系里（从 y=0 起）。
+         若沿用目标画布的 oy（几百 px），渐变整体落在画布之外，
+         destination-in 会把整层抹成全透明 —— 花海"看不见"就是这么来的。 */
       const fe = Math.round(L.h * 0.22);
-      const grd = ctx.createLinearGradient(0, oy, 0, oy + fe);
-      grd.addColorStop(0, 'rgba(0,0,0,0)');
-      grd.addColorStop(0.55, 'rgba(0,0,0,.72)');
-      grd.addColorStop(1, 'rgba(0,0,0,1)');
       const c = tmp(Math.max(1, L.w), Math.max(1, L.h)), c2 = c.getContext('2d');
       c2.setTransform(1, 0, 0, 1, 0, 0);
       c2.clearRect(0, 0, c.width, c.height);
       c2.drawImage(L.cv, 0, 0);
+      const grd = c2.createLinearGradient(0, 0, 0, fe);
+      grd.addColorStop(0, 'rgba(0,0,0,0)');
+      grd.addColorStop(0.55, 'rgba(0,0,0,.72)');
+      grd.addColorStop(1, 'rgba(0,0,0,1)');
       c2.globalCompositeOperation = 'destination-in';
       c2.fillStyle = grd; c2.fillRect(0, 0, L.w, L.h);
       c2.globalCompositeOperation = 'source-over';
@@ -248,107 +253,76 @@
     ctx.restore();
   }
 
-  /* ------------------------------------------------- 油画草甸（静态预渲染）*/
-  /* 底色渐变 + 厚涂笔触 + 色点花（远处只是色点，近处才成形） + 空气透视雾 */
-  function buildMeadow(W, top, H, seed) {
-    const r = mk(seed);
-    const h = Math.max(40, Math.ceil(H - top));
-    const cv = document.createElement('canvas');
-    cv.width = Math.max(1, Math.ceil(W)); cv.height = h;
-    const g = cv.getContext('2d');
-    const w = cv.width;
-
-    /* 上边界起伏（草甸与山脚的接缝不能是直线） */
-    g.save();
-    g.beginPath(); g.moveTo(0, h); g.lineTo(0, 12);
-    const n = 48;
-    for (let i = 0; i <= n; i++) {
-      const p = i / n;
-      const y = 9 + Math.sin(p * 5.7 + 0.6) * 5.0 + Math.sin(p * 13.9 + 2.4) * 2.6 + Math.sin(p * 29.3 + 1.1) * 1.2;
-      g.lineTo(p * w, y);
-    }
-    g.lineTo(w, h); g.closePath(); g.clip();
-
-    /* 底色：远处被地平线微光擦亮（冷青），近处沉入夜色（墨松绿） */
-    const bg = g.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, '#2a6b58');
-    bg.addColorStop(0.10, '#22604e');
-    bg.addColorStop(0.30, '#1a5040');
-    bg.addColorStop(0.55, '#14402f');
-    bg.addColorStop(0.80, '#0e3226');
-    bg.addColorStop(1, '#08201a');
-    g.fillStyle = bg; g.fillRect(0, 0, w, h);
-
-    /* 厚涂笔触 */
-    const strokes = Math.round(w * h / 320);
-    g.lineCap = 'round';
-    for (let i = 0; i < strokes; i++) {
-      const p = Math.pow(r(), 0.68);
-      const y = 6 + p * (h - 6), x = r() * w;
-      const len = (5 + r() * 17) * (0.45 + p * 1.55);
-      const ang = -0.66 + r() * 1.32;
-      const hue = 152 + (r() - 0.5) * 22;
-      const sat = 26 + r() * 32;
-      const li = 9 + (1 - p) * 14 + r() * 13;
-      g.strokeStyle = hsl(hue, sat, li, 0.42 + r() * 0.34);
-      g.lineWidth = 1 + r() * 2.7;
-      g.beginPath();
-      g.moveTo(x, y);
-      g.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len * 0.55);
-      g.stroke();
-      if (r() < 0.48) {
-        g.strokeStyle = hsl(hue + 7, sat * 0.7, li + 15, 0.28);
-        g.lineWidth = 0.8 + r() * 1.4;
-        g.beginPath();
-        g.moveTo(x + 1.6, y - 1.3);
-        g.lineTo(x + Math.cos(ang) * len + 1.6, y + Math.sin(ang) * len * 0.55 - 1.3);
-        g.stroke();
+  /* ---------------------------------------------------------------- 水面 */
+  function rippleSet() {
+    const list = [];
+    return {
+      spawn(x, y, r0, vr, a, life) { if (list.length < 70) list.push({ x, y, r: r0, vr, a, life: 0, max: life }); },
+      step(dt) { for (let i = list.length - 1; i >= 0; i--) { const p = list[i]; p.life += dt; p.r += p.vr * dt; if (p.life > p.max) list.splice(i, 1); } },
+      draw(ctx, k) {
+        for (const p of list) {
+          const t = p.life / p.max, a = p.a * (1 - t) * (1 - t);
+          if (a <= 0.004) continue;
+          const lw = Math.max(0.6, 1.5 * (1 - t) + 0.35);
+          ctx.save();
+          ctx.lineWidth = lw;
+          /* 深色描边打底 + 亮色叠画 → 无论水底明暗都能读出涟漪 */
+          for (let pass = 0; pass < 2; pass++) {
+            ctx.globalAlpha = pass ? a : a * 0.42;
+            ctx.strokeStyle = pass ? 'rgba(216,255,242,1)' : 'rgba(4,26,22,1)';
+            ctx.lineWidth = pass ? lw : lw + 1.1;
+            ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r, p.r * k, 0, 0, TAU); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 0.58, p.r * 0.58 * k, 0, 0, TAU); ctx.stroke();
+          }
+          ctx.restore();
+        }
       }
+    };
+  }
+  function shimmer(ctx, W, yTop, yBot, t, n) {
+    const r = mk(9173);
+    ctx.save(); ctx.lineCap = 'round';
+    for (let i = 0; i < n; i++) {
+      const p = r(), y = yTop + p * (yBot - yTop), len = W * (0.04 + r() * 0.16), x = r() * W;
+      const ph = t * (0.5 + r() * 0.9) + i;
+      ctx.globalAlpha = (0.05 + 0.14 * (0.5 + 0.5 * Math.sin(ph))) * (1 - p * 0.5);
+      ctx.strokeStyle = 'rgba(198,248,224,1)';
+      ctx.lineWidth = 0.7 + r() * 0.9;
+      const off = Math.sin(ph * 0.7) * W * 0.02;
+      ctx.beginPath(); ctx.moveTo(x + off, y); ctx.lineTo(x + off + len, y); ctx.stroke();
     }
-
-    /* 色点小花：远处的花海只是色点，夜色里像被星光照亮的碎光。
-       指数 1.25 把色点往远处压，近处留白，画面才不糊 */
-    const dots = Math.round(w * h / 205);
-    for (let i = 0; i < dots; i++) {
-      const p = Math.pow(r(), 1.25);
-      const y = 6 + p * (h - 6), x = r() * w;
-      const sz = (0.7 + r() * 1.5) * (0.45 + p * 2.4);
-      const hue = pick(r, [340, 352, 8, 42, 48, 300, 286, 202, 30]);
-      const sat = 22 + p * 46 + r() * 16;
-      const li = 50 + p * 16 + r() * 16;
-      g.fillStyle = hsl(hue, sat, li, 0.40 + p * 0.40);
-      g.beginPath(); g.ellipse(x, y, sz, sz * 0.74, r() * TAU, 0, TAU); g.fill();
+    ctx.restore();
+  }
+  /* 镜像倒影：逐行切片 + 波动 + 渐隐 */
+  function mirror(ctx, src, dx, dy, dw, dh, alpha, t, amp, fade) {
+    const sw = src.width || src.naturalWidth, sh = src.height || src.naturalHeight;
+    const rows = Math.max(10, Math.round(dh / 3)), rh = dh / rows;
+    for (let i = 0; i < rows; i++) {
+      const p = i / rows;
+      const off = reduce ? 0 : Math.sin(t * 1.5 + p * 8.5) * amp * (0.35 + p * 0.9);
+      let a = alpha * (fade ? 1 - p * 0.92 : 1);
+      if (!reduce && p > 0.02) a *= 0.55 + 0.45 * Math.sin(t * 2.2 + p * 22);
+      if (a <= 0.008) continue;
+      ctx.globalAlpha = a;
+      ctx.drawImage(src, 0, sh * (1 - (i + 1) / rows), sw, sh / rows, dx + off, dy + i * rh, dw, rh + 0.7);
     }
-
-    /* 空气透视：远处融进地平线的青绿微光里 */
-    const fog = g.createLinearGradient(0, 0, 0, h * 0.34);
-    fog.addColorStop(0, 'rgba(126,240,196,.26)');
-    fog.addColorStop(0.45, 'rgba(110,225,180,.10)');
-    fog.addColorStop(1, 'rgba(110,225,180,0)');
-    g.fillStyle = fog; g.fillRect(0, 0, w, h * 0.34);
-
-    /* 底部压暗，衔接页脚 */
-    const vg = g.createLinearGradient(0, h * 0.62, 0, h);
-    vg.addColorStop(0, 'rgba(2,14,12,0)');
-    vg.addColorStop(1, 'rgba(2,14,12,.5)');
-    g.fillStyle = vg; g.fillRect(0, h * 0.62, w, h * 0.38);
-
-    g.restore();
-    return { cv: cv, w: w, h: h, top: top };
   }
 
   /* ---------------------------------------------------------------- 场景 */
   const canvases = [].slice.call(document.querySelectorAll('.hero__meadow, .hero__flora'));
   if (!canvases.length) return;
+  const ptr = { x: -1, y: -1 };
+  window.addEventListener('mousemove', function (e) { ptr.x = e.clientX; ptr.y = e.clientY; }, { passive: true });
 
   function init(canvas) {
     const ctx = canvas.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0, H = 0, hor = 0, t = 0;
-    let meadow = null, far = null, midA = null, midB = null;
+    let far = null, midA = null, midB = null, midC = null;
     let bokeh = [], motes = [], petals = [];
     let fig = null, figOk = false;
     const FIG = { cx: 0, feet: 0, ph: 0, fw: 0 };
+    const rip = rippleSet();
 
     fig = new Image();
     fig.onload = function () { figOk = true; };
@@ -357,7 +331,7 @@
     function resize() {
       const box = canvas.parentElement.getBoundingClientRect();
       W = Math.max(1, Math.round(box.width)); H = Math.max(1, Math.round(box.height));
-      hor = H * 0.50;
+      hor = H * 0.5;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -365,68 +339,66 @@
     }
 
     function build() {
-      const seed = 20261005;
-      /* 人物：坐在花海中画油画的背影 —— 居中，落在标题正下方的草甸里。
-         头顶压在地平线上，文案(上收至 10u)与她在竖直方向错开。 */
+      const seed = 20261004;
+      /* 人物：坐在花海中画油画的背影 —— 居中、正对上方那颗大星球、尽量往下放。
+         头顶压在地平线附近，与上方文案(已上收至 10u)错开 */
       const narrow = W < 860;
-      FIG.ph = H * (narrow ? 0.35 : 0.50);
+      FIG.ph = H * (narrow ? 0.34 : 0.44);
       FIG.fw = FIG.ph * 1.243;                       // ham-painter.png 1268×1020
       FIG.cx = W * 0.5;
       FIG.feet = H * 0.945;
 
-      meadow = buildMeadow(W, hor, H, seed);
-
-      /* 远岸花带：贴着地平线，一道矮矮的花边 */
+      /* 远岸花海：贴着地平线的一道矮花边，逆光剪影 */
       far = buildLayer({
-        W: W, baseScreenY: hor + H * 0.035, maxH: H * 0.048, bottomPad: 8,
-        count: Math.max(150, Math.round(W * 0.62)),
+        W: W, baseScreenY: hor - H * 0.008, maxH: H * 0.05, bottomPad: 10,
+        count: Math.max(150, Math.round(W * 0.66)),
         mix: ['cosmos', 'daisy', 'spike', 'gyp', 'grass', 'grass'],
-        sizeMin: 3, sizeMax: 6.6, hMin: 0.35, hMax: 1,
-        tone: 0.16, dark: 0.34, rim: true
+        sizeMin: 3, sizeMax: 6.4, hMin: 0.35, hMax: 1,
+        tone: 0.18, dark: 0.4, rim: true
       }, seed);
-      /* 中景两层：全部压成小花（用户要"只留下小花"，前景大株不再画） */
+      /* 中景：全部是小花（前景大株不再画） */
       midA = buildLayer({
-        W: W, baseScreenY: H * 0.66, maxH: H * 0.062, bottomPad: H * 0.03,
+        W: W, baseScreenY: H * 0.74, maxH: H * 0.065, bottomPad: H * 0.04,
         count: Math.max(150, Math.round(W * 0.46)),
         mix: ['cosmos', 'daisy', 'spike', 'gyp', 'grass', 'grass'],
-        sizeMin: 3.4, sizeMax: 6.4, hMin: 0.24, hMax: 0.7,
-        tone: 0.40, dark: 0.28, rim: true
+        sizeMin: 3.4, sizeMax: 6.6, hMin: 0.24, hMax: 0.7,
+        tone: 0.42, dark: 0.26, rim: true
       }, seed + 11);
+      /* 脚边那一层：漫过她脚踝，把身下的土地全部吃掉。
+         baseScreenY + bottomPad = H → 图层底边正好压到页面最底，下方不留空地 */
       midB = buildLayer({
-        W: W, baseScreenY: H * 0.94, maxH: H * 0.085, bottomPad: H * 0.05,
-        count: Math.max(110, Math.round(W * 0.30)),
-        mix: ['cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
-        sizeMin: 5, sizeMax: 9, hMin: 0.26, hMax: 0.85,
-        tone: 0.70, dark: 0.10, rim: true
+        W: W, baseScreenY: H * 0.90, maxH: H * 0.14, bottomPad: H * 0.10,
+        count: Math.max(160, Math.round(W * 0.55)),
+        mix: ['cosmos', 'cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
+        sizeMin: 5.5, sizeMax: 10.5, hMin: 0.30, hMax: 1.0,
+        tone: 0.82, dark: 0.05, rim: true
       }, seed + 23);
+      /* 最贴近镜头的一层矮花毯：基线压到页面底边之外，
+         把 850px 以下（她脚边、画面最底）彻底铺满，不给土地留缝 */
+      midC = buildLayer({
+        W: W, baseScreenY: H * 1.01, maxH: H * 0.115, bottomPad: H * 0.075,
+        count: Math.max(150, Math.round(W * 0.50)),
+        mix: ['cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
+        sizeMin: 6, sizeMax: 11.5, hMin: 0.34, hMax: 1.0,
+        tone: 0.88, dark: 0.02, rim: true
+      }, seed + 41);
 
       const r = mk(seed + 37);
-
-      /* 焦外光斑（青绿 / 暖粉） */
       bokeh = [];
-      for (let i = 0; i < 24; i++) {
-        bokeh.push({
-          x: r() * W, y: H * (0.44 + r() * 0.44), rr: 5 + r() * 22,
-          a: 0.04 + r() * 0.10, ph: r() * TAU, warm: r() > 0.5
-        });
+      for (let i = 0; i < 26; i++) {
+        bokeh.push({ x: r() * W, y: H * (0.52 + r() * 0.36), rr: 5 + r() * 22, a: 0.04 + r() * 0.11, ph: r() * TAU, warm: r() > 0.5 });
       }
-      /* 上升的花粉 / 微尘 */
       motes = [];
-      for (let i = 0; i < 42; i++) {
-        motes.push({
-          x: r() * W, y: H * (0.34 + r() * 0.66), rr: 0.6 + r() * 1.7,
-          vy: -(0.05 + r() * 0.20), vx: (r() - 0.5) * 0.16,
-          a: 0.14 + r() * 0.36, ph: r() * TAU
-        });
+      for (let i = 0; i < 46; i++) {
+        motes.push({ x: r() * W, y: H * (0.3 + r() * 0.7), rr: 0.6 + r() * 1.8, vy: -(0.05 + r() * 0.2), vx: (r() - 0.5) * 0.16, a: 0.14 + r() * 0.42, ph: r() * TAU });
       }
-      /* 飘落花瓣 */
       petals = [];
-      for (let i = 0; i < 16; i++) {
-        petals.push({
-          x: r() * W, y: H * (0.36 + r() * 0.64), vy: 0.06 + r() * 0.22, vx: (r() - 0.5) * 0.34,
-          rot: r() * TAU, vr: (r() - 0.5) * 0.03, s: 2.4 + r() * 3.2,
-          h: pick(r, [340, 352, 300, 44])
-        });
+      for (let i = 0; i < 18; i++) {
+        petals.push({ x: r() * W, y: H * (0.4 + r() * 0.6), vy: 0.06 + r() * 0.24, vx: (r() - 0.5) * 0.34, rot: r() * TAU, vr: (r() - 0.5) * 0.03, s: 2.4 + r() * 3.4, h: pick(r, [340, 352, 300, 42]) });
+      }
+      /* 预置一批涟漪，错开生成时间避免同相位 */
+      for (let i = 0; i < 18; i++) {
+        rip.spawn(r() * W, hor + 9 + r() * (H * 0.20), 3, 6 + r() * 10, 0.2 + r() * 0.14, 3 + r() * 3);
       }
     }
 
@@ -436,14 +408,14 @@
       const bob = reduce ? 0 : Math.sin(t * 0.5) * H * 0.0032;
       const sway = reduce ? 0 : Math.sin(t * 0.32) * 0.0035;
 
-      /* 落在草甸上的接触阴影 */
+      /* 落在花丛里的接触阴影 */
       ctx.save();
-      const sg = ctx.createRadialGradient(cx, feet, 0, cx, feet, fw * 0.52);
-      sg.addColorStop(0, 'rgba(58,40,28,.42)');
-      sg.addColorStop(0.6, 'rgba(58,40,28,.16)');
-      sg.addColorStop(1, 'rgba(58,40,28,0)');
+      const sg = ctx.createRadialGradient(cx, feet, 0, cx, feet, fw * 0.5);
+      sg.addColorStop(0, 'rgba(3,18,14,.5)');
+      sg.addColorStop(0.6, 'rgba(3,18,14,.18)');
+      sg.addColorStop(1, 'rgba(3,18,14,0)');
       ctx.fillStyle = sg;
-      ctx.beginPath(); ctx.ellipse(cx, feet + ph * 0.015, fw * 0.48, ph * 0.042, 0, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(cx, feet + ph * 0.012, fw * 0.46, ph * 0.04, 0, 0, TAU); ctx.fill();
       ctx.restore();
 
       /* 星球清辉包裹（青绿 + 玫瑰），弱化抠图边界 */
@@ -475,28 +447,41 @@
       t += 0.016;
       ctx.clearRect(0, 0, W, H);
 
-      /* 草甸（静态预渲染，整层一次贴出） */
-      if (meadow) ctx.drawImage(meadow.cv, 0, meadow.top);
-
-      /* 花海：摆动只做极小幅平移 + 极轻微旋转。
-         整层旋转在宽屏下端点位移过大 = 视觉"抽搐"，这里全部压到亚像素级。 */
+      /* 花海摆动：只做极小幅平移 + 亚像素级旋转。
+         整层旋转在宽屏下端点位移过大 = 视觉"抽搐"，这里全部压住。 */
       const br = reduce ? 0 : Math.sin(t * 0.10);
       const s1 = reduce ? 0 : Math.sin(t * 0.12);
       const s2 = reduce ? 0 : Math.sin(t * 0.09 + 1.2);
 
+      /* 远岸花海 + 水中倒影 */
       drawLayer(ctx, far, br * 0.6, br * 0.00015, 1);
-      drawLayer(ctx, midA, s1 * 1.2, s1 * 0.00025, 0);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, hor, W, H * 0.5); ctx.clip();
+      ctx.globalAlpha = 1;
+      mirror(ctx, far.cv, -far.pad, hor + 2, W + 2 * far.pad, H * 0.085, 0.3, t, 4.5, true);
+      ctx.restore();
 
-      /* 背影：坐在花海中画油画（居中，标题正下方） */
-      drawFigure();
+      /* 水面：先垫一层薄暗，亮色涟漪环才有对比可读 */
+      const wg = ctx.createLinearGradient(0, hor, 0, hor + H * 0.28);
+      wg.addColorStop(0, 'rgba(3,14,18,.42)');
+      wg.addColorStop(0.55, 'rgba(3,14,18,.26)');
+      wg.addColorStop(1, 'rgba(3,14,18,0)');
+      ctx.fillStyle = wg; ctx.fillRect(0, hor, W, H * 0.28);
 
-      /* 脚边那一圈小花压在她身前 —— "坐在花海里"的包裹感 */
-      drawLayer(ctx, midB, s2 * 1.8, s2 * 0.00035, 1);
+      shimmer(ctx, W, hor + 8, hor + H * 0.26, t, Math.round(W / 22));
+      rip.draw(ctx, 0.28);
+      if (!reduce) {
+        rip.step(1);
+        if (Math.random() < 0.09) {
+          const r = mk((t * 1000) | 0);
+          rip.spawn(r() * W, hor + 9 + r() * H * 0.20, 2, 7 + r() * 11, 0.18 + r() * 0.14, 3.2 + r() * 3);
+        }
+      }
 
       /* 焦外光斑 */
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const b of bokeh) {
-        const y = b.y + (reduce ? 0 : Math.sin(t * 0.34 + b.ph) * 4);
+        const y = b.y + (reduce ? 0 : Math.sin(t * 0.35 + b.ph) * 4);
         const a = b.a * (0.62 + 0.38 * Math.sin(t * 0.55 + b.ph));
         const g = ctx.createRadialGradient(b.x, y, 0, b.x, y, b.rr);
         g.addColorStop(0, b.warm ? 'rgba(255,226,186,' + a.toFixed(3) + ')' : 'rgba(255,214,232,' + a.toFixed(3) + ')');
@@ -505,6 +490,23 @@
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, y, b.rr, 0, TAU); ctx.fill();
       }
       ctx.restore();
+
+      /* 中景小花 */
+      drawLayer(ctx, midA, s1 * 1.2, s1 * 0.00025, 1);
+
+      /* 背影：坐在花海中画油画（居中，大星球正下方） */
+      drawFigure();
+
+      /* 花床底色：先把人物身下那块"不搭配的土地"换成暗绿花甸，再压上花海 */
+      const bd = ctx.createLinearGradient(0, H * 0.78, 0, H);
+      bd.addColorStop(0, 'rgba(7,28,20,0)');
+      bd.addColorStop(0.42, 'rgba(7,28,20,.62)');
+      bd.addColorStop(1, 'rgba(5,20,16,.88)');
+      ctx.fillStyle = bd; ctx.fillRect(0, H * 0.78, W, H * 0.22);
+
+      /* 脚边花海：漫过她脚踝，把身下的土地全部盖住 */
+      drawLayer(ctx, midB, s2 * 1.8, s2 * 0.00035, 1);
+      drawLayer(ctx, midC, s2 * 2.4, s2 * 0.00040, 1);
 
       /* 飘落花瓣 */
       for (const p of petals) {
@@ -516,7 +518,7 @@
         ctx.restore();
       }
 
-      /* 上升花粉 / 微尘 */
+      /* 上升花粉 */
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const m of motes) {
         m.y += m.vy; m.x += m.vx + (reduce ? 0 : Math.sin(t * 0.55 + m.ph) * 0.16);
@@ -529,6 +531,15 @@
 
       if (!reduce) requestAnimationFrame(frame);
     }
+
+    window.addEventListener('mousemove', function () {
+      const b = canvas.getBoundingClientRect();
+      if (b.bottom < 0 || b.top > window.innerHeight) return;
+      const y = ptr.y - b.top, x = ptr.x - b.left;
+      if (y > hor && y < b.height && x > 0 && x < b.width && Math.random() < 0.3) {
+        rip.spawn(x, y, 2, 7, 0.18, 3);
+      }
+    }, { passive: true });
 
     resize();
     window.addEventListener('resize', resize);
