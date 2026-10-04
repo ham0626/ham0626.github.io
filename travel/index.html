@@ -38,13 +38,15 @@
       <div class="globe__frame">
         <div id="globe" class="globe__stage" role="img"
              aria-label="可交互的三维地球仪，标有你去过的国家；按 Tab 后用下方列表访问每个地点"></div>
-        <div class="globe__hud" aria-hidden="true">
-          <span class="globe__hint">拖动旋转 · 滚轮缩放 · 点击图钉</span>
-        </div>
       </div>
       <div class="globe__bar">
         <button class="btn-ghost" type="button" onclick="window.__globeReset && window.__globeReset()">↺ 回到全球视角</button>
-        <span class="globe__stat"><b>11</b> 国 · <b>20</b> 座城市</span>
+      </div>
+      <div class="globe__tips">
+        <p class="gtip gtip--key">拖动地球转起来 · 滚轮缩放 · 点开图钉读当时的事</p>
+        <p class="gtip"><span id="globeStat">11 国 · 30 座城市</span> 已经点亮 —— 这颗星球上还有 <b id="globeLeft">184</b> 个地方待发现。</p>
+        <p class="gtip">图钉是按记忆打的大致位置，差个几十公里别较真。</p>
+        <p class="gtip">马来西亚和泰国的具体城市还在考古，等我问我爸妈。</p>
       </div>
     </div>
 
@@ -99,7 +101,19 @@
 <script src="../assets/lib/three.min.js"></script>
 <script src="../assets/flags.js"></script>
 <script src="../assets/travel-data.js"></script>
+<script src="../assets/world-geo.js"></script>
 <script src="../assets/globe.js"></script>
 <script>if (window.fillFlags) window.fillFlags();</script>
+<script>
+/* 国家/城市数量从数据里算，别在 HTML 里写死 */
+(function () {
+  var D = window.TRAVEL || {}, n = 0, c = 0;
+  Object.keys(D).forEach(function (k) { n++; c += (D[k].cities || []).length; });
+  var s = document.getElementById('globeStat');
+  if (s) s.innerHTML = '<b>' + n + '</b> 国 · <b>' + c + '</b> 座城市';
+  var l = document.getElementById('globeLeft');
+  if (l) l.textContent = 195 - n;   /* 195 = 联合国会员国 + 2 观察员国 */
+})();
+</script>
 </body>
 </html>
