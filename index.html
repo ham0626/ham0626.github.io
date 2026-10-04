@@ -1,224 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="你好，我是黄安萌欢迎来到我的个人网站">
-<meta property="og:type" content="website">
-<meta property="og:title" content="首页">
-<meta property="og:url" content="http://example.com/index.html">
-<meta property="og:site_name" content="Ham">
-<meta property="og:description" content="你好，我是黄安萌欢迎来到我的个人网站">
-<meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2026-08-10T08:33:41.841Z">
-<meta property="article:modified_time" content="2026-08-06T06:13:20.000Z">
-<meta property="article:author" content="Ham">
-<meta name="twitter:card" content="summary">
-
-
-<link rel="canonical" href="http://example.com/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"en","comments":true,"permalink":"http://example.com/index.html","path":"index.html","title":"首页"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>首页 | Ham
-</title>
-  
-
-
-
-
-
-
-
-
-  
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
-
-
-
-
-
-  
-
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>黄安萌 · Ham — 在旷野与代码之间</title>
+<meta name="description" content="黄安萌 Ham · 东南大学 2026 级 · 信息竞赛 / 雅思 7.5 / AI 黑客松" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Noto+Serif+SC:ital,wght@0,500;1,500;1,600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/site.css?v=13" />
 </head>
+<body>
 
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
+<header class="hero" id="home">
+  <!-- 星场 / 尘埃 / 流星 / 鼠标视差（Canvas，位于 SVG 之下） -->
+  <canvas class="hero__space" id="space"></canvas>
 
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
+  <!-- 太空场景（内联 SVG）：镜像对称，地平线压中线
+       层次：星云/极光/轨道环 → 行星 → 地平线光晕 → 远丘/近丘 → 湖面倒影 → 岸边花丛 -->
+  <svg class="hero__ground scene-breathe" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="nebPink" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#f6b8c8" stop-opacity=".38"/>
+        <stop offset="60%" stop-color="#c47f9c" stop-opacity=".13"/>
+        <stop offset="100%" stop-color="#c47f9c" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="nebTeal" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#4fd7a6" stop-opacity=".32"/>
+        <stop offset="62%" stop-color="#2b8f7e" stop-opacity=".11"/>
+        <stop offset="100%" stop-color="#2b8f7e" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="auroraGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8ad8ff" stop-opacity="0"/>
+        <stop offset="48%" stop-color="#5fe3b0" stop-opacity=".55"/>
+        <stop offset="78%" stop-color="#3fae7e" stop-opacity=".28"/>
+        <stop offset="100%" stop-color="#2f7d5b" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="planetGrad" cx="33%" cy="27%" r="86%">
+        <stop offset="0%" stop-color="#7cecc0"/>
+        <stop offset="34%" stop-color="#37b98d"/>
+        <stop offset="68%" stop-color="#1a6e54"/>
+        <stop offset="100%" stop-color="#08251c"/>
+      </radialGradient>
+      <linearGradient id="termGrad" x1=".12" y1=".04" x2=".96" y2=".98">
+        <stop offset="0%" stop-color="#02060f" stop-opacity="0"/>
+        <stop offset="46%" stop-color="#02060f" stop-opacity=".14"/>
+        <stop offset="100%" stop-color="#02060f" stop-opacity=".92"/>
+      </linearGradient>
+      <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#9ff0c8" stop-opacity="0"/>
+        <stop offset="22%" stop-color="#9ff0c8" stop-opacity=".85"/>
+        <stop offset="52%" stop-color="#f6b8c8" stop-opacity=".9"/>
+        <stop offset="80%" stop-color="#9ff0c8" stop-opacity=".8"/>
+        <stop offset="100%" stop-color="#9ff0c8" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1d5f4a"/><stop offset="100%" stop-color="#0a2620"/>
+      </linearGradient>
+      <linearGradient id="hillNear" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0d3a2b"/><stop offset="100%" stop-color="#04120d"/>
+      </linearGradient>
+      <radialGradient id="horizonGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7ef0c4" stop-opacity=".48"/>
+        <stop offset="60%" stop-color="#3fae7e" stop-opacity=".15"/>
+        <stop offset="100%" stop-color="#3fae7e" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="cosmosGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffd9a0" stop-opacity=".95"/>
+        <stop offset="52%" stop-color="#f6b8c8" stop-opacity=".34"/>
+        <stop offset="100%" stop-color="#f6b8c8" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="emberGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ff9a63" stop-opacity=".95"/>
+        <stop offset="42%" stop-color="#e0552e" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#e0552e" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="waterShade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#020a0e" stop-opacity=".34"/>
+        <stop offset="55%" stop-color="#020a0e" stop-opacity=".56"/>
+        <stop offset="100%" stop-color="#020a0e" stop-opacity=".74"/>
+      </linearGradient>
+      <linearGradient id="lightColumn" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#bffbe0" stop-opacity=".2"/>
+        <stop offset="46%" stop-color="#7ef0c4" stop-opacity=".08"/>
+        <stop offset="100%" stop-color="#7ef0c4" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="blurSm"><feGaussianBlur stdDeviation="2.4"/></filter>
+      <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
+      <filter id="blurMid"><feGaussianBlur stdDeviation="4.5"/></filter>
+      <filter id="blurBig"><feGaussianBlur stdDeviation="15"/></filter>
+      <linearGradient id="swirlGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ffd6e8" stop-opacity="0"/>
+        <stop offset="30%" stop-color="#ffc4dc" stop-opacity=".85"/>
+        <stop offset="58%" stop-color="#a0fad6" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#a0fad6" stop-opacity="0"/>
+      </linearGradient>
+      <path id="sp4" d="M0,-11 Q1.5,-1.5 11,0 Q1.5,1.5 0,11 Q-1.5,1.5 -11,0 Q-1.5,-1.5 0,-11 Z"/>
+      <clipPath id="planetClip"><circle cx="768" cy="252" r="148"/></clipPath>
+      <clipPath id="ringFrontClip"><rect x="400" y="330" width="740" height="320"/></clipPath>
+    </defs>
 
-  <div class="site-meta">
+    <!-- ========== 天空（上半）========== -->
+    <!-- 星云 -->
+    <ellipse cx="358" cy="176" rx="452" ry="200" fill="url(#nebPink)"/>
+    <ellipse cx="1188" cy="126" rx="410" ry="184" fill="url(#nebTeal)"/>
+    <ellipse cx="742" cy="332" rx="580" ry="152" fill="url(#nebTeal)" opacity=".8"/>
 
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">Ham</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
+    <!-- 极光 -->
+    <path class="aurora" d="M-60,250 C200,206 420,286 680,246 C930,208 1150,282 1600,236 L1600,352 C1150,398 930,324 680,362 C420,400 200,320 -60,364 Z"
+          fill="url(#auroraGrad)" filter="url(#soft)"/>
+    <path class="aurora aurora--2" d="M-60,356 C220,320 430,392 700,356 C950,324 1160,390 1600,348 L1600,432 C1160,474 950,408 700,440 C430,472 220,400 -60,436 Z"
+          fill="url(#auroraGrad)" opacity=".55" filter="url(#soft)"/>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="Search" role="button">
-    </div>
-  </div>
-</div>
+    <!-- 轨道环 -->
+    <g transform="translate(768,252)">
+      <ellipse class="orbit-ring" rx="334" ry="100" fill="none" stroke="#9ff0c8" stroke-width="1.1"
+               opacity=".26" stroke-dasharray="6 11"/>
+      <ellipse class="orbit-ring" rx="452" ry="138" fill="none" stroke="#f6b8c8" stroke-width="1.1"
+               opacity=".17" stroke-dasharray="5 16"/>
+    </g>
 
+    <!-- 行星：后环 → 脉冲光环 → 大气辉光 → 本体 → 陆块 → 明暗界线 → 镜面高光
+              → 边缘扫光 → 流光丝带 → 星芒 → 前环 -->
+    <g class="planet">
+      <ellipse cx="768" cy="252" rx="252" ry="60" fill="none" stroke="url(#ringGrad)" stroke-width="9"
+               opacity=".42" transform="rotate(-13 768 252)"/>
 
+      <!-- 脉冲光环：向外一圈圈扩散 -->
+      <g class="planet-ping">
+        <circle class="ping" cx="768" cy="252" r="152" fill="none" stroke="#bffbe0" stroke-width="1.3"/>
+        <circle class="ping ping--2" cx="768" cy="252" r="152" fill="none" stroke="#f6b8c8" stroke-width="1.1"/>
+        <circle class="ping ping--3" cx="768" cy="252" r="152" fill="none" stroke="#bffbe0" stroke-width=".9"/>
+      </g>
 
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-首页"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-关于我"><a href="/about" rel="section"><i class="fa fa-user fa-fw"></i>关于我</a></li><li class="menu-item menu-item-成长日志"><a href="/blog" rel="section"><i class="fa fa-pencil fa-fw"></i>成长日志</a></li><li class="menu-item menu-item-足迹地图"><a href="/travel" rel="section"><i class="fa fa-map fa-fw"></i>足迹地图</a></li><li class="menu-item menu-item-学术之路"><a href="/academic" rel="section"><i class="fa fa-graduation-cap fa-fw"></i>学术之路</a></li><li class="menu-item menu-item-项目作品"><a href="/portfolio" rel="section"><i class="fa fa-code fa-fw"></i>项目作品</a></li><li class="menu-item menu-item-书影记录"><a href="/bookfilm" rel="section"><i class="fa fa-book fa-fw"></i>书影记录</a></li><li class="menu-item menu-item-理想与规划"><a href="/vision" rel="section"><i class="fa fa-bullseye fa-fw"></i>理想与规划</a></li><li class="menu-item menu-item-友链"><a href="/links" rel="section"><i class="fa fa-link fa-fw"></i>友链</a></li>
-  </ul>
-</nav>
+      <!-- 大气辉光（双层，反相呼吸） -->
+      <circle class="planet-glow" cx="768" cy="252" r="176" fill="none" stroke="#7ef0c4"
+              stroke-width="16" opacity=".5" filter="url(#blurBig)"/>
+      <circle class="planet-glow planet-glow--2" cx="768" cy="252" r="196" fill="none" stroke="#f6b8c8"
+              stroke-width="22" opacity=".3" filter="url(#blurBig)"/>
 
+      <circle cx="768" cy="252" r="148" fill="url(#planetGrad)"/>
+      <g clip-path="url(#planetClip)">
+        <ellipse cx="692" cy="268" rx="88" ry="36" fill="#2fae86" opacity=".45"/>
+        <ellipse cx="822" cy="362" rx="72" ry="30" fill="#0f5240" opacity=".55"/>
+        <ellipse cx="792" cy="228" rx="54" ry="22" fill="#4fd7a6" opacity=".3"/>
+      </g>
+      <circle cx="768" cy="252" r="148" fill="url(#termGrad)"/>
 
+      <!-- 镜面高光：星球受光面的一点亮斑 -->
+      <ellipse class="spec" cx="700" cy="248" rx="48" ry="27" fill="#ffffff" opacity=".18"
+               filter="url(#blurMid)" transform="rotate(-26 700 248)"/>
+      <circle cx="768" cy="252" r="148" fill="none" stroke="#a9f5d2" stroke-width="1.6" opacity=".5"/>
 
+      <!-- 边缘扫光：沿星球轮廓巡游的一小段亮弧 -->
+      <circle class="rim-sweep" cx="768" cy="252" r="146" fill="none" stroke="#ffffff"
+              stroke-width="3.2" stroke-linecap="round" stroke-dasharray="46 872" opacity=".75"/>
 
-</header>
-        
-  
-  <aside class="sidebar">
+      <!-- 流光丝带（Creative Matter）：环绕星球的丝质流光 -->
+      <g class="matter" filter="url(#blurMid)">
+        <path class="matter__ribbon" d="M556,224 C604,140 706,108 768,130 C862,158 950,196 994,252"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="7" stroke-linecap="round" opacity=".5"/>
+        <path class="matter__ribbon matter__ribbon--2" d="M556,286 C622,366 722,392 790,366 C882,332 962,302 1002,252"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="6" stroke-linecap="round" opacity=".42"/>
+        <path class="matter__ribbon matter__ribbon--3" d="M636,116 C718,80 842,82 918,130"
+              fill="none" stroke="url(#swirlGrad)" stroke-width="4.5" stroke-linecap="round" opacity=".34"/>
+      </g>
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
+      <!-- 星芒：贴着星球边缘闪烁 -->
+      <g class="sparks" fill="#ffffff">
+        <g transform="translate(642,240)"><g class="sp sp--1"><use href="#sp4"/></g></g>
+        <g transform="translate(896,246)"><g class="sp sp--2" ><use href="#sp4"/></g></g>
+        <g transform="translate(912,382)"><g class="sp sp--3"><use href="#sp4"/></g></g>
+        <g transform="translate(668,404)"><g class="sp sp--4"><use href="#sp4"/></g></g>
+        <g transform="translate(770,164)"><g class="sp sp--5"><use href="#sp4"/></g></g>
+        <g transform="translate(1014,296)"><g class="sp sp--6"><use href="#sp4"/></g></g>
+      </g>
 
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%98%AF%E9%BB%84%E5%AE%89%E8%90%8C"><span class="nav-number">1.</span> <span class="nav-text">你好，我是黄安萌</span></a></li></ol></div>
-        </div>
-        <!--/noindex-->
+      <g clip-path="url(#ringFrontClip)">
+        <ellipse cx="768" cy="252" rx="252" ry="60" fill="none" stroke="url(#ringGrad)" stroke-width="9"
+                 opacity=".72" transform="rotate(-13 768 252)"/>
+      </g>
+    </g>
 
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Ham</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
+    <!-- 盆栽火星（余烬） -->
+    <g class="ember" transform="translate(1268,170)">
+      <circle r="48" fill="url(#emberGlow)"/>
+      <circle r="7" fill="#ffb38a"/>
+      <rect x="-5" y="7" width="10" height="10" rx="2" fill="#6b4a32" opacity=".8"/>
+    </g>
+
+    <!-- ========== 湖面倒影（静态镜像，不参与动画，保持滤镜缓存）========== -->
+    <g transform="scale(1,-1) translate(0,-1024)" opacity=".5" filter="url(#blurSm)">
+      <ellipse cx="358" cy="176" rx="452" ry="200" fill="url(#nebPink)"/>
+      <ellipse cx="1188" cy="126" rx="410" ry="184" fill="url(#nebTeal)"/>
+      <ellipse cx="742" cy="332" rx="580" ry="152" fill="url(#nebTeal)" opacity=".7"/>
+      <path d="M-60,250 C200,206 420,286 680,246 C930,208 1150,282 1600,236 L1600,352 C1150,398 930,324 680,362 C420,400 200,320 -60,364 Z"
+            fill="url(#auroraGrad)" opacity=".5"/>
+      <g transform="translate(768,252)">
+        <ellipse rx="334" ry="100" fill="none" stroke="#9ff0c8" stroke-width="1" opacity=".18" stroke-dasharray="6 11"/>
+      </g>
+      <circle cx="768" cy="252" r="148" fill="url(#planetGrad)" opacity=".72"/>
+      <circle cx="768" cy="252" r="148" fill="url(#termGrad)" opacity=".7"/>
+      <circle cx="768" cy="252" r="148" fill="none" stroke="#a9f5d2" stroke-width="1.4" opacity=".35"/>
+      <g class="ember" transform="translate(1268,170)" opacity=".5">
+        <circle r="48" fill="url(#emberGlow)"/>
+      </g>
+    </g>
+
+    <!-- 湖水整体压暗：让倒影比天空更暗，一眼读成"水" -->
+    <rect x="0" y="512" width="1536" height="512" fill="url(#waterShade)"/>
+
+    <!-- ========== 地平线 ========== -->
+    <ellipse class="horizon-glow" cx="768" cy="512" rx="880" ry="118" fill="url(#horizonGlow)"/>
+    <rect x="0" y="510.6" width="1536" height="2.2" fill="#c8f7e2" opacity=".38"/>
+
+    <!-- ========== 丘陵剪影（贴近地平线）========== -->
+    <path d="M0,512 L0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442 L1536,512 Z"
+          fill="url(#hillFar)" opacity=".82"/>
+    <g transform="scale(1,-1) translate(0,-1024)" opacity=".28" filter="url(#blurSm)">
+      <path d="M0,512 L0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442 L1536,512 Z"
+            fill="url(#hillFar)"/>
+    </g>
+    <path d="M0,512 L0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482 L1536,512 Z"
+          fill="url(#hillNear)"/>
+    <g transform="scale(1,-1) translate(0,-1024)" opacity=".24" filter="url(#blurSm)">
+      <path d="M0,512 L0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482 L1536,512 Z"
+            fill="url(#hillNear)"/>
+    </g>
+
+    <!-- 山脊受光边（让地平线剪影可读） -->
+    <path d="M0,452 C160,424 300,444 440,462 C560,478 660,432 800,428 C950,424 1040,452 1180,446 C1300,440 1420,430 1536,442"
+          fill="none" stroke="#7ef0c4" stroke-width="1.6" opacity=".4"/>
+    <path d="M0,486 C180,470 320,482 500,492 C640,500 750,470 900,468 C1040,466 1140,484 1320,478 C1440,474 1495,486 1536,482"
+          fill="none" stroke="#a9f5d2" stroke-width="1.3" opacity=".26"/>
+
+    <!-- 行星在水面的光路 -->
+    <rect x="694" y="512" width="148" height="330" fill="url(#lightColumn)" filter="url(#blurSm)"/>
+
+    <!-- 湖面微光 -->
+    <g class="water-lines" stroke="#9ff0c8" stroke-width="1.2" stroke-linecap="round" opacity=".22">
+      <line x1="360" y1="540" x2="556" y2="540"/>
+      <line x1="946" y1="552" x2="1178" y2="552"/>
+      <line x1="556" y1="572" x2="702" y2="572"/>
+      <line x1="892" y1="526" x2="1006" y2="526"/>
+      <line x1="640" y1="600" x2="900" y2="600"/>
+    </g>
+  </svg>
+
+  <!-- 花海 / 涟漪 / 倒影层（Canvas）：地平线之下为花海，之上为远岸花带 -->
+  <canvas class="hero__flora" aria-hidden="true"></canvas>
+
+  <div class="hero__scrim"></div>
+
+  <nav class="nav" aria-label="主导航">
+    <a href="./" class="cur">首页</a>
+    <a href="about/">关于我</a>
+    <a href="bookfilm/">书影记录</a>
+    <a href="blog/">成长日志</a>
+    <a href="travel/">足迹地图</a>
+    <a href="academic/">学术之路</a>
+    <a href="portfolio/">项目作品</a>
+    <a href="vision/">理想与规划</a>
+    <a href="links/">友链</a>
   </nav>
-</div>
 
-        </div>
-      </div>
-    </div>
-
-    
-  </aside>
-
-
-    </div>
-
-    <div class="main-inner page posts-expand">
-
-
-    
-    
-    
-    <div class="post-block" lang="en"><header class="post-header">
-
-<h1 class="post-title" itemprop="name headline">首页
-</h1>
-
-<div class="post-meta-container">
-</div>
-
+  <div class="hero__inner">
+    <span class="badge"><span class="dot"></span><b>New</b>&nbsp;—&nbsp;2026 求组队 AI 黑客松</span>
+    <h1 class="hero__title serif">在旷野与代码之间<br/>种一株温柔的野性</h1>
+    <blockquote class="hero__quote">
+      <p class="serif"><span>一切终将实现它们的意义。</span><span>那儿，挚爱的渴望之星，依然向我灼灼燃烧</span></p>
+      <cite>Hermann Hesse</cite>
+    </blockquote>
+    <div class="hero__rule"></div>
+  </div>
 </header>
 
-      
-      
-      
-      <div class="post-body">
-          <h1 id="你好，我是黄安萌"><a href="#你好，我是黄安萌" class="headerlink" title="你好，我是黄安萌"></a>你好，我是黄安萌</h1><p>欢迎来到我的个人网站</p>
-
-      </div>
-      
-      
-      
+<!-- ================= 形象舞台：花海 · 湖面 · 倒影 ================= -->
+<section class="stage" id="portrait">
+  <canvas class="stage__space" aria-hidden="true"></canvas>
+  <canvas class="stage__scene" aria-hidden="true"></canvas>
+  <div class="stage__scrim"></div>
+  <div class="stage__inner">
+    <div class="stage__cap">
+      <span class="eyebrow">Portrait · 2026</span>
+      <h2 class="serif">黄安萌 <i>Ham</i></h2>
+      <p>东南大学 BME → CS · 在旷野与代码之间，种一株温柔的野性</p>
     </div>
-
-    
-    
-
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">Ham</span>
   </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+</section>
 
-    </div>
-  </footer>
+<footer>
+  © 2026 黄安萌 · Ham &nbsp;·&nbsp; 在旷野与代码之间生长 &nbsp;·&nbsp; <a href="./">回到顶部 ↑</a>
+</footer>
 
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="Back to top">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
+<script src="assets/space.js?v=13"></script>
+<script src="assets/garden.js?v=13"></script>
 </body>
 </html>
