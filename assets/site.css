@@ -169,6 +169,21 @@ a{color:inherit}
   font-size:clamp(28px,4.6vw,52px);margin-top:calc(var(--u)*1.5);text-shadow:0 2px 18px rgba(0,0,0,.4)}
 .subhero p{color:var(--ink-dim);margin-top:calc(var(--u)*2);max-width:640px;line-height:1.7;font-size:15px}
 
+/* 子页头部下方的联系方式一行（目前用在「关于我」） */
+.hero-mail{display:flex;flex-wrap:wrap;align-items:center;gap:calc(var(--u)*1.5);
+  margin-top:calc(var(--u)*2.5);min-height:0}
+.hero-mail a{display:inline-flex;align-items:center;gap:calc(var(--u)*1);
+  font-size:14px;letter-spacing:.02em;color:var(--green-bright);text-decoration:none;
+  padding:calc(var(--u)*.9) calc(var(--u)*1.75);border-radius:var(--radius);
+  border:1px solid rgba(159,240,200,.32);background:rgba(63,174,126,.10);
+  transition:gap var(--dur) var(--ease),background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),color var(--dur) var(--ease)}
+.hero-mail a:hover,.hero-mail a:focus-visible{gap:calc(var(--u)*1.5);color:var(--mint);
+  background:rgba(63,174,126,.18);border-color:rgba(159,240,200,.55);outline:none}
+.hero-mail a svg{width:15px;height:15px;flex:none}
+/* 只有悬停才变是不够的（WCAG 2.2）：复制/未访问状态也要看得清 */
+.hero-mail .lb{font-size:12.5px;color:rgba(201,214,207,.72);letter-spacing:.06em}
+
 /* ===== CONTENT ===== */
 /* body 是深蓝（星空底色）。若页面 <section class="block"> 不带 inline 底色，
    就会露出蓝色，在 subhero 下面切出一道明显的横向分界。所以给 .block 一个
