@@ -412,30 +412,31 @@ footer a{color:var(--green-bright);text-decoration:none}
   letter-spacing:.16em;font-size:14px;color:var(--mint);text-transform:uppercase}
 .bf-count{font-size:12px;color:var(--ink-dim);letter-spacing:.06em}
 
-/* 书架 */
-.shelf{position:relative;display:flex;align-items:flex-end;gap:calc(var(--u)*1.25);
-  padding:calc(var(--u)*3) calc(var(--u)*2.5) calc(var(--u)*2);height:236px;overflow-x:auto;
-  overflow-y:hidden;scrollbar-width:thin;scroll-behavior:smooth;
+/* 书架（分层版：每层是一排书，层板压在书脚上 —— 不用左右拖了） */
+.shelf{position:relative;padding:calc(var(--u)*2.5) 0 0;
   background:linear-gradient(180deg,rgba(6,26,20,.55),rgba(3,12,9,.85));
   border:1px solid rgba(255,255,255,.08);border-radius:14px 14px 8px 8px;
-  box-shadow:inset 0 22px 40px rgba(0,0,0,.4);
-  /* 书多了往右滑：两端做渐隐，暗示"还有" */
-  mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 34px),transparent 100%);
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 34px),transparent 100%)}
-.shelf::-webkit-scrollbar{height:5px}
-.shelf::-webkit-scrollbar-thumb{background:rgba(159,240,200,.25);border-radius:3px}
-.shelf::-webkit-scrollbar-track{background:transparent}
+  box-shadow:inset 0 22px 40px rgba(0,0,0,.4)}
+.shelf__row{position:relative;display:flex;align-items:flex-end;gap:calc(var(--u)*1.25);
+  height:var(--rh,172px);padding:calc(var(--u)*2) calc(var(--u)*2.5) 15px;overflow:hidden}
+/* 层板：既是这一层的地板，也是下一层的天花板 */
+.shelf__row::after{content:"";position:absolute;left:0;right:0;bottom:0;height:15px;
+  background:linear-gradient(180deg,#12452f,#07160f);border-top:1px solid rgba(159,240,200,.28);
+  box-shadow:0 -6px 18px rgba(0,0,0,.45)}
 .shelf::after{content:"";position:absolute;left:0;right:0;bottom:0;height:16px;
   background:linear-gradient(180deg,#12452f,#07160f);border-top:1px solid rgba(159,240,200,.28);
   box-shadow:0 -6px 18px rgba(0,0,0,.45)}
 .spine{position:relative;flex:0 0 auto;width:42px;height:var(--h,160px);cursor:pointer;
   border:1px solid rgba(255,255,255,.14);border-radius:4px 4px 2px 2px;
   background:linear-gradient(90deg,var(--c2),var(--c1) 42%,var(--c2));
-  display:flex;align-items:center;justify-content:center;padding:calc(var(--u)*1.5) 0;
+  display:flex;align-items:center;justify-content:center;padding:calc(var(--u)*.75) 0;
   transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease);
   box-shadow:0 6px 14px rgba(0,0,0,.45),inset 2px 0 0 rgba(255,255,255,.10)}
+/* 竖排书名要在有限层高里放下最长的《克林索尔的最后夏天》（9 字），
+   所以字号和字距都收一点：13.5px/.14em → 12.5px/.1em，9 字约占 125px，
+   层高 172px（可用 141px）刚好容得下，不会出省略号。 */
 .spine__title{writing-mode:vertical-rl;text-orientation:mixed;
-  font-family:"Noto Serif SC",serif;font-size:13.5px;letter-spacing:.14em;
+  font-family:"Noto Serif SC",serif;font-size:12.5px;letter-spacing:.1em;
   color:#eff7f2;text-shadow:0 1px 3px rgba(0,0,0,.6);white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;max-height:100%}
 .spine:hover{transform:translateY(-9px);box-shadow:0 16px 30px rgba(0,0,0,.55)}
@@ -539,7 +540,9 @@ footer a{color:var(--green-bright);text-decoration:none}
   .grid,.grid--2{grid-template-columns:1fr}
   .nav{top:calc(var(--u)*2);right:calc(var(--u)*2);padding:calc(var(--u)*.6) calc(var(--u)*.75);max-width:94vw}
   .nav a{font-size:12px;padding:calc(var(--u)*.7) calc(var(--u)*1)}
-  .shelf{height:206px}
+  .shelf{padding-top:calc(var(--u)*2)}
+  .shelf__row{--rh:172px;gap:calc(var(--u)*1);padding-left:calc(var(--u)*1.5);padding-right:calc(var(--u)*1.5)}
+  .shelf-hint{display:none}
   /* 手机：面板内边距收窄，避免书架 + 银幕一起把页面撑出横向滚动条 */
   .bf-panel{padding:calc(var(--u)*2)}
   .screen{padding:calc(var(--u)*1)}
@@ -556,6 +559,8 @@ footer a{color:var(--green-bright);text-decoration:none}
   .spine--empty{width:36px}
   .spine__title{font-size:12.5px;letter-spacing:.1em}
   .shelf{gap:calc(var(--u)*.9);padding-left:calc(var(--u)*1.5);padding-right:calc(var(--u)*1.5)}
+  /* 窄屏放不下装饰书脊，直接藏掉 —— 它们本来只是填充用的 */
+  .spine--deco{display:none}
   .wall{padding:calc(var(--u)*2);gap:calc(var(--u)*1.5)}
   .flow__col{padding-left:calc(var(--u)*2.5)}
   .flow__col .card::after{left:calc(var(--u)*-2.5 - 4px)}

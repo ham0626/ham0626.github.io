@@ -60,31 +60,50 @@
         </div>
 
         <div class="shelf">
-          <span class="spine spine--deco" style="--c1:#1f4a3a;--c2:#0b231b;--h:150px" aria-hidden="true"></span>
-          <button class="spine" data-id="klingsor" style="--c1:#2f7d5b;--c2:#123527;--h:186px" aria-label="克林索尔的最后夏天 书评">
-            <span class="spine__title">克林索尔的最后夏天</span>
-          </button>
-          <button class="spine" data-id="demian" style="--c1:#5c6f3a;--c2:#232b14;--h:176px" aria-label="德米安 书评">
-            <span class="spine__title">德米安</span>
-          </button>
-          <span class="spine spine--deco" style="--c1:#3a3550;--c2:#171426;--h:164px" aria-hidden="true"></span>
-          <button class="spine" data-id="nonethen" style="--c1:#7a4055;--c2:#33192a;--h:172px" aria-label="无人生还 书评">
-            <span class="spine__title">无人生还</span>
-          </button>
-          <button class="spine" data-id="goldcangue" style="--c1:#8a6a4a;--c2:#33241a;--h:158px" aria-label="金锁记 书评">
-            <span class="spine__title">金锁记</span>
-          </button>
-          <span class="spine spine--deco" style="--c1:#2b4a55;--c2:#102027;--h:142px" aria-hidden="true"></span>
-          <button class="spine" data-id="beauvoir" style="--c1:#6a4a6f;--c2:#2b1c2e;--h:196px" aria-label="波伏娃传 书评">
-            <span class="spine__title">波伏娃传</span>
-          </button>
-          <button class="spine" data-id="westfront" style="--c1:#4a5a68;--c2:#1b242b;--h:168px" aria-label="西线无战事 书评">
-            <span class="spine__title">西线无战事</span>
-          </button>
-          <button class="spine" data-id="straitgate" style="--c1:#9a7a63;--c2:#3a2b22;--h:150px" aria-label="窄门 书评">
-            <span class="spine__title">窄门</span>
-          </button>
-          <span class="spine spine--empty"><span>更多在补录</span></span>
+          <!-- 第一层 -->
+          <div class="shelf__row">
+            <span class="spine spine--deco" style="--c1:#1f4a3a;--c2:#0b231b;--h:112px" aria-hidden="true"></span>
+            <button class="spine" data-id="klingsor" style="--c1:#2f7d5b;--c2:#123527;--h:140px" aria-label="克林索尔的最后夏天 书评">
+              <span class="spine__title">克林索尔的最后夏天</span>
+            </button>
+            <button class="spine" data-id="demian" style="--c1:#5c6f3a;--c2:#232b14;--h:132px" aria-label="德米安 书评">
+              <span class="spine__title">德米安</span>
+            </button>
+            <span class="spine spine--deco" style="--c1:#3a3550;--c2:#171426;--h:120px" aria-hidden="true"></span>
+            <button class="spine" data-id="nonethen" style="--c1:#7a4055;--c2:#33192a;--h:124px" aria-label="无人生还 书评">
+              <span class="spine__title">无人生还</span>
+            </button>
+            <span class="spine spine--deco" style="--c1:#2b4a55;--c2:#102027;--h:104px" aria-hidden="true"></span>
+            <span class="spine spine--deco" style="--c1:#4a3a2a;--c2:#1d1712;--h:116px" aria-hidden="true"></span>
+          </div>
+
+          <!-- 第二层 -->
+          <div class="shelf__row">
+            <button class="spine" data-id="beauvoir" style="--c1:#6a4a6f;--c2:#2b1c2e;--h:138px" aria-label="波伏娃传 书评">
+              <span class="spine__title">波伏娃传</span>
+            </button>
+            <span class="spine spine--deco" style="--c1:#2f4a58;--c2:#121e26;--h:108px" aria-hidden="true"></span>
+            <button class="spine" data-id="goldcangue" style="--c1:#8a6a4a;--c2:#33241a;--h:118px" aria-label="金锁记 书评">
+              <span class="spine__title">金锁记</span>
+            </button>
+            <span class="spine spine--deco" style="--c1:#40463a;--c2:#1a1d16;--h:126px" aria-hidden="true"></span>
+            <span class="spine spine--deco" style="--c1:#5a3a44;--c2:#22151a;--h:98px" aria-hidden="true"></span>
+            <span class="spine spine--deco" style="--c1:#33474f;--c2:#131c20;--h:114px" aria-hidden="true"></span>
+          </div>
+
+          <!-- 第三层 -->
+          <div class="shelf__row">
+            <button class="spine" data-id="westfront" style="--c1:#4a5a68;--c2:#1b242b;--h:126px" aria-label="西线无战事 书评">
+              <span class="spine__title">西线无战事</span>
+            </button>
+            <span class="spine spine--deco" style="--c1:#4f4066;--c2:#1e1829;--h:106px" aria-hidden="true"></span>
+            <button class="spine" data-id="straitgate" style="--c1:#9a7a63;--c2:#3a2b22;--h:114px" aria-label="窄门 书评">
+              <span class="spine__title">窄门</span>
+            </button>
+            <span class="spine spine--empty"><span>更多在补录</span></span>
+            <span class="spine spine--deco" style="--c1:#3a4a40;--c2:#151d18;--h:120px" aria-hidden="true"></span>
+          </div>
+
           <span class="shelf-hint">点击书脊 →</span>
         </div>
 
@@ -278,14 +297,14 @@
     spirited:{
       kind:'film', tag:'电影', title:'千与千寻', en:'Spirited Away',
       meta:'宫崎骏 / 吉卜力 · 2001 · 动画 / 奇幻', stars:5,
-      text:'千寻在搬家的路上被卷进了一个不属于她的世界，父母变成了猪，名字被夺走，她只能签下一份自己并不情愿的合约。整部电影最动人的不是奇幻设定，而是她一点点把「名字」找回来的过程——名字在这里就是自我：别人叫你什么都可以，但你还记得自己是谁吗？无脸男守在桥边递金子，白龙忘了自己叫什么，锅炉爷爷说「不管怎样，要工作」——每一样都像是成年世界的一个隐喻。最后她从隧道里走出来，回头看了一眼，什么也没说。',
+      text:'千寻在搬家的路上被卷进了一个不属于她的世界，父母变成了猪，名字被夺走，她只能签下一份自己并不情愿的合约。整部电影最动人的不是奇幻设定，而是她一点点把「名字」找回来的过程——名字在这里就是自我：别人叫你什么都可以，但你还记得自己是谁吗？无脸男守在桥边递金子，白龙忘了自己叫什么，锅炉爷爷说「不管怎样，要工作」——每一样都像是成年世界的一个隐喻。最后她从隧道里走出来，回头看了一眼——Said you won\'t forget my name, not today, not tomorrow. —— Billie Eilish《CHIHIRO》',
       quote:'「不管前方的路有多苦，只要走的方向正确，都比站在原地更接近幸福。」'
     },
     weathering:{
       kind:'film', tag:'电影', title:'天气之子', en:'Weathering with You',
       meta:'新海诚 / CoMix Wave · 2019 · 动画 / 爱情', stars:4,
       text:'帆高离家出走到东京，遇见能让天空放晴的阳菜。到最后一刻，新海诚给了他一个在日式动画里相当少见的答案：不是为了世界牺牲你，而是为了你，让世界继续下雨。很多人的不满也在这里——这场雨淹掉了半座东京，凭什么？可它恰恰是这部电影最诚实的地方：一个还没被教导要顾全大局的少年，只会说「我只是想再见到你」。雨一直下了三年，而那把小伞下的两个人才刚刚开始过日子。',
-      quote:'「即使这世界充满了怎样都无所谓，我仍然只想再见你一面。」'
+      quote:'「比起晴天，我更需要你。」'
     }
   };
 
