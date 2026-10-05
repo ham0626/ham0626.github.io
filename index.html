@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Noto+Serif+SC:ital,wght@0,500;1,500;1,600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css?v=15" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2308212b'/%3E%3Ccircle cx='13' cy='13' r='9' fill='%233fae7e'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%239ff0c8' opacity='.9'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23f6b8c8' stroke-width='1.4' opacity='.7'/%3E%3C/svg%3E" />
 </head>
 <body>
 
@@ -252,7 +253,7 @@
 
   <div class="hero__scrim"></div>
 
-  <nav class="nav" aria-label="主导航">
+  <nav class="nav lg" aria-label="主导航">
     <a href="/" class="cur">首页</a>
     <a href="/about/">关于我</a>
     <a href="/bookfilm/">书影记录</a>
@@ -265,12 +266,30 @@
   </nav>
 
   <div class="hero__inner">
-    <span class="badge"><span class="dot"></span><b>New</b>&nbsp;—&nbsp;2026 求组队 AI 黑客松</span>
-    <h1 class="hero__title serif">在旷野与代码之间<br/>种一株温柔的野性</h1>
-    <blockquote class="hero__quote">
+    <span class="badge lg"><span class="dot"></span><span class="pill">New</span><span>2026 · 想组队打一场 AI 黑客松</span></span>
+    <h1 class="hero__title serif" data-blur>在旷野与代码之间<br/>种一株温柔的野性</h1>
+    <blockquote class="hero__quote fade-blur">
       <p class="serif"><span>一切终将实现它们的意义。</span><span>那儿，挚爱的渴望之星，依然向我灼灼燃烧</span></p>
       <cite>Hermann Hesse</cite>
     </blockquote>
+    <div class="hero__cta fade-blur">
+      <a class="lg-strong" href="/portfolio/">看看我做的东西
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+      </a>
+      <a class="ghost" href="/travel/">去足迹地图
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- 底部条：Space Voyage partners bar 的位置，内容换成自己的关键词 -->
+  <div class="hero__foot">
+    <span class="tag lg">东南大学 2026 级 · 生物医学工程 → 目标转入计算机学院 / PALM 实验室</span>
+    <div class="row">
+      <b>SEU</b><b>PALM Lab</b><b>C++</b><b>Python</b><b>IELTS 7.5</b>
+    </div>
   </div>
 </header>
 
@@ -282,5 +301,6 @@
 
 <script src="/assets/space.js?v=15"></script>
 <script src="/assets/garden.js?v=15"></script>
+<script src="/assets/hero.js?v=15"></script>
 </body>
 </html>

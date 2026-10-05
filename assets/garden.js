@@ -320,13 +320,18 @@
     let W = 0, H = 0, hor = 0, t = 0;
     let far = null, midA = null, midB = null, midC = null;
     let bokeh = [], motes = [], petals = [];
-    let fig = null, figOk = false;
-    const FIG = { cx: 0, feet: 0, ph: 0, fw: 0 };
+    /* 两个人物：左「画画」+ 右「敲代码」，左右镜像对称放在花海里 */
+    let figA = null, figB = null, okA = false, okB = false;
+    const FA = { cx: 0, feet: 0, ph: 0, fw: 0 };
+    const FB = { cx: 0, feet: 0, ph: 0, fw: 0 };
     const rip = rippleSet();
 
-    fig = new Image();
-    fig.onload = function () { figOk = true; };
-    fig.src = 'assets/img/ham-painter.png';
+    figA = new Image();
+    figA.onload = function () { okA = true; };
+    figA.src = 'assets/img/ham-painter.png';          // 1268×1020 → 宽高比 1.243
+    figB = new Image();
+    figB.onload = function () { okB = true; };
+    figB.src = 'assets/img/ham-fairy.png';            //  652×1000 → 宽高比 0.652
 
     function resize() {
       const box = canvas.parentElement.getBoundingClientRect();
@@ -342,11 +347,17 @@
       const seed = 20261004;
       /* 人物：坐在花海中画油画的背影 —— 居中、正对上方那颗大星球、尽量往下放。
          头顶压在地平线附近，与上方文案(已上收至 10u)错开 */
+      /* 人物：左右镜像对称。脚都落在 H*0.86 —— 再往下会被底部关键词条压住。 */
       const narrow = W < 860;
-      FIG.ph = H * (narrow ? 0.34 : 0.44);
-      FIG.fw = FIG.ph * 1.243;                       // ham-painter.png 1268×1020
-      FIG.cx = W * 0.5;
-      FIG.feet = H * 0.945;
+      FA.ph = H * (narrow ? 0.20 : 0.32);
+      FA.fw = FA.ph * 1.243;                         // ham-painter.png 1268×1020
+      FA.cx = W * (narrow ? 0.165 : 0.235);
+      FA.feet = H * 0.86;
+
+      FB.ph = H * (narrow ? 0.225 : 0.355);
+      FB.fw = FB.ph * 0.652;                         // ham-fairy.png 652×1000
+      FB.cx = W - FA.cx;                             // 严格镜像
+      FB.feet = H * 0.86;
 
       /* 远岸花海：贴着地平线的一道矮花边，逆光剪影 */
       far = buildLayer({
@@ -402,11 +413,11 @@
       }
     }
 
-    function drawFigure() {
-      if (!figOk) return;
-      const fw = FIG.fw, ph = FIG.ph, cx = FIG.cx, feet = FIG.feet, fy = feet - ph;
-      const bob = reduce ? 0 : Math.sin(t * 0.5) * H * 0.0032;
-      const sway = reduce ? 0 : Math.sin(t * 0.32) * 0.0035;
+    /* dir: +1 原向 / -1 水平镜像；phase 让两人的呼吸错开，镜像感靠 dir 反向摇摆保证 */
+    function drawOne(img, F, dir, phase) {
+      const fw = F.fw, ph = F.ph, cx = F.cx, feet = F.feet, fy = feet - ph;
+      const bob = reduce ? 0 : Math.sin(t * 0.5 + phase) * H * 0.0032;
+      const sway = reduce ? 0 : Math.sin(t * 0.32 + phase) * 0.0035 * dir;
 
       /* 落在花丛里的接触阴影 */
       ctx.save();
@@ -428,19 +439,31 @@
       ctx.beginPath(); ctx.ellipse(cx, fy + ph * 0.42, fw * 1.02, ph * 0.70, 0, 0, TAU); ctx.fill();
       ctx.restore();
 
+      /* 三层极淡描边，柔化边缘 */
       ctx.save();
       for (let k = 0; k < 3; k++) {
         const sp = 1 + (k + 1) * 0.020;
         ctx.globalAlpha = 0.13 - k * 0.038;
-        ctx.drawImage(fig, cx - fw * sp / 2, fy + ph / 2 + bob - ph * sp / 2, fw * sp, ph * sp);
+        ctx.drawImage(img, cx - fw * sp / 2, fy + ph / 2 + bob - ph * sp / 2, fw * sp, ph * sp);
       }
       ctx.restore();
 
       ctx.save();
       ctx.translate(cx, fy + ph / 2 + bob);
       ctx.rotate(sway);
-      ctx.drawImage(fig, -fw / 2, -ph / 2, fw, ph);
+      ctx.scale(dir, 1);                    // ← 镜像就靠这一行
+      ctx.drawImage(img, -fw / 2, -ph / 2, fw, ph);
       ctx.restore();
+    }
+
+    function drawFigure() {
+      if (okA) drawOne(figA, FA, +1, 0);     // 左：画画
+      if (okB) drawOne(figB, FB, -1, 1.1);   // 右：敲代码（水平镜像）
+      /* 开发期量测用：读两个人的实际落位 */
+      window.__figs = function () {
+        return { A: { cx: FA.cx, feet: FA.feet, ph: FA.ph, fw: FA.fw, ok: okA },
+                 B: { cx: FB.cx, feet: FB.feet, ph: FB.ph, fw: FB.fw, ok: okB }, W: W, H: H };
+      };
     }
 
     function frame() {

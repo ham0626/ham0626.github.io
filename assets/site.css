@@ -74,6 +74,90 @@ a{color:inherit}
   .hero__quote p{font-size:clamp(13px,3.5vw,16px)}
 }
 
+/* ===== LIQUID GLASS（Space Voyage 玻璃质感）=====
+   半透明本体 + ::before 画一圈上下亮、中间透明的 1.4px 渐变描边，
+   靠 mask-composite:exclude 把内部挖空，只留那圈边 —— 这是"液态玻璃"的关键。 */
+/* 用 :where() 包一层：优先级降为 0，这样 .nav 自己的 position:absolute 不会被
+   这里的 position:relative 顶掉（否则导航会脱离右上角、跑到视口外）。 */
+:where(.lg),:where(.lg-strong){background:rgba(255,255,255,.012);background-blend-mode:luminosity;
+  border:none;position:relative;overflow:hidden;border-radius:var(--radius)}
+.lg{backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.10)}
+.lg-strong{backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
+  box-shadow:4px 4px 4px rgba(0,0,0,.05),inset 0 1px 1px rgba(255,255,255,.15)}
+.lg::before,.lg-strong::before{content:'';position:absolute;inset:0;border-radius:inherit;
+  padding:1.4px;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.45) 0%,rgba(255,255,255,.15) 20%,
+    rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,
+    rgba(255,255,255,.15) 80%,rgba(255,255,255,.45) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.lg-strong::before{background:linear-gradient(180deg,
+    rgba(255,255,255,.5) 0%,rgba(255,255,255,.2) 20%,
+    rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,
+    rgba(255,255,255,.2) 80%,rgba(255,255,255,.5) 100%)}
+
+/* 可选的背景视频：压在星空(z1)之下，淡叠不被抢戏 —— 配色仍然是现有的深青 */
+.hero__video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
+  opacity:.42;mix-blend-mode:screen;pointer-events:none}
+
+/* 导航胶囊：换液态玻璃，配色沿用深青（position 必须显式写回 absolute） */
+.nav.lg{position:absolute;background:rgba(12,38,34,.30)}
+.nav.lg a{padding:calc(var(--u)*.875) calc(var(--u)*1.4)}
+
+/* 徽章：外壳液态玻璃 + 内部实心白胶囊 */
+.badge{padding:3px;gap:calc(var(--u)*1.25);margin-bottom:calc(var(--u)*3.5)}
+.badge .pill{background:#fff;color:#05201a;border-radius:var(--radius);
+  padding:2px calc(var(--u)*1.25);font-size:11px;font-weight:600;letter-spacing:.04em}
+.badge span:not(.dot):not(.pill){font-size:12.5px;color:rgba(243,246,244,.9);padding-right:calc(var(--u)*1.5)}
+.badge .dot{width:6px;height:6px;margin-left:calc(var(--u)*1.25)}
+
+/* 逐词模糊渐入（BlurText）：JS 负责切词，这里只管动画 */
+.hero__title .bw{display:inline-block;will-change:filter,opacity,transform}
+.hero__title .bw{filter:blur(10px);opacity:0;transform:translateY(50px)}
+.hero__title.bt-go .bw{animation:bwin .9s var(--ease) forwards}
+@keyframes bwin{
+  0%{filter:blur(10px);opacity:0;transform:translateY(50px)}
+  55%{filter:blur(5px);opacity:.5;transform:translateY(-5px)}
+  100%{filter:blur(0);opacity:1;transform:translateY(0)}}
+/* 副标题 / 按钮组：整块模糊渐入 */
+.fade-blur{filter:blur(10px);opacity:0;transform:translateY(20px);
+  transition:filter .8s var(--ease),opacity .8s var(--ease),transform .8s var(--ease)}
+.fade-blur.in{filter:blur(0);opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){
+  .hero__title .bw{filter:none;opacity:1;transform:none;animation:none}
+  .fade-blur{filter:none;opacity:1;transform:none;transition:none}
+}
+
+/* CTA 按钮组 */
+.hero__cta{display:flex;align-items:center;gap:calc(var(--u)*3);margin-top:calc(var(--u)*3.5);
+  flex-wrap:wrap;justify-content:center}
+.hero__cta a{display:inline-flex;align-items:center;gap:calc(var(--u)*.875);
+  text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.02em;
+  color:var(--ink);padding:calc(var(--u)*1.4) calc(var(--u)*2.75);
+  transition:transform var(--dur) var(--ease)}
+.hero__cta a:hover{transform:translateY(-2px)}
+.hero__cta a svg{width:18px;height:18px;flex:none}
+.hero__cta .ghost{color:rgba(243,246,244,.82);font-weight:400;gap:calc(var(--u)*.75)}
+.hero__cta .ghost svg{width:16px;height:16px;fill:currentColor}
+.hero__cta .ghost:hover{color:var(--ink)}
+
+/* 底部条（Space Voyage partners bar 的位置，内容换成自己的） */
+.hero__foot{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);z-index:6;
+  display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2)}
+.hero__foot .tag{font-size:11.5px;letter-spacing:.06em;color:rgba(243,246,244,.86);
+  padding:calc(var(--u)*.875) calc(var(--u)*2.25)}
+.hero__foot .row{display:flex;align-items:center;gap:calc(var(--u)*4) calc(var(--u)*5);
+  flex-wrap:wrap;justify-content:center}
+.hero__foot .row b{font-family:"Cormorant Garamond","Noto Serif SC",serif;font-style:italic;
+  font-weight:500;font-size:clamp(17px,2.1vw,26px);color:rgba(243,246,244,.92);
+  letter-spacing:.01em;text-shadow:0 2px 18px rgba(0,0,0,.55)}
+@media(max-height:700px){.hero__foot{bottom:calc(var(--u)*1.5);gap:calc(var(--u)*1.25)}
+  .hero__foot .row{gap:calc(var(--u)*3)}}
+@media(max-width:860px){.hero__foot .row{gap:calc(var(--u)*2.5)}
+  .hero__foot .row b{font-size:16px}}
+
 /* ===== SUBPAGE HEADER ===== */
 .subhero{position:relative;overflow:hidden;padding:calc(var(--u)*14) calc(var(--u)*3) calc(var(--u)*8);
   background:linear-gradient(160deg,#05101f 0%,#0a2019 60%,#08150f 100%);min-height:340px}
@@ -124,6 +208,22 @@ section.block{padding:calc(var(--u)*12) calc(var(--u)*3)}
 .tag{font-size:12px;padding:calc(var(--u)*.75) calc(var(--u)*1.5);border-radius:var(--radius);
   background:rgba(63,174,126,.16);border:1px solid rgba(63,174,126,.35);color:#bfe9d4}
 .award-meta{font-size:12px;color:var(--gold);margin-top:calc(var(--u)*1.5);letter-spacing:.03em}
+
+/* 卡片底部的仓库跳转 */
+.card__links{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.75);margin-top:calc(var(--u)*2.25)}
+.card__link{display:inline-flex;align-items:center;gap:calc(var(--u)*.75);
+  font-size:13px;color:var(--green-bright);text-decoration:none;letter-spacing:.02em;
+  transition:gap var(--dur) var(--ease),color var(--dur) var(--ease)}
+.card__link:hover,.card__link:focus-visible{gap:calc(var(--u)*1.25);color:var(--mint);outline:none}
+.card__link svg{width:14px;height:14px;flex:none}
+.card__link.dim{color:rgba(201,214,207,.55)}
+.card__link.dim:hover{color:rgba(201,214,207,.85)}
+/* 状态标记：制作中 / 还没开 */
+.card__soon{display:inline-flex;align-items:center;gap:7px;margin-top:calc(var(--u)*2.25);
+  font-size:12px;color:var(--gold);letter-spacing:.04em}
+.card__soon .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);
+  animation:soonPulse 2.2s ease-in-out infinite}
+@keyframes soonPulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
 
 /* timeline */
 .timeline{position:relative;margin-top:calc(var(--u)*3);padding-left:calc(var(--u)*3)}
