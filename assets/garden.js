@@ -222,7 +222,30 @@
       g.fillStyle = rg; g.fillRect(0, 0, cv.width, h);
       g.globalCompositeOperation = 'source-over';
     }
-    return { cv: cv, w: cv.width, h: h, pad: pad, baseY: baseY, dstY: o.baseScreenY - baseY, base: o.baseScreenY };
+    /* Space Voyage 的"电影感"：预渲染一张模糊 + 提亮的光晕副本。
+       每帧只是多一次 drawImage，不做实时 blur —— 运行时零开销。
+       配色完全沿用花海本身的色相，只是把光"散"开来。 */
+    let glow = null;
+    if (o.glow) {
+      const px = o.glowBlur || 7;
+      const b = document.createElement('canvas');
+      b.width = cv.width; b.height = cv.height;
+      const bx = b.getContext('2d');
+      bx.filter = 'blur(' + px + 'px)';
+      bx.drawImage(cv, 0, 0);
+      bx.filter = 'none';
+      const gc = document.createElement('canvas');
+      gc.width = cv.width; gc.height = cv.height;
+      const g2 = gc.getContext('2d');
+      g2.drawImage(b, 0, 0);
+      g2.globalCompositeOperation = 'lighter';   // 自叠加把亮度顶上去
+      g2.globalAlpha = 0.9;
+      g2.drawImage(b, 0, 0);
+      glow = gc;
+    }
+    return { cv: cv, glow: glow, glowA: o.glow == null ? 0 : o.glow,
+             w: cv.width, h: h, pad: pad, baseY: baseY,
+             dstY: o.baseScreenY - baseY, base: o.baseScreenY };
   }
   function drawLayer(ctx, L, dx, rot, soft) {
     ctx.save();
@@ -230,6 +253,14 @@
     ctx.rotate(rot);
     ctx.translate(-L.w / 2, -(L.dstY + L.baseY));
     const ox = -L.pad, oy = L.dstY;
+    /* 先铺一层柔光（lighter），再压清晰层 —— 花就有"发光"的质感 */
+    if (L.glow) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = L.glowA;
+      ctx.drawImage(L.glow, ox, oy);
+      ctx.restore();
+    }
     if (soft) {
       /* 注意：渐变必须建在临时画布 c2 的坐标系里（从 y=0 起）。
          若沿用目标画布的 oy（几百 px），渐变整体落在画布之外，
@@ -320,18 +351,14 @@
     let W = 0, H = 0, hor = 0, t = 0;
     let far = null, midA = null, midB = null, midC = null;
     let bokeh = [], motes = [], petals = [];
-    /* 两个人物：左「画画」+ 右「敲代码」，左右镜像对称放在花海里 */
-    let figA = null, figB = null, okA = false, okB = false;
+    /* 就一个人物：坐在花海里画画的背影，居中、正对上方那颗大星球 */
+    let figA = null, okA = false;
     const FA = { cx: 0, feet: 0, ph: 0, fw: 0 };
-    const FB = { cx: 0, feet: 0, ph: 0, fw: 0 };
     const rip = rippleSet();
 
     figA = new Image();
     figA.onload = function () { okA = true; };
     figA.src = 'assets/img/ham-painter.png';          // 1268×1020 → 宽高比 1.243
-    figB = new Image();
-    figB.onload = function () { okB = true; };
-    figB.src = 'assets/img/ham-fairy.png';            //  652×1000 → 宽高比 0.652
 
     function resize() {
       const box = canvas.parentElement.getBoundingClientRect();
@@ -347,61 +374,63 @@
       const seed = 20261004;
       /* 人物：坐在花海中画油画的背影 —— 居中、正对上方那颗大星球、尽量往下放。
          头顶压在地平线附近，与上方文案(已上收至 10u)错开 */
-      /* 人物：左右镜像对称。脚都落在 H*0.86 —— 再往下会被底部关键词条压住。 */
+      /* 人物：居中，头顶压在地平线附近，与上方文案错开 */
       const narrow = W < 860;
-      FA.ph = H * (narrow ? 0.20 : 0.32);
+      FA.ph = H * (narrow ? 0.34 : 0.44);
       FA.fw = FA.ph * 1.243;                         // ham-painter.png 1268×1020
-      FA.cx = W * (narrow ? 0.165 : 0.235);
-      FA.feet = H * 0.86;
+      FA.cx = W * 0.5;
+      FA.feet = H * 0.945;
 
-      FB.ph = H * (narrow ? 0.225 : 0.355);
-      FB.fw = FB.ph * 0.652;                         // ham-fairy.png 652×1000
-      FB.cx = W - FA.cx;                             // 严格镜像
-      FB.feet = H * 0.86;
+      /* 花海调成 Space Voyage 的调子：花朵变少、变大，每一层都带一层柔光（glow）。
+         越靠近镜头 glow 越散（glowBlur 更大）= 景深，颜色一律沿用原来的色相。 */
 
       /* 远岸花海：贴着地平线的一道矮花边，逆光剪影 */
       far = buildLayer({
         W: W, baseScreenY: hor - H * 0.008, maxH: H * 0.05, bottomPad: 10,
-        count: Math.max(150, Math.round(W * 0.66)),
+        count: Math.max(110, Math.round(W * 0.40)),
         mix: ['cosmos', 'daisy', 'spike', 'gyp', 'grass', 'grass'],
-        sizeMin: 3, sizeMax: 6.4, hMin: 0.35, hMax: 1,
-        tone: 0.18, dark: 0.4, rim: true
+        sizeMin: 4.2, sizeMax: 8.2, hMin: 0.35, hMax: 1,
+        tone: 0.18, dark: 0.4, rim: true,
+        glow: 0.30, glowBlur: 6
       }, seed);
       /* 中景：全部是小花（前景大株不再画） */
       midA = buildLayer({
         W: W, baseScreenY: H * 0.74, maxH: H * 0.065, bottomPad: H * 0.04,
-        count: Math.max(150, Math.round(W * 0.46)),
+        count: Math.max(110, Math.round(W * 0.28)),
         mix: ['cosmos', 'daisy', 'spike', 'gyp', 'grass', 'grass'],
-        sizeMin: 3.4, sizeMax: 6.6, hMin: 0.24, hMax: 0.7,
-        tone: 0.42, dark: 0.26, rim: true
+        sizeMin: 4.8, sizeMax: 9.0, hMin: 0.24, hMax: 0.7,
+        tone: 0.42, dark: 0.26, rim: true,
+        glow: 0.42, glowBlur: 8
       }, seed + 11);
       /* 脚边那一层：漫过她脚踝，把身下的土地全部吃掉。
          baseScreenY + bottomPad = H → 图层底边正好压到页面最底，下方不留空地 */
       midB = buildLayer({
         W: W, baseScreenY: H * 0.90, maxH: H * 0.14, bottomPad: H * 0.10,
-        count: Math.max(160, Math.round(W * 0.55)),
+        count: Math.max(120, Math.round(W * 0.34)),
         mix: ['cosmos', 'cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
-        sizeMin: 5.5, sizeMax: 10.5, hMin: 0.30, hMax: 1.0,
-        tone: 0.82, dark: 0.05, rim: true
+        sizeMin: 7.5, sizeMax: 14, hMin: 0.30, hMax: 1.0,
+        tone: 0.82, dark: 0.05, rim: true,
+        glow: 0.50, glowBlur: 10
       }, seed + 23);
       /* 最贴近镜头的一层矮花毯：基线压到页面底边之外，
          把 850px 以下（她脚边、画面最底）彻底铺满，不给土地留缝 */
       midC = buildLayer({
         W: W, baseScreenY: H * 1.01, maxH: H * 0.115, bottomPad: H * 0.075,
-        count: Math.max(150, Math.round(W * 0.50)),
+        count: Math.max(110, Math.round(W * 0.32)),
         mix: ['cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
-        sizeMin: 6, sizeMax: 11.5, hMin: 0.34, hMax: 1.0,
-        tone: 0.88, dark: 0.02, rim: true
+        sizeMin: 8, sizeMax: 15, hMin: 0.34, hMax: 1.0,
+        tone: 0.88, dark: 0.02, rim: true,
+        glow: 0.58, glowBlur: 13
       }, seed + 41);
 
       const r = mk(seed + 37);
       bokeh = [];
-      for (let i = 0; i < 26; i++) {
-        bokeh.push({ x: r() * W, y: H * (0.52 + r() * 0.36), rr: 5 + r() * 22, a: 0.04 + r() * 0.11, ph: r() * TAU, warm: r() > 0.5 });
+      for (let i = 0; i < 34; i++) {
+        bokeh.push({ x: r() * W, y: H * (0.52 + r() * 0.36), rr: 7 + r() * 27, a: 0.05 + r() * 0.13, ph: r() * TAU, warm: r() > 0.5 });
       }
       motes = [];
-      for (let i = 0; i < 46; i++) {
-        motes.push({ x: r() * W, y: H * (0.3 + r() * 0.7), rr: 0.6 + r() * 1.8, vy: -(0.05 + r() * 0.2), vx: (r() - 0.5) * 0.16, a: 0.14 + r() * 0.42, ph: r() * TAU });
+      for (let i = 0; i < 72; i++) {
+        motes.push({ x: r() * W, y: H * (0.3 + r() * 0.7), rr: 0.7 + r() * 2.1, vy: -(0.05 + r() * 0.2), vx: (r() - 0.5) * 0.16, a: 0.16 + r() * 0.46, ph: r() * TAU });
       }
       petals = [];
       for (let i = 0; i < 18; i++) {
@@ -457,12 +486,10 @@
     }
 
     function drawFigure() {
-      if (okA) drawOne(figA, FA, +1, 0);     // 左：画画
-      if (okB) drawOne(figB, FB, -1, 1.1);   // 右：敲代码（水平镜像）
-      /* 开发期量测用：读两个人的实际落位 */
+      if (okA) drawOne(figA, FA, +1, 0);
+      /* 开发期量测用：读人物的实际落位 */
       window.__figs = function () {
-        return { A: { cx: FA.cx, feet: FA.feet, ph: FA.ph, fw: FA.fw, ok: okA },
-                 B: { cx: FB.cx, feet: FB.feet, ph: FB.ph, fw: FB.fw, ok: okB }, W: W, H: H };
+        return { A: { cx: FA.cx, feet: FA.feet, ph: FA.ph, fw: FA.fw, ok: okA }, W: W, H: H };
       };
     }
 
@@ -478,6 +505,20 @@
 
       /* 远岸花海 + 水中倒影 */
       drawLayer(ctx, far, br * 0.6, br * 0.00015, 1);
+
+      /* 地平线大气：一条贴着 hor 的柔光带，让远景"退"进去 —— 电影景深靠这层。
+         色相沿用站点青绿，只加光不加别的颜色。 */
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const hz = ctx.createLinearGradient(0, hor - H * 0.12, 0, hor + H * 0.12);
+      hz.addColorStop(0, 'rgba(90,220,180,0)');
+      hz.addColorStop(0.42, 'rgba(120,235,195,.085)');
+      hz.addColorStop(0.5, 'rgba(158,244,214,.12)');
+      hz.addColorStop(0.58, 'rgba(120,235,195,.085)');
+      hz.addColorStop(1, 'rgba(90,220,180,0)');
+      ctx.fillStyle = hz;
+      ctx.fillRect(0, hor - H * 0.12, W, H * 0.24);
+      ctx.restore();
       ctx.save();
       ctx.beginPath(); ctx.rect(0, hor, W, H * 0.5); ctx.clip();
       ctx.globalAlpha = 1;

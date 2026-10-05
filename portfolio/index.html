@@ -26,20 +26,85 @@
   <div class="wrap">
     <div class="crumb">Home / Portfolio</div>
     <h1 class="serif">项目作品</h1>
-    <p>这一板块还在搭建中。</p>
+    <p>把写过的东西摆出来。有的做完了，有的还在做，有的只是刚起个头 —— 都在下面。</p>
   </div>
 </header>
+
 <section class="block" style="background:linear-gradient(180deg,#0c1f1a,#081712)">
   <div class="wrap">
-    <div class="empty">
-      <div class="emoji">🛠️</div>
-      <h3 class="serif">项目作品筹备中</h3>
-      <p>蹭饭地图、个人网站、学术争议雷达之后，更多作品正在路上。这里会放上仓库、演示与复盘。</p>
-      <span class="hint">即将上线 · 敬请期待</span>
+
+    <!-- ============ 主项目 ============ -->
+    <div class="sub-title serif">— 主项目 —</div>
+    <div class="grid">
+      <article class="card">
+        <span class="kicker">Web</span><h3 class="serif">个人网站</h3>
+        <p>独立完成页面设计、前端实现与部署上线，集中展示个人介绍、项目与技能。</p>
+        <div class="tagrow"><span class="tag">HTML / CSS</span><span class="tag">部署</span></div>
+        <div class="card__links">
+          <a class="card__link" href="https://github.com/ham0626/ham0626.github.io" data-repo="ham0626/ham0626.github.io" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+          <a class="card__link" href="https://ham0626.github.io/" target="_blank" rel="noopener">线上站点<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="kicker">Hackathon</span><h3 class="serif">学术争议雷达</h3>
+        <p>黑客松作品：输入领域关键词，扒出学界争论焦点与真实论文依据（Gradio + Qwen + Crossref，反幻觉引用）。</p>
+        <div class="tagrow"><span class="tag">Gradio</span><span class="tag">Qwen</span><span class="tag">反幻觉</span></div>
+        <div class="card__links">
+          <a class="card__link" href="https://github.com/ham0626/academic-controversy-radar" data-repo="ham0626/academic-controversy-radar" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+        </div>
+        <span class="card__soon"><span class="dot"></span>2026.10 · 还在制作中</span>
+      </article>
+
+      <article class="card">
+        <span class="kicker">Map</span><h3 class="serif">高中蹭饭地图</h3>
+        <p>Codex 辅助独立完成：同学大学分布可标注地图，密钥保护个人信息，方便跨校联络。</p>
+        <div class="tagrow"><span class="tag">C++ / 前端</span><span class="tag">地图标注</span><span class="tag">密钥保护</span></div>
+      </article>
     </div>
+
+    <!-- ============ 代码仓库 ============ -->
+    <div class="sub-title serif">— 代码仓库 —</div>
+    <div class="grid">
+      <article class="card">
+        <span class="kicker">Code</span><h3 class="serif">Code-notes</h3>
+        <p>日常练习的存放处：算法题、Python 小练习、课程作业、临时冒出来的想法。不求写得漂亮，只求一直在写 —— 这里大概是最能看出我进步曲线的地方。</p>
+        <div class="tagrow"><span class="tag">C++</span><span class="tag">Python</span><span class="tag">持续更新</span></div>
+        <div class="card__links">
+          <a class="card__link" href="https://github.com/ham0626/Code-notes" data-repo="ham0626/Code-notes" target="_blank" rel="noopener">去看看<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+        </div>
+      </article>
+    </div>
+
+    <!-- ============ 代码思路 ============ -->
+    <div class="sub-title serif">— 代码思路 —</div>
+    <div class="grid">
+      <article class="card">
+        <span class="kicker">Writing</span><h3 class="serif">想明白的那些事</h3>
+        <p>想把自己踩过的坑和想清楚的算法写下来 —— 从「为什么这样写」开始，而不是「这样写」。第一篇大概会从背包或者 DFS 说起。</p>
+        <div class="tagrow"><span class="tag">算法</span><span class="tag">复盘</span></div>
+        <span class="card__soon"><span class="dot"></span>还没开 · 攒够几篇就动笔</span>
+      </article>
+    </div>
+
+    <!-- ============ 比赛项目（预留，以后直接往这里加卡片） ============ -->
+    <div class="sub-title serif">— 比赛项目 —</div>
+    <div class="grid">
+      <article class="card ghost">
+        <span class="kicker">Soon</span><h3 class="serif">虚位以待</h3>
+        <p>信息竞赛、AI 黑客松、以后可能参加的别的比赛 —— 做出来一个就往这里放一个。</p>
+        <span class="card__soon"><span class="dot"></span>空着，等第一个作品</span>
+      </article>
+    </div>
+
   </div>
 </section>
-<footer>© 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="/">回到首页 ↑</a></footer>
+
+<footer>
+  © 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="/">回到首页 ↑</a>
+</footer>
+
 <script src="/assets/space.js"></script>
+<script src="/assets/repos.js"></script>
 </body>
 </html>
