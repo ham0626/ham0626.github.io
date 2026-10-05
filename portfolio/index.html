@@ -26,84 +26,248 @@
   <div class="wrap">
     <div class="crumb">Home / Portfolio</div>
     <h1 class="serif">项目作品</h1>
-    <p>把写过的东西摆出来。有的做完了，有的还在做，有的只是刚起个头 —— 都在下面。</p>
+    <p>三条并行的路一起往前走：左边是自己一点点练出来的能力，中间是正在做的黑客松，右边是打过和要打的比赛。点任意一张卡，看它到底是怎么来的。</p>
   </div>
 </header>
 
-<section class="block" style="background:linear-gradient(180deg,#0c1f1a,#081712)">
+<section class="block" style="background:linear-gradient(180deg,#0c1f1a,#06110e)">
   <div class="wrap">
+    <div class="flow">
 
-    <!-- ============ 主项目 ============ -->
-    <div class="sub-title serif">— 主项目 —</div>
-    <div class="grid">
-      <article class="card">
-        <span class="kicker">Web</span><h3 class="serif">个人网站</h3>
-        <p>独立完成页面设计、前端实现与部署上线，集中展示个人介绍、项目与技能。</p>
-        <div class="tagrow"><span class="tag">HTML / CSS</span><span class="tag">部署</span></div>
-        <div class="card__links">
-          <a class="card__link" href="https://github.com/ham0626/ham0626.github.io" data-repo="ham0626/ham0626.github.io" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
-          <a class="card__link" href="https://ham0626.github.io/" target="_blank" rel="noopener">线上站点<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
-        </div>
-      </article>
+      <!-- ============ 第 1 列：个人能力 ============ -->
+      <div class="flow__col">
+        <div class="sub-title serif" style="margin-top:0">— 个人能力 —</div>
 
-      <article class="card">
-        <span class="kicker">Hackathon</span><h3 class="serif">学术争议雷达</h3>
-        <p>黑客松作品：输入领域关键词，扒出学界争论焦点与真实论文依据（Gradio + Qwen + Crossref，反幻觉引用）。</p>
-        <div class="tagrow"><span class="tag">Gradio</span><span class="tag">Qwen</span><span class="tag">反幻觉</span></div>
-        <div class="card__links">
-          <a class="card__link" href="https://github.com/ham0626/academic-controversy-radar" data-repo="ham0626/academic-controversy-radar" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
-        </div>
-        <span class="card__soon"><span class="dot"></span>2026.10 · 还在制作中</span>
-      </article>
+        <article class="card card--open" data-pm="site" tabindex="0" role="button" aria-label="个人网站 详情">
+          <span class="kicker">Web</span><h3 class="serif">个人网站</h3>
+          <p>独立完成页面设计、前端实现与部署上线，集中展示个人介绍、项目与技能。</p>
+          <div class="tagrow"><span class="tag">HTML / CSS</span><span class="tag">部署</span></div>
+          <div class="card__links">
+            <a class="card__link" href="https://github.com/ham0626/ham0626.github.io" data-repo="ham0626/ham0626.github.io" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+            <a class="card__link" href="https://ham0626.github.io/" target="_blank" rel="noopener">线上站点<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+          </div>
+          <span class="card__more">点开看它怎么长出来的 →</span>
+        </article>
 
-      <article class="card">
-        <span class="kicker">Map</span><h3 class="serif">高中蹭饭地图</h3>
-        <p>Codex 辅助独立完成：同学大学分布可标注地图，密钥保护个人信息，方便跨校联络。</p>
-        <div class="tagrow"><span class="tag">C++ / 前端</span><span class="tag">地图标注</span><span class="tag">密钥保护</span></div>
-      </article>
+        <article class="card card--open" data-pm="notes" tabindex="0" role="button" aria-label="Code-notes 详情">
+          <span class="kicker">Code</span><h3 class="serif">Code-notes</h3>
+          <p>日常练习的存放处：算法题、Python 小练习、课程作业、临时冒出来的想法。不求写得漂亮，只求一直在写。</p>
+          <div class="tagrow"><span class="tag">C++</span><span class="tag">Python</span><span class="tag">持续更新</span></div>
+          <div class="card__links">
+            <a class="card__link" href="https://github.com/ham0626/Code-notes" data-repo="ham0626/Code-notes" target="_blank" rel="noopener">去看看<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+          </div>
+          <span class="card__more">点开看它怎么长出来的 →</span>
+        </article>
+
+        <article class="card card--open" data-pm="thoughts" tabindex="0" role="button" aria-label="代码思路 详情">
+          <span class="kicker">Writing</span><h3 class="serif">代码思路</h3>
+          <p>想把自己踩过的坑和想清楚的算法写下来 —— 从「为什么这样写」开始，而不是「这样写」。</p>
+          <div class="tagrow"><span class="tag">算法</span><span class="tag">复盘</span></div>
+          <span class="card__soon"><span class="dot"></span>还没开 · 攒够几篇就动笔</span>
+          <span class="card__more">点开看它怎么长出来的 →</span>
+        </article>
+
+        <article class="card ghost">
+          <span class="kicker">Next</span><h3 class="serif">下一个练手</h3>
+          <p>学一门新技术就想找个小东西练一练，做完了往这上面挂。</p>
+        </article>
+      </div>
+
+      <!-- ============ 第 2 列：黑客松项目 ============ -->
+      <div class="flow__col">
+        <div class="sub-title serif" style="margin-top:0">— 黑客松项目 —</div>
+
+        <article class="card card--open" data-pm="radar" tabindex="0" role="button" aria-label="学术争议雷达 详情">
+          <span class="kicker">Hackathon</span><h3 class="serif">学术争议雷达</h3>
+          <p>输入领域关键词，扒出学界争论焦点与真实论文依据（Gradio + Qwen + Crossref，反幻觉引用）。</p>
+          <div class="tagrow"><span class="tag">Gradio</span><span class="tag">Qwen</span><span class="tag">反幻觉</span></div>
+          <div class="card__links">
+            <a class="card__link" href="https://github.com/ham0626/academic-controversy-radar" data-repo="ham0626/academic-controversy-radar" target="_blank" rel="noopener">仓库<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+          </div>
+          <span class="card__soon"><span class="dot"></span>2026.10 · 还在制作中</span>
+          <span class="card__more">点开看它怎么长出来的 →</span>
+        </article>
+
+        <article class="card ghost">
+          <span class="kicker">Soon</span><h3 class="serif">下一场黑客松</h3>
+          <p>2026 · 想再组一次队。有想法的人可以直接找我。</p>
+        </article>
+      </div>
+
+      <!-- ============ 第 3 列：比赛经历 ============ -->
+      <div class="flow__col">
+        <div class="sub-title serif" style="margin-top:0">— 比赛经历 —</div>
+
+        <article class="card card--open" data-pm="map" tabindex="0" role="button" aria-label="高中蹭饭地图 详情">
+          <span class="kicker">Tool</span><h3 class="serif">高中蹭饭地图</h3>
+          <p>同学大学分布可标注地图，密钥保护个人信息，方便跨校联络。Codex 辅助独立完成。</p>
+          <div class="tagrow"><span class="tag">C++ / 前端</span><span class="tag">地图标注</span><span class="tag">密钥保护</span></div>
+          <span class="card__more">点开看它怎么长出来的 →</span>
+        </article>
+
+        <article class="card ghost">
+          <span class="kicker">Soon</span><h3 class="serif">虚位以待</h3>
+          <p>信息竞赛、AI 黑客松、以后可能参加的别的比赛 —— 打完一场就在这里记一笔。</p>
+          <span class="card__soon"><span class="dot"></span>空着，等第一个记录</span>
+        </article>
+      </div>
+
     </div>
-
-    <!-- ============ 代码仓库 ============ -->
-    <div class="sub-title serif">— 代码仓库 —</div>
-    <div class="grid">
-      <article class="card">
-        <span class="kicker">Code</span><h3 class="serif">Code-notes</h3>
-        <p>日常练习的存放处：算法题、Python 小练习、课程作业、临时冒出来的想法。不求写得漂亮，只求一直在写 —— 这里大概是最能看出我进步曲线的地方。</p>
-        <div class="tagrow"><span class="tag">C++</span><span class="tag">Python</span><span class="tag">持续更新</span></div>
-        <div class="card__links">
-          <a class="card__link" href="https://github.com/ham0626/Code-notes" data-repo="ham0626/Code-notes" target="_blank" rel="noopener">去看看<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
-        </div>
-      </article>
-    </div>
-
-    <!-- ============ 代码思路 ============ -->
-    <div class="sub-title serif">— 代码思路 —</div>
-    <div class="grid">
-      <article class="card">
-        <span class="kicker">Writing</span><h3 class="serif">想明白的那些事</h3>
-        <p>想把自己踩过的坑和想清楚的算法写下来 —— 从「为什么这样写」开始，而不是「这样写」。第一篇大概会从背包或者 DFS 说起。</p>
-        <div class="tagrow"><span class="tag">算法</span><span class="tag">复盘</span></div>
-        <span class="card__soon"><span class="dot"></span>还没开 · 攒够几篇就动笔</span>
-      </article>
-    </div>
-
-    <!-- ============ 比赛项目（预留，以后直接往这里加卡片） ============ -->
-    <div class="sub-title serif">— 比赛项目 —</div>
-    <div class="grid">
-      <article class="card ghost">
-        <span class="kicker">Soon</span><h3 class="serif">虚位以待</h3>
-        <p>信息竞赛、AI 黑客松、以后可能参加的别的比赛 —— 做出来一个就往这里放一个。</p>
-        <span class="card__soon"><span class="dot"></span>空着，等第一个作品</span>
-      </article>
-    </div>
-
   </div>
 </section>
+
+<!-- ============ 详情弹层 ============ -->
+<div class="pm" id="pm" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="pm__bg" data-pm-close></div>
+  <div class="pm__box">
+    <button class="pm__close" data-pm-close aria-label="关闭">×</button>
+    <span class="kicker" id="pmKind"></span>
+    <h3 class="serif" id="pmTitle"></h3>
+    <div id="pmBody"></div>
+    <div class="card__links" id="pmLinks" style="margin-top:calc(var(--u)*4)"></div>
+  </div>
+</div>
 
 <footer>
   © 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="/">回到首页 ↑</a>
 </footer>
 
+<script>
+(function(){
+  /* 详情正文：每张卡背后到底是怎么做出来的 */
+  var PM = {
+    site: {
+      kind: 'Web · 个人能力', title: '个人网站',
+      body: '<p>这是我第一个从头到尾自己动手做完的东西 —— 不是跟着教程抄一遍，而是先想清楚"我想让人看到什么"，再一点一点把页面搭出来。</p>'
+        + '<p>整体是一个深绿底色的暗色站点，衬黑塞式的温柔野性：星空是 Canvas 画的，首页那片花海和人像也是逐层渲染出来的，导航和按钮用了半透明玻璃质感。全过程没有用框架，就是 HTML、CSS 和原生 JavaScript，写完推到 GitHub Pages 上。</p>'
+        + '<h4>过程中真正学到的事</h4>'
+        + '<ul>'
+        + '<li><b>路径必须写根绝对路径</b>：站点用目录式部署（<code>/travel/index.html</code>），跨页链接写相对路径会在子目录里拼错，我第一次就是这么把书影和足迹地图搞成一片 404 的。</li>'
+        + '<li><b>动画要尊重系统偏好</b>：检测到 <code>prefers-reduced-motion</code> 时把动画关掉，不然对晕动敏感的人不友好。</li>'
+        + '<li><b>性能靠"预计算"</b>：花海的发光效果不是每帧实时模糊，而是提前把模糊副本渲染好，之后每帧只多画一张图。看起来更电影感，代价却几乎为零。</li>'
+        + '</ul>'
+        + '<p>现在它还在长。缺的板块会一个一个补上，就像这个网站本身也在往前走。</p>',
+      links: [
+        { t: '仓库', h: 'https://github.com/ham0626/ham0626.github.io', r: 'ham0626/ham0626.github.io' },
+        { t: '线上站点', h: 'https://ham0626.github.io/' }
+      ]
+    },
+    notes: {
+      kind: 'Code · 个人能力', title: 'Code-notes',
+      body: '<p>这里没有作品，只有过程。</p>'
+        + '<p>算法题的题解、Python 的小练习、课程作业、半夜冒出来顺手写的几十行 —— 全部往这一个仓库里堆。它们大多不好看，有些甚至是错的，但我不想让它们散落在各种临时文件里消失掉。</p>'
+        + '<p>把练习集中放在一起有一个好处：过一段时间回头看，能明显看出自己什么时候在认真、什么时候在划水。这大概是最诚实的一份成长曲线。</p>'
+        + '<h4>里面会有什么</h4>'
+        + '<ul>'
+        + '<li><b>C++</b>：算法与数据结构练习，信息竞赛留下的习惯。</li>'
+        + '<li><b>Python</b>：小工具、脚本、尝试性的东西。</li>'
+        + '<li><b>课程与作业</b>：大一之后会慢慢多起来的部分。</li>'
+        + '</ul>'
+        + '<p>它会一直更新。写得不好也会更新。</p>',
+      links: [{ t: '去看看', h: 'https://github.com/ham0626/Code-notes', r: 'ham0626/Code-notes' }]
+    },
+    thoughts: {
+      kind: 'Writing · 个人能力', title: '代码思路',
+      body: '<p>我一直觉得，能跑通的代码和真正想明白的代码，是两件事。</p>'
+        + '<p>所以我想开一个地方，专门写"为什么"。为什么这里要用二分而不是遍历，为什么这个状态的转移是对的，为什么我当时写错了、错在哪一步。不求系统，只求诚实。</p>'
+        + '<h4>已经想好的开头</h4>'
+        + '<ul>'
+        + '<li>从一个背包问题讲起：状态到底是怎么被想出来的。</li>'
+        + '<li>DFS 里最容易写错的那几行边界。</li>'
+        + '<li>我踩过的坑，以及后来怎么绕开的。</li>'
+        + '</ul>'
+        + '<p>还没动笔。攒够几篇不那么难看的，就一起放出来。</p>',
+      links: []
+    },
+    radar: {
+      kind: 'Hackathon · 黑客松项目', title: '学术争议雷达',
+      body: '<p>做科研的人有一个共同的痛：想知道某个领域到底在吵什么，得先读掉几十篇论文。</p>'
+        + '<p>这个项目的想法是反过来 —— 你只输入一个领域关键词，它去把这个领域里<b>真正存在争议</b>的点挖出来，然后每个观点后面都挂上真实的论文依据，而不是让大模型自由发挥。</p>'
+        + '<h4>为什么强调"反幻觉"</h4>'
+        + '<ul>'
+        + '<li>大模型编文献的能力太强了，格式完整、作者像真的，但一查根本不存在。</li>'
+        + '<li>所以引用不走模型，走 <b>Crossref</b> 这类真实的文献数据库，模型只负责组织语言和判断争议点。</li>'
+        + '<li>每条结论都能点回原文 —— 这是这个项目最核心的坚持。</li>'
+        + '</ul>'
+        + '<h4>用到的</h4>'
+        + '<ul>'
+        + '<li><b>Gradio</b> 做界面，让不会写代码的人也能直接用。</li>'
+        + '<li><b>Qwen</b> 做理解与生成。</li>'
+        + '<li><b>Crossref API</b> 做文献核对。</li>'
+        + '</ul>'
+        + '<p>2026 年 10 月，还在做。做完了会把线上地址放上来。</p>',
+      links: [{ t: '仓库', h: 'https://github.com/ham0626/academic-controversy-radar', r: 'ham0626/academic-controversy-radar' }]
+    },
+    map: {
+      kind: 'Tool · 比赛经历', title: '高中蹭饭地图',
+      body: '<p>高中毕业之后，同学散到了各个城市。想找人吃饭的时候，脑子里那张地图是乱的。</p>'
+        + '<p>所以做了这个：一张可以标注的地图，谁在哪个学校、在哪个城市，一眼看得见。去外地玩的时候顺便蹭顿饭，就这么简单。</p>'
+        + '<h4>两个当时特意处理的地方</h4>'
+        + '<ul>'
+        + '<li><b>个人信息保护</b>：地图上不会把所有人的信息摊开给任何人看，用密钥做了访问控制 —— 只有拿到密钥的人才能看到完整位置。</li>'
+        + '<li><b>标注要够简单</b>：同学不是程序员，加一个位置必须点几下就完成，不然没人会用。</li>'
+        + '</ul>'
+        + '<p>用 Codex 辅助，独立做完。这是我第一次把"想做个小东西给自己用"变成真的能用的东西。</p>',
+      links: []
+    }
+  };
+
+  var pm = document.getElementById('pm');
+  var elKind = document.getElementById('pmKind');
+  var elTitle = document.getElementById('pmTitle');
+  var elBody = document.getElementById('pmBody');
+  var elLinks = document.getElementById('pmLinks');
+  var lastFocus = null;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; }); }
+
+  function open(id){
+    var d = PM[id]; if(!d) return;
+    lastFocus = document.activeElement;
+    elKind.textContent = d.kind || '';
+    elTitle.textContent = d.title || '';
+    elBody.innerHTML = d.body || '';
+    elLinks.innerHTML = (d.links || []).map(function(l){
+      var repo = l.r ? ' data-repo="' + esc(l.r) + '"' : '';
+      return '<a class="card__link" href="' + esc(l.h) + '"' + repo
+        + ' target="_blank" rel="noopener">' + esc(l.t)
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        + '<path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>';
+    }).join('');
+    pm.classList.add('is-on');
+    document.body.style.overflow = 'hidden';
+    // 弹层里后插入的仓库链接也要体检一次（repos.js 只在加载时扫一遍全局）
+    if (window.HAM_REPO_CHECK) window.HAM_REPO_CHECK(pm);
+    pm.querySelector('.pm__close').focus();
+  }
+  function close(){
+    pm.classList.remove('is-on');
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.querySelectorAll('.card--open').forEach(function(c){
+    c.addEventListener('click', function(e){
+      // 点卡片里的仓库链接时不要顺带打开弹层
+      if (e.target.closest('a')) return;
+      open(c.dataset.pm);
+    });
+    c.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(c.dataset.pm); }
+    });
+  });
+  pm.addEventListener('click', function(e){ if (e.target.closest('[data-pm-close]')) close(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && pm.classList.contains('is-on')) close(); });
+
+  // 深链：#site / #radar …
+  (function(){
+    var m = (location.hash || '').match(/^#(?:pm-)?(\w+)$/);
+    if (m && PM[m[1]]) open(m[1]);
+  })();
+})();
+</script>
 <script src="/assets/space.js"></script>
 <script src="/assets/repos.js"></script>
 </body>
