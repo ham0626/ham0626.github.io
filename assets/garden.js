@@ -419,8 +419,8 @@
         count: Math.max(110, Math.round(W * 0.32)),
         mix: ['cosmos', 'daisy', 'poppy', 'rose', 'gyp', 'grass'],
         sizeMin: 8, sizeMax: 15, hMin: 0.34, hMax: 1.0,
-        tone: 0.88, dark: 0.02, rim: true,
-        glow: 0.58, glowBlur: 13
+        tone: 0.88, dark: 0.30, rim: true,
+        glow: 0.42, glowBlur: 13
       }, seed + 41);
 
       const r = mk(seed + 37);
