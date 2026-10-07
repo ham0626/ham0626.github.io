@@ -613,7 +613,7 @@ footer a{color:var(--green-bright);text-decoration:none}
   86%{opacity:.45}
   100%{transform:translateY(-560px) translateX(22px);opacity:0}}
 
-.creek{position:relative;z-index:1;max-width:min(820px,100%);margin:calc(var(--u)*2) auto 0}
+.creek{position:relative;z-index:1;max-width:min(1400px,96vw);margin:calc(var(--u)*2) auto 0}
 .creek__water{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
 .creek__path{fill:none;stroke:url(#creekGrad);stroke-width:7;stroke-linecap:round;
   filter:drop-shadow(0 0 10px rgba(63,174,126,.5));
@@ -622,8 +622,56 @@ footer a{color:var(--green-bright);text-decoration:none}
   stroke-dasharray:2 18;animation:creekFlow 5s linear infinite;opacity:.7;pointer-events:none}
 @keyframes creekFlow{to{stroke-dashoffset:-40}}
 
+/* —— 空白之处的装饰：萤火虫 / 蝴蝶 / 散落小花 —— */
+.creek__fireflies,.creek__butterflies{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.creek__fireflies{z-index:3}
+.creek__butterflies{z-index:4}
+
+/* 萤火虫：暖金光点，缓缓游移、忽明忽暗 */
+.firefly{position:absolute;width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle,#fff6c8 0%,rgba(244,213,141,.95) 32%,rgba(244,213,141,0) 70%);
+  box-shadow:0 0 9px 2px rgba(244,213,141,.6);opacity:0;
+  animation:fireflyWander var(--fdur,18s) ease-in-out infinite,fireflyTwinkle var(--ftw,3.4s) ease-in-out infinite}
+.firefly:nth-child(3n+1){animation-name:fireflyWander1,fireflyTwinkle}
+.firefly:nth-child(3n+2){animation-name:fireflyWander2,fireflyTwinkle}
+@keyframes fireflyWander{
+  0%{transform:translate(0,0)}25%{transform:translate(34px,-26px)}50%{transform:translate(-22px,-58px)}
+  75%{transform:translate(18px,-30px)}100%{transform:translate(0,0)}}
+@keyframes fireflyWander1{
+  0%{transform:translate(0,0)}30%{transform:translate(-30px,-34px)}60%{transform:translate(26px,-64px)}
+  100%{transform:translate(0,0)}}
+@keyframes fireflyWander2{
+  0%{transform:translate(0,0)}35%{transform:translate(28px,-20px)}70%{transform:translate(-26px,-52px)}
+  100%{transform:translate(0,0)}}
+@keyframes fireflyTwinkle{0%,100%{opacity:.12}50%{opacity:.95}}
+
+/* 蝴蝶：两翼轻扇，沿小径飘过 */
+.butterfly{position:absolute;width:30px;height:24px;opacity:0;will-change:transform;
+  animation:bflyDrift var(--bdur,24s) linear infinite}
+.butterfly .bf-body{position:absolute;left:50%;top:50%;width:2px;height:15px;margin:-7px 0 0 -1px;
+  background:linear-gradient(180deg,#d9b89a,#7a9c6e);border-radius:2px}
+.butterfly .bf-wing{position:absolute;top:1px;width:14px;height:21px;
+  border-radius:62% 62% 55% 55%/78% 78% 35% 35%;box-shadow:0 0 5px rgba(246,184,200,.35);
+  transform-origin:right center}
+.butterfly .bf-l{left:0;animation:bflyFlap 260ms ease-in-out infinite}
+.butterfly .bf-r{right:0;transform-origin:left center;animation:bflyFlap 260ms ease-in-out infinite reverse}
+@keyframes bflyFlap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.32)}}
+@keyframes bflyDrift{
+  0%{transform:translate(0,0);opacity:0}
+  7%{opacity:.92}
+  50%{transform:translate(calc(var(--bdist,420px) * var(--dir,1)),-54px)}
+  93%{opacity:.92}
+  100%{transform:translate(calc(var(--bdist,420px) * var(--dir,1) * 2),-22px);opacity:0}}
+
+/* 散落小花：在溪水两侧静静摇曳 */
+.deco-flower-wrap{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
+.deco-flower{display:block;width:20px;height:20px;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));transform-origin:50% 78%;
+  animation:flowerSway 7s ease-in-out infinite}
+@keyframes flowerSway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+
 /* 一朵苗 / 花：默认缩成 0，进入视野时长出来 */
-.bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;
+.bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;z-index:2;
   transition:transform 720ms cubic-bezier(.2,.7,.2,1),opacity 620ms ease;
   cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;
   display:flex;flex-direction:column;align-items:center;width:140px}
@@ -725,8 +773,10 @@ footer a{color:var(--green-bright);text-decoration:none}
   font-family:"Noto Serif SC",serif;font-style:italic;color:#ecd9a8;font-size:13.5px;line-height:1.9}
 
 @media(max-width:560px){
+  .block--creek::before{background:none}
   .creek{max-width:100%}
-  .bud{width:110px}
-  .bud__label{font-size:12.5px;max-width:160px}
+  .bud{width:100px}
+  .bud__label{font-size:12px;max-width:128px}
+  .deco-flower{width:16px;height:16px}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }
