@@ -586,157 +586,147 @@ footer a{color:var(--green-bright);text-decoration:none}
   .flow__col::after{animation:none;opacity:0}
 }
 
+
 /* ============================================================
-   成长日志：「金门」翻页书（Golden Portal）
-   —— 暖金光晕 + 金色门环 + 一叠纸页绕左边缘 3D 翻动。
-      内容装在 .leaf__inner 里，JS 按最高的一页给 .book 定高；
-      无 JS 时 .book 不是 .is-live，自动退化成一张张竖排的页（见下方规则）。
+   成长日志：「花圃小溪」竖向流淌（Flower-bed Creek）
+   —— 一条在花圃里蜿蜒向下的小溪，随滚动自绘延伸；
+      两岸的苗与花随进入视野而生长，点开即见一段心事。
+      无 JS 时 .creek 不是 .is-live，退化为竖排的卡片列表。
    ============================================================ */
-.block--portal{position:relative;overflow:hidden}
-.block--portal::before{content:"";position:absolute;inset:0;pointer-events:none;
+.block--creek{position:relative;overflow:hidden;
   background:
-    radial-gradient(46% 38% at 50% 22%,rgba(244,213,141,.07),rgba(244,213,141,0) 74%),
-    radial-gradient(72% 58% at 50% 102%,rgba(63,174,126,.06),rgba(0,0,0,0) 72%)}
+    radial-gradient(60% 30% at 50% -4%,rgba(63,174,126,.10),rgba(0,0,0,0) 70%),
+    linear-gradient(180deg,#08120e 0%,#0a1714 42%,#0a1c16 100%)}
+.block--creek::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(38% 22% at 18% 16%,rgba(244,213,141,.05),rgba(0,0,0,0) 70%),
+    radial-gradient(40% 24% at 84% 62%,rgba(159,240,200,.05),rgba(0,0,0,0) 72%)}
 
-/* 版心尺寸集中在这里：页内容的内边距 与 页脚细线的左右位置 共用 */
-.portal{position:relative;--pgx:calc(var(--u)*7);--pgy:calc(var(--u)*6)}
-.bookwrap{position:relative;width:min(780px,100%);margin:0 auto}
+/* 飘浮的花粉 / 萤光点 */
+.creek__pollen{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.creek__pollen i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;
+  background:radial-gradient(circle,rgba(244,213,141,.9),rgba(244,213,141,0) 70%);
+  opacity:0;animation:pollenDrift linear infinite}
+@keyframes pollenDrift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  14%{opacity:.7}
+  86%{opacity:.45}
+  100%{transform:translateY(-560px) translateX(22px);opacity:0}}
 
-/* 门里的光：暖金色光晕 */
-.portal__halo{position:absolute;left:50%;top:50%;width:118%;height:calc(100% + 200px);
-  transform:translate(-50%,-50%);pointer-events:none;z-index:0;filter:blur(8px);
-  background:radial-gradient(50% 50% at 50% 50%,rgba(244,213,141,.12),
-    rgba(244,213,141,.03) 50%,rgba(244,213,141,0) 74%)}
-/* 金色门环：沿用站点"液态玻璃"的 mask 描边法，只留一圈暖金边 */
-.portal__ring{position:absolute;inset:-18px -22px;border-radius:28px;padding:1.4px;
-  pointer-events:none;z-index:0;opacity:.78;
-  background:linear-gradient(180deg,rgba(244,213,141,.62) 0%,rgba(244,213,141,.10) 34%,
-    rgba(244,213,141,.10) 66%,rgba(244,213,141,.62) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  transition:opacity var(--dur) var(--ease)}
-.portal.is-turning .portal__ring{animation:portalPulse 900ms var(--ease)}
-@keyframes portalPulse{
-  0%,100%{opacity:.78;filter:drop-shadow(0 0 0 rgba(244,213,141,0))}
-  45%{opacity:1;filter:drop-shadow(0 0 20px rgba(244,213,141,.55))}}
+.creek{position:relative;z-index:1;max-width:min(820px,100%);margin:calc(var(--u)*2) auto 0}
+.creek__water{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
+.creek__path{fill:none;stroke:url(#creekGrad);stroke-width:7;stroke-linecap:round;
+  filter:drop-shadow(0 0 10px rgba(63,174,126,.5));
+  stroke-dasharray:1;transition:stroke-dashoffset 120ms linear}
+.creek__flow{fill:none;stroke:rgba(214,255,235,.55);stroke-width:1.6;stroke-linecap:round;
+  stroke-dasharray:2 18;animation:creekFlow 5s linear infinite;opacity:.7;pointer-events:none}
+@keyframes creekFlow{to{stroke-dashoffset:-40}}
 
-/* 书：一叠页。翻动中的那张由 JS 提到最高层。
-   页必须完全不透明 —— 半透明会让下面几页的字透上来，像鬼影。 */
-.book{position:relative;width:100%;perspective:2200px;transform-style:preserve-3d}
-.leaf{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;
-  -webkit-backface-visibility:hidden;backface-visibility:hidden;
-  border:1px solid rgba(244,213,141,.26);border-radius:20px;overflow:hidden;
-  background:linear-gradient(158deg,#15302a 0%,#0a1c16 56%,#081612 100%);
-  box-shadow:0 26px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);
-  /* 缓动接近线性：backface 在 90° 就消失，若起步太慢，可见的翻转只有一瞬 */
-  transition:transform 900ms cubic-bezier(.4,.05,.6,.95);will-change:transform}
-.leaf.turned{transform:rotateY(-179deg)}
-/* 页脚细线：让较短的页下方留白看起来像"纸面"，而不是没写完 */
-.leaf::after{content:"";position:absolute;left:var(--pgx);right:var(--pgx);bottom:calc(var(--u)*2.6);
-  height:1px;background:linear-gradient(90deg,rgba(244,213,141,.20),rgba(244,213,141,.03))}
-.leaf__inner{position:relative;padding:var(--pgy) var(--pgx) calc(var(--pgy) + var(--u)*.5)}
+/* 一朵苗 / 花：默认缩成 0，进入视野时长出来 */
+.bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;
+  transition:transform 720ms cubic-bezier(.2,.7,.2,1),opacity 620ms ease;
+  cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;
+  display:flex;flex-direction:column;align-items:center;width:140px}
+.bud.is-grown{transform:translate(-50%,-50%) scale(1);opacity:1}
+.bud:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:14px}
+.bud__stem{width:2px;height:34px;margin:0 auto;
+  background:linear-gradient(180deg,rgba(159,240,200,0),rgba(159,240,200,.7));border-radius:2px}
+.bud__bloom{position:relative;width:48px;height:48px;margin-top:-3px;display:grid;place-items:center;
+  filter:drop-shadow(0 5px 11px rgba(0,0,0,.5));transition:transform var(--dur) var(--ease)}
+.bud:hover .bud__bloom,.bud:focus-visible .bud__bloom{transform:scale(1.12) rotate(-3deg)}
+.bud__bloom::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%,var(--gold) 0 22%,rgba(244,213,141,0) 23%),
+    conic-gradient(from 0deg,
+      rgba(246,184,200,.95) 0 18%,rgba(244,213,141,0) 18% 22%,
+      rgba(246,184,200,.95) 22% 40%,rgba(244,213,141,0) 40% 44%,
+      rgba(246,184,200,.95) 44% 62%,rgba(244,213,141,0) 62% 66%,
+      rgba(246,184,200,.95) 66% 84%,rgba(244,213,141,0) 84% 88%,
+      rgba(246,184,200,.95) 88% 100%);
+  -webkit-mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 62%);
+  mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 62%);
+  transform:scale(.92)}
+.bud__core{position:relative;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#fff6e0,var(--gold) 70%);
+  box-shadow:0 0 12px rgba(244,213,141,.8)}
+/* 苗：用两片嫩叶换下花瓣 */
+.bud--sprout .bud__bloom{width:42px;height:42px}
+.bud--sprout .bud__bloom::before{background:
+    radial-gradient(circle at 50% 78%,rgba(159,240,200,.95) 0 20%,rgba(159,240,200,0) 21%),
+    conic-gradient(from 200deg,
+      rgba(63,174,126,.95) 0 30%,rgba(63,174,126,0) 30% 38%,
+      rgba(63,174,126,.95) 38% 68%,rgba(63,174,126,0) 68% 76%,
+      rgba(63,174,126,.95) 76% 100%);
+  -webkit-mask:radial-gradient(circle at 50% 60%,#000 58%,transparent 60%);
+  mask:radial-gradient(circle at 50% 60%,#000 58%,transparent 60%);
+  transform:scale(1)}
+.bud--sprout .bud__core{background:radial-gradient(circle at 40% 35%,#d6ffe9,var(--mint) 72%);
+  box-shadow:0 0 12px rgba(63,174,126,.8);width:12px;height:12px}
 
-/* 无 JS / 初始化前：不叠成书，就是一张张竖排的页 */
-.book:not(.is-live){perspective:none}
-.book:not(.is-live) .leaf{position:static;transform:none;margin-bottom:calc(var(--u)*3)}
+.bud__label{margin-top:9px;max-width:200px;text-align:center;
+  font-family:"Noto Serif SC",serif;color:var(--ink);font-size:13.5px;line-height:1.5;
+  text-shadow:0 1px 8px rgba(0,0,0,.6);transition:color var(--dur) var(--ease)}
+.bud__era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:11px;letter-spacing:.1em;color:var(--gold);opacity:.82;margin-bottom:2px}
+.bud:hover .bud__label,.bud:focus-visible .bud__label{color:#fff}
 
-/* 翻页时扫过一道暖金高光 */
-.leaf__sheen{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;
-  background:linear-gradient(105deg,rgba(244,213,141,0) 32%,rgba(255,241,206,.22) 50%,rgba(244,213,141,0) 68%)}
-.leaf.leaving .leaf__sheen{animation:pageSheen 900ms var(--ease)}
-@keyframes pageSheen{0%{opacity:0;transform:translateX(-34%)}24%{opacity:.95}100%{opacity:0;transform:translateX(34%)}}
-
-/* 页内排版 */
-.pg__top{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*2);flex-wrap:wrap}
-.pg__era{font-family:"Cormorant Garamond","Noto Serif SC",serif;font-style:italic;
-  font-size:13px;letter-spacing:.12em;color:var(--gold);opacity:.86}
-.pg__ch{font-size:11.5px;letter-spacing:.1em;color:rgba(159,240,200,.74);white-space:nowrap;
-  border:1px solid rgba(159,240,200,.26);border-radius:var(--radius);padding:calc(var(--u)*.5) calc(var(--u)*1.4)}
-.pg__title{font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;color:var(--ink);
-  font-size:clamp(24px,3.2vw,36px);line-height:1.22;margin:calc(var(--u)*2) 0 calc(var(--u)*2.5)}
-.pg__title::after{content:"";display:block;width:58px;height:2px;margin-top:calc(var(--u)*2);
+/* 点开后的感悟卡片（modal） */
+.petal{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:calc(var(--u)*3)}
+.petal.is-open{display:flex;animation:petalFade 220ms ease both}
+@keyframes petalFade{from{opacity:0}to{opacity:1}}
+.petal__backdrop{position:absolute;inset:0;background:rgba(4,10,8,.72);backdrop-filter:blur(6px)}
+.petal__card{position:relative;z-index:1;width:min(560px,100%);max-height:84vh;overflow:auto;
+  background:linear-gradient(168deg,#10261f,#0a1a15 60%,#081512);
+  border:1px solid rgba(244,213,141,.3);border-radius:22px;
+  padding:calc(var(--u)*5) calc(var(--u)*5) calc(var(--u)*4.5);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:petalPop 320ms cubic-bezier(.2,.7,.2,1) both}
+@keyframes petalPop{from{transform:translateY(18px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.petal__close{position:absolute;top:calc(var(--u)*2);right:calc(var(--u)*2.5);
+  width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;color:var(--ink);
+  background:rgba(244,213,141,.10);border:1px solid rgba(244,213,141,.32);
+  transition:background var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.petal__close:hover{background:rgba(244,213,141,.2);transform:rotate(90deg)}
+.petal__close:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.petal__era{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;
+  letter-spacing:.12em;color:var(--gold);opacity:.85}
+.petal__title{font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;color:var(--ink);
+  font-size:clamp(22px,3.4vw,30px);line-height:1.3;margin:calc(var(--u)*1.5) 0 calc(var(--u)*2.5)}
+.petal__title::after{content:"";display:block;width:54px;height:2px;margin-top:calc(var(--u)*2);
   background:linear-gradient(90deg,var(--gold),rgba(244,213,141,0))}
-.pg__body p{color:#dbe6e0;font-size:15px;line-height:2}
-.pg__body p + p{margin-top:calc(var(--u)*1.75)}
-.pg__body .pg__aside{margin-top:calc(var(--u)*2);font-size:13.5px;line-height:1.85;color:rgba(201,214,207,.72)}
-/* RPG 日志行 */
-.pg__log{list-style:none;display:flex;flex-direction:column;gap:calc(var(--u)*1.25)}
-.pg__log li{position:relative;padding-left:calc(var(--u)*2.75);color:#dbe6e0;font-size:14.5px;line-height:1.75}
-.pg__log li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;
-  background:var(--gold);box-shadow:0 0 8px rgba(244,213,141,.65)}
-.pg__log b{color:var(--ink);font-weight:600;letter-spacing:.02em}
-.pg__log i{font-style:normal;color:rgba(159,240,200,.82);margin-left:2px}
-.pg__quote{margin-top:calc(var(--u)*3);padding:calc(var(--u)*.25) 0 calc(var(--u)*.25) calc(var(--u)*2.5);
+.petal__text{color:#dbe6e0;font-size:15px;line-height:2}
+.petal__text p + p{margin-top:calc(var(--u)*1.75)}
+.petal__quote{margin-top:calc(var(--u)*3);padding:calc(var(--u)*.25) 0 calc(var(--u)*.25) calc(var(--u)*2.5);
   border-left:2px solid rgba(244,213,141,.5);font-family:"Noto Serif SC",serif;font-style:italic;
   color:#ecd9a8;font-size:14px;line-height:1.9}
-.pg__no{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*4.2);
-  font-family:"Cormorant Garamond",serif;font-style:italic;font-size:46px;line-height:1;
-  color:rgba(244,213,141,.17);letter-spacing:.02em}
-.leaf.is-jump .leaf__inner{animation:fadeUp 460ms var(--ease) both}
 
-/* 左右翻页热区（只有 JS 就绪后才出现） */
-.pgzone{display:none;position:absolute;top:0;bottom:0;width:15%;z-index:650;cursor:pointer;
-  opacity:0;transition:opacity var(--dur) var(--ease)}
-.portal.is-live .pgzone{display:block}
-.pgzone--l{left:0;border-radius:20px 0 0 20px;
-  background:linear-gradient(90deg,rgba(244,213,141,.10),rgba(244,213,141,0))}
-.pgzone--r{right:0;border-radius:0 20px 20px 0;
-  background:linear-gradient(270deg,rgba(244,213,141,.10),rgba(244,213,141,0))}
-.pgzone:hover{opacity:1}
+.creek__hint{position:relative;z-index:1;text-align:center;margin-top:calc(var(--u)*4);
+  font-size:12px;letter-spacing:.06em;color:rgba(201,214,207,.5)}
 
-/* 页数控制 */
-.portal__ctrl,.portal__hint{display:none}
-.portal.is-live .portal__ctrl{display:flex}
-.portal.is-live .portal__hint{display:block}
-.portal__ctrl{position:relative;z-index:6;align-items:center;justify-content:center;
-  gap:calc(var(--u)*3);margin-top:calc(var(--u)*5)}
-.pgbtn{width:46px;height:46px;border-radius:50%;cursor:pointer;font-family:inherit;
-  font-size:22px;line-height:1;color:var(--ink);display:flex;align-items:center;justify-content:center;
-  background:rgba(244,213,141,.10);border:1px solid rgba(244,213,141,.34);
-  transition:background var(--dur) var(--ease),transform var(--dur) var(--ease),border-color var(--dur) var(--ease)}
-.pgbtn:hover{background:rgba(244,213,141,.20);border-color:rgba(244,213,141,.62);transform:translateY(-2px)}
-.pgbtn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
-.pgbtn[disabled]{opacity:.3;cursor:default;transform:none}
-.pgmeter{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px;
-  letter-spacing:.16em;color:var(--ink-dim);min-width:78px;text-align:center}
-.pgmeter #pgCount{color:var(--gold);font-size:19px}
-.portal__hint{margin-top:calc(var(--u)*2);text-align:center;font-size:12px;
-  letter-spacing:.06em;color:rgba(201,214,207,.5)}
+/* 无 JS：退化成竖排卡片，内容全可读 */
+.creek:not(.is-live){min-height:0}
+.creek:not(.is-live) .bud{position:static;transform:none;opacity:1;width:100%;
+  align-items:flex-start;margin:calc(var(--u)*2) 0;padding:calc(var(--u)*2.5);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  flex-direction:row;flex-wrap:wrap;gap:calc(var(--u)*2.5)}
+.creek:not(.is-live) .bud__stem,.creek:not(.is-live) .bud__bloom{display:none}
+.creek:not(.is-live) .bud__label{text-align:left;margin-top:0}
+.creek__pollen{display:none}
 
-/* 底部索引：点哪一条翻到哪一页 */
-.ix{display:grid;grid-template-columns:repeat(auto-fill,minmax(214px,1fr));gap:calc(var(--u)*1.25);
-  margin-top:calc(var(--u)*11);padding-top:calc(var(--u)*4);border-top:1px solid rgba(244,213,141,.16)}
-.ix__i{display:flex;align-items:baseline;gap:calc(var(--u)*1.5);text-align:left;cursor:pointer;
-  font:inherit;color:var(--ink-dim);background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:calc(var(--u)*1.5) calc(var(--u)*1.75);
-  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),
-    color var(--dur) var(--ease),transform var(--dur) var(--ease)}
-.ix__i:hover{background:rgba(244,213,141,.10);border-color:rgba(244,213,141,.42);
-  color:var(--ink);transform:translateY(-2px)}
-.ix__i:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-.ix__i.is-on{background:rgba(244,213,141,.13);border-color:rgba(244,213,141,.55);color:var(--ink)}
-.ix__n{flex:none;font-family:"Cormorant Garamond",serif;font-style:italic;
-  font-size:13px;color:var(--gold);opacity:.85}
-.ix__t{font-size:13.5px;line-height:1.5}
-.ix__t small{display:block;margin-top:2px;font-size:11.5px;color:rgba(201,214,207,.55);letter-spacing:.04em}
+.bud__panel{display:none}
+.creek:not(.is-live) .bud__panel{display:block;width:100%}
+.bud__p-era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;
+  letter-spacing:.1em;color:var(--gold);opacity:.82}
+.bud__p-title{display:block;font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;
+  color:var(--ink);font-size:clamp(18px,2.6vw,22px);line-height:1.4;margin:6px 0 12px}
+.bud__p-text{display:block;color:#dbe6e0;font-size:14.5px;line-height:1.95}
+.bud__p-text p + p{margin-top:12px}
+.bud__p-quote{display:block;margin-top:14px;padding:4px 0 4px 18px;border-left:2px solid rgba(244,213,141,.5);
+  font-family:"Noto Serif SC",serif;font-style:italic;color:#ecd9a8;font-size:13.5px;line-height:1.9}
 
-@media(max-width:860px){
-  .portal{--pgx:calc(var(--u)*4);--pgy:calc(var(--u)*4.5)}
-  .pg__title{font-size:clamp(21px,6vw,27px);margin:calc(var(--u)*1.5) 0 calc(var(--u)*2)}
-  .pg__body p{font-size:14.5px;line-height:1.9}
-  .pg__log li{font-size:14px}
-  .pg__quote{font-size:13.5px}
-  .pg__no{right:calc(var(--u)*3);bottom:calc(var(--u)*3.6);font-size:34px}
-  .leaf{border-radius:16px}
-  .portal__ring{inset:-11px -13px;border-radius:20px}
-  .portal.is-live .portal__hint{display:none}
-  .pgzone{width:22%}
-  .ix{margin-top:calc(var(--u)*8)}
-}
-@media(max-width:520px){
-  .portal{--pgx:calc(var(--u)*3.25);--pgy:calc(var(--u)*4)}
-  .pg__top{gap:calc(var(--u)*1)}
-  .pg__ch{font-size:10.5px;letter-spacing:.06em}
-  .ix{grid-template-columns:1fr}
-  .pgbtn{width:42px;height:42px}
+@media(max-width:560px){
+  .creek{max-width:100%}
+  .bud{width:110px}
+  .bud__label{font-size:12.5px;max-width:160px}
+  .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }
