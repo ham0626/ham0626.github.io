@@ -735,6 +735,27 @@ footer a{color:var(--green-bright);text-decoration:none}
   font-size:11px;letter-spacing:.1em;color:var(--gold);opacity:.82;margin-bottom:2px}
 .bud:hover .bud__label,.bud:focus-visible .bud__label{color:#fff}
 
+/* 溪畔的词：心理学 / 认知 / 哲学 / 金融。翻到时从上方缓缓降落 */
+.word{position:absolute;left:0;top:0;z-index:2;width:156px;
+  transform:translate(-50%,calc(-50% - 46px)) rotate(-2.5deg);opacity:0;
+  transition:transform 1500ms cubic-bezier(.16,.86,.3,1),opacity 1000ms ease;
+  pointer-events:none}
+.word.is-landed{transform:translate(-50%,-50%) rotate(0deg);opacity:1}
+.word__card{display:block;padding:11px 14px 12px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(18,42,34,.86),rgba(8,21,18,.78));
+  border:1px solid rgba(244,213,141,.24);
+  box-shadow:0 12px 28px rgba(0,0,0,.44),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(2px);
+  animation:wordFloat 7.5s ease-in-out infinite}
+.word__t{display:block;font-family:"Noto Serif SC",serif;font-size:14.5px;font-weight:600;
+  color:var(--gold);letter-spacing:.04em;line-height:1.4;
+  text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.word__en{display:block;margin-top:2px;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:10.5px;letter-spacing:.1em;color:var(--mint);opacity:.7}
+.word__d{display:block;margin-top:7px;font-family:"Noto Serif SC",serif;font-size:12px;
+  line-height:1.7;color:#cfe0d8;text-shadow:0 1px 4px rgba(0,0,0,.72)}
+@keyframes wordFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
 /* 点开后的感悟卡片（modal） */
 .petal{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:calc(var(--u)*3)}
 .petal.is-open{display:flex;animation:petalFade 220ms ease both}
@@ -777,6 +798,10 @@ footer a{color:var(--green-bright);text-decoration:none}
 .creek:not(.is-live) .bud__stem,.creek:not(.is-live) .bud__bloom{display:none}
 .creek:not(.is-live) .bud__label{text-align:left;margin-top:0}
 .creek__pollen{display:none}
+/* 无 JS：词牌也退化成竖排小卡，内容照旧可读 */
+.creek:not(.is-live) .word{position:static;transform:none;opacity:1;width:100%;
+  display:block;margin:calc(var(--u)*1.5) 0}
+.creek:not(.is-live) .word__card{animation:none}
 
 .bud__panel{display:none}
 .creek:not(.is-live) .bud__panel{display:block;width:100%}
@@ -795,5 +820,9 @@ footer a{color:var(--green-bright);text-decoration:none}
   .bud{width:120px}
   .bud__label{font-size:13.5px;max-width:150px}
   .deco-flower{width:16px;height:16px}
+  .word{width:132px}
+  .word__card{padding:9px 11px 10px}
+  .word__t{font-size:13px}
+  .word__d{font-size:11.5px;line-height:1.65}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }

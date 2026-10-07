@@ -11,14 +11,16 @@
   var flow = document.getElementById('creekFlow');
   var pollenBox = document.getElementById('creekPollen');
   var buds = Array.prototype.slice.call(creek.querySelectorAll('.bud'));
+  var words = Array.prototype.slice.call(creek.querySelectorAll('.word'));
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var TOP = 120, BOT = 140;     // 上下留白
   var BUD_GAP = 104;            // 同一簇内，苗/花之间的纵向间距
-  var CLUSTER_GAP = 520;       // 相邻时间节点（拐弯）之间的纵向间距（太密会让水线极陡，内侧就没地方放苗了）
+  var CLUSTER_GAP = 470;       // 相邻时间节点（拐弯）之间的纵向间距（太密会让水线极陡，内侧就没地方放苗了）
   var SEG = 200;                // 路径采样段数
   var W = 0, H = 0, LABEL_M = 98; // LABEL_M：苗/花中心到水线的安全留白（保证文字不压到水线）
   var creekPts = [];            // 溪流折线采样点，用于算「到水线的真实距离」
+  var ffBox = null, bfBox = null; // 萤火虫 / 蝴蝶容器（resize 时整块重建）
 
   // 窄屏振幅收一点，避免花被边缘裁掉
   function ampNow() { return W < 560 ? 0.30 : (W < 820 ? 0.36 : 0.42); }
@@ -241,6 +243,110 @@
     });
   }
 
+  /* ---------- 溪畔的词：心理学 / 认知 / 哲学 / 金融，翻到时缓缓降落 ---------- */
+  // 词牌半宽（窄屏收窄），据此定离水线的安全距离与左右边界
+  function wordHalf() { return W < 560 ? 66 : 78; }
+  function wordMargin() { return wordHalf() + 10; }
+
+  // 候选点是否可用。mode：'strict' 全避让 / 'relaxed' 允许贴近小花 / 'loose' 只保证不压水线
+  function wordFits(x, y, placed, mode) {
+    var i, dx, dy, half = wordHalf();
+    if (x < half + 12 || x > W - half - 12) return false;
+    if (y < TOP + 24 || y > H - BOT - 24) return false;
+    if (nearest(x, y).d < wordMargin() * 0.88) return false;
+    // 卡片是矩形：只要横向或纵向让开一个身位就不会叠上，比欧氏距离更可靠
+    var bh = (W < 560 ? 60 : 80) + half + 8;   // 与苗/花的横向净距
+    var ww = half * 2 + 12;                    // 词牌之间的横向净距
+    var vv = W < 560 ? 124 : 128;              // 纵向净距（卡片高约 110~130）
+    for (i = 0; i < placed.length; i++) {
+      if (Math.abs(y - placed[i].y) < vv && Math.abs(x - placed[i].x) < ww) return false;
+    }
+    for (i = 0; i < buds.length; i++) {
+      if (Math.abs(y - buds[i]._y) < 118 && Math.abs(x - buds[i]._x) < bh) return false;
+    }
+    if (mode === 'loose') return true;   // 兜底时仍不能压苗，只是不再顾及小花
+    for (i = 0; i < nodes.length; i++) {
+      dx = x - sideX(nodes[i]._ci); dy = y - centerOf(nodes[i]._ci);
+      if (dx * dx + dy * dy < 86 * 86) return false;
+    }
+    if (mode === 'strict') {
+      for (i = 0; i < decoFlowers.length; i++) {
+        dx = x - decoFlowers[i]._x; dy = y - decoFlowers[i]._y;
+        if (dx * dx + dy * dy < 60 * 60) return false;
+      }
+    }
+    return true;
+  }
+
+  function layoutWords() {
+    if (!words.length) return;
+    var M = wordMargin(), placed = [], i, t, ci, bd, k, dir, cand, yy, got;
+    var y0 = TOP + 70, y1 = H - BOT - 70;
+    for (i = 0; i < words.length; i++) {
+      var y = y0 + ((i + 0.5) / words.length) * (y1 - y0);
+      // 离它最近的那一个拐弯：决定它落在「内侧」还是「外侧」
+      ci = 0; bd = 1e9;
+      for (k = 0; k < nC; k++) { var dd = Math.abs(centerOf(k) - y); if (dd < bd) { bd = dd; ci = k; } }
+      got = null;
+      // 先试外侧（拐弯背面，空得最多），再试内侧；每侧上下挪几格找位子
+      var order = [(i % 2 === 0) ? -dirs[ci] : dirs[ci], (i % 2 === 0) ? dirs[ci] : -dirs[ci]];
+      for (var s = 0; s < order.length && !got; s++) {
+        dir = order[s];
+        // 拐弯背面（外侧）空得最多，允许它落到更远的地方，把大片空白用起来
+        var hi = (dir === -dirs[ci]) ? 0.80 : 0.62;
+        for (t = 0; t < 24 && !got; t++) {
+          yy = y + (((t % 2) ? 1 : -1) * Math.ceil(t / 2) * 38) + (rnd(i + 1, t + 1) - 0.5) * 46;
+          cand = crookPoint(yy, dir, M, 0.14, hi, rnd(i + 3, t + 7), centerOf(ci));
+          if (wordFits(cand.x, cand.y, placed, 'strict')) got = cand;
+        }
+      }
+      if (!got) {   // 放宽：允许贴近小花
+        for (t = 0; t < 20 && !got; t++) {
+          yy = y + (rnd(i + 9, t + 1) - 0.5) * 300;
+          cand = crookPoint(yy, dirs[ci], M, 0.12, 0.60, rnd(i + 11, t + 3), centerOf(ci));
+          if (wordFits(cand.x, cand.y, placed, 'relaxed')) got = cand;
+        }
+      }
+      if (!got) {   // 兜底：只要不压水线就放下（窄屏也保证 13 条都在，内容不丢）
+        for (t = 0; t < 70 && !got; t++) {
+          yy = y + (rnd(i + 13, t + 1) - 0.5) * 420;
+          cand = crookPoint(yy, (t % 2 ? dirs[ci] : -dirs[ci]), M, 0.10, 0.80, rnd(i + 17, t + 5), centerOf(ci));
+          if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
+        }
+      }
+      if (!got) {   // 最后兜底：整幅随机找空位（只保证不压水线、不压苗、不与别的词牌叠上）
+        var halfW = wordHalf(), lo = halfW + 14, span = W - 2 * lo;
+        for (t = 0; t < 140 && !got; t++) {
+          yy = y + (rnd(i + 21, t + 1) - 0.5) * 520;
+          yy = Math.max(TOP + 30, Math.min(H - BOT - 30, yy));
+          cand = { x: lo + rnd(i + 23, t + 3) * span, y: yy };
+          if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
+        }
+      }
+      if (!got) { words[i].style.display = 'none'; continue; }
+      words[i].style.display = '';
+      words[i].style.left = got.x + 'px';
+      words[i].style.top = got.y + 'px';
+      placed.push(got);
+    }
+  }
+
+  // 进入视野 → 缓缓降落（错开一点先后，像叶子依次落定）
+  var wio = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('is-landed'); wio.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -10% 0px' })
+    : null;
+  // 必须在 layoutWords() 之后调用：否则会在 (0,0) 处先降落一次再被挪走
+  function armWords() {
+    words.forEach(function (w, i) {
+      w.style.transitionDelay = ((i % 3) * 160) + 'ms';
+      if (wio) wio.observe(w); else w.classList.add('is-landed');
+    });
+  }
+
   /* ---------- 装饰层：萤火虫 / 蝴蝶 / 散落小花（均在拐弯内侧，绝不压水线） ---------- */
   function flowerSVG(c1, c2) {
     return '<svg class="deco-flower" viewBox="0 0 24 24" aria-hidden="true">' +
@@ -298,6 +404,7 @@
         ff.appendChild(f);
       }
       creek.appendChild(ff);
+      ffBox = ff;
     }
     // 蝴蝶
     if (!reduce) {
@@ -324,6 +431,7 @@
         bf.appendChild(b2);
       }
       creek.appendChild(bf);
+      bfBox = bf;
     }
     // 每个拐弯内侧：苗与苗之间、簇心附近，均匀堆一点花
     clusterKeys.forEach(function (k, ci) {
@@ -374,14 +482,32 @@
     }
   }, { passive: true });
   var rt;
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(size, 150); });
+  // 换宽度就整块重排：花与词的坐标都是绝对像素，不重建就会错位
+  function clearDeco() {
+    decoFlowers.forEach(function (w) { if (w.parentNode) w.parentNode.removeChild(w); });
+    decoFlowers = [];
+    if (ffBox && ffBox.parentNode) ffBox.parentNode.removeChild(ffBox);
+    if (bfBox && bfBox.parentNode) bfBox.parentNode.removeChild(bfBox);
+    ffBox = bfBox = null;
+  }
+  function relayout() {
+    clearDeco();
+    size();                 // 先算出 W / 各定位（苗与节点的位置），再据此布花与词
+    buildDeco();            // 用已算好的苗/节点位置撒花、避开
+    layoutDeco();           // 给新撒的花定位
+    layoutWords();          // 词落在剩下的空白处
+    armWords();
+  }
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(relayout, 150); });
 
   function boot() {
     buildNodes();
-    size();                 // 先算出 W / 各定位（苗与节点的位置），再据此布花
-    buildDeco();            // 用已算好的苗/节点位置撒花、避开
-    layoutDeco();           // 给新撒的花定位
+    size();
+    buildDeco();
+    layoutDeco();
+    layoutWords();
     creek.classList.add('is-live');
+    armWords();
     paint();
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot);
