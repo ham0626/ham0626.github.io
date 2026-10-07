@@ -244,27 +244,60 @@
   }
 
   /* ---------- 溪畔的词：心理学 / 认知 / 哲学 / 金融，翻到时缓缓降落 ---------- */
-  // 词牌半宽（窄屏收窄），据此定离水线的安全距离与左右边界
-  function wordHalf() { return W < 560 ? 66 : 78; }
+  // 词牌是矩形（约 156×126），判定是否压到水线必须量整张卡：
+  // 只量中心点会漏——中心离水线 83px 时，卡片下沿照样盖在水上。
+  // 卡片真实尺寸（is-live 之前就能量准；别用写死的估算，三行/两行差 20px，避让会差一截）
+  var wHalfW = 82, wHalfH = 70;
+  function measureWords() {
+    var w = 0, h = 0;
+    words.forEach(function (el) { w = Math.max(w, el.offsetWidth); h = Math.max(h, el.offsetHeight); });
+    if (w) wHalfW = w / 2 + 2;
+    if (h) wHalfH = h / 2 + 4;
+  }
+  function wordHalf() { return wHalfW; }
+  function wordHalfH() { return wHalfH; }
   function wordMargin() { return wordHalf() + 10; }
+
+  // 溪长按词条数等分成若干「带」，一条带一张卡 —— 撑起整体的均匀感
+  var wordYA = 0, wordBand = 1;
+  function bandOf(y) { return wordBand ? Math.floor((y - wordYA) / wordBand) : 0; }
+
+  // 沿卡片四边取样，逐个算到水线的真实距离
+  function waterClear(x, y, need) {
+    var hw = wordHalf(), hh = wordHalfH(), i, t, px, py;
+    for (i = 0; i <= 6; i++) {
+      t = i / 6; px = x - hw + 2 * hw * t;
+      if (nearest(px, y - hh).d < need) return false;
+      if (nearest(px, y + hh).d < need) return false;
+    }
+    for (i = 0; i <= 4; i++) {
+      t = i / 4; py = y - hh + 2 * hh * t;
+      if (nearest(x - hw, py).d < need) return false;
+      if (nearest(x + hw, py).d < need) return false;
+    }
+    return true;
+  }
 
   // 候选点是否可用。mode：'strict' 全避让 / 'relaxed' 允许贴近小花 / 'loose' 只保证不压水线
   function wordFits(x, y, placed, mode) {
-    var i, dx, dy, half = wordHalf();
+    var i, dx, dy, half = wordHalf(), hh = wordHalfH();
     if (x < half + 12 || x > W - half - 12) return false;
-    if (y < TOP + 24 || y > H - BOT - 24) return false;
-    if (nearest(x, y).d < wordMargin() * 0.88) return false;
+    if (y < hh + 30 || y > H - hh - 30) return false;
+    if (!waterClear(x, y, 14)) return false;
     // 卡片是矩形：只要横向或纵向让开一个身位就不会叠上，比欧氏距离更可靠
     var bh = (W < 560 ? 60 : 80) + half + 8;   // 与苗/花的横向净距
-    var ww = half * 2 + 12;                    // 词牌之间的横向净距
-    var vv = W < 560 ? 124 : 128;              // 纵向净距（卡片高约 110~130）
+    var ww = half * 2 + 40;                    // 词牌之间的横向净距
+    var vv = hh * 2 + 34;                      // 纵向净距 = 一张卡高 + 一点呼吸
+    var b = bandOf(y);
     for (i = 0; i < placed.length; i++) {
+      // 一条带只放一张 → 13 条沿溪均匀铺开，不会某一段挤两条、另一段落空
+      if (mode !== 'free' && b === placed[i].b) return false;
       if (Math.abs(y - placed[i].y) < vv && Math.abs(x - placed[i].x) < ww) return false;
     }
     for (i = 0; i < buds.length; i++) {
-      if (Math.abs(y - buds[i]._y) < 118 && Math.abs(x - buds[i]._x) < bh) return false;
+      if (Math.abs(y - buds[i]._y) < hh + 64 && Math.abs(x - buds[i]._x) < bh) return false;
     }
-    if (mode === 'loose') return true;   // 兜底时仍不能压苗，只是不再顾及小花
+    if (mode === 'loose' || mode === 'free') return true;   // 兜底时仍不能压苗，只是不再顾及小花/节点
     for (i = 0; i < nodes.length; i++) {
       dx = x - sideX(nodes[i]._ci); dy = y - centerOf(nodes[i]._ci);
       if (dx * dx + dy * dy < 86 * 86) return false;
@@ -280,54 +313,65 @@
 
   function layoutWords() {
     if (!words.length) return;
+    measureWords();
     var M = wordMargin(), placed = [], i, t, ci, bd, k, dir, cand, yy, got;
-    var y0 = TOP + 70, y1 = H - BOT - 70;
-    for (i = 0; i < words.length; i++) {
-      var y = y0 + ((i + 0.5) / words.length) * (y1 - y0);
+    var n = words.length;
+    // 把溪长等分成 n 条带，每条带放一张卡 —— 这样不会某一块挤一堆、另一块空着
+    var yA = TOP + 30, yB = H - BOT - 30;
+    var band = (yB - yA) / n;
+    wordYA = yA; wordBand = band;
+    var slack = band * 0.30;   // 在自己的带里最多能挪多远（大了就会两条挤进同一带，看着就不均了）
+    for (i = 0; i < n; i++) {
+      var bTop = yA + i * band, bBot = bTop + band;
+      var yMid = (bTop + bBot) / 2;
+      var yLo = Math.max(40, bTop + 14 - slack), yHi = Math.min(H - 40, bBot - 14 + slack);
+      var clampY = function (v) { return Math.max(yLo, Math.min(yHi, v)); };
       // 离它最近的那一个拐弯：决定它落在「内侧」还是「外侧」
       ci = 0; bd = 1e9;
-      for (k = 0; k < nC; k++) { var dd = Math.abs(centerOf(k) - y); if (dd < bd) { bd = dd; ci = k; } }
+      for (k = 0; k < nC; k++) { var dd = Math.abs(centerOf(k) - yMid); if (dd < bd) { bd = dd; ci = k; } }
       got = null;
-      // 先试外侧（拐弯背面，空得最多），再试内侧；每侧上下挪几格找位子
+      // 先试外侧（拐弯背面，空得最多），再试内侧；上下挪几格找位子
       var order = [(i % 2 === 0) ? -dirs[ci] : dirs[ci], (i % 2 === 0) ? dirs[ci] : -dirs[ci]];
       for (var s = 0; s < order.length && !got; s++) {
         dir = order[s];
         // 拐弯背面（外侧）空得最多，允许它落到更远的地方，把大片空白用起来
         var hi = (dir === -dirs[ci]) ? 0.80 : 0.62;
-        for (t = 0; t < 24 && !got; t++) {
-          yy = y + (((t % 2) ? 1 : -1) * Math.ceil(t / 2) * 38) + (rnd(i + 1, t + 1) - 0.5) * 46;
+        for (t = 0; t < 26 && !got; t++) {
+          yy = clampY(yMid + (((t % 2) ? 1 : -1) * Math.ceil(t / 2) * 34) + (rnd(i + 1, t + 1) - 0.5) * 40);
           cand = crookPoint(yy, dir, M, 0.14, hi, rnd(i + 3, t + 7), centerOf(ci));
+          cand.y = clampY(cand.y);
           if (wordFits(cand.x, cand.y, placed, 'strict')) got = cand;
         }
       }
       if (!got) {   // 放宽：允许贴近小花
-        for (t = 0; t < 20 && !got; t++) {
-          yy = y + (rnd(i + 9, t + 1) - 0.5) * 300;
+        for (t = 0; t < 22 && !got; t++) {
+          yy = clampY(yMid + (rnd(i + 9, t + 1) - 0.5) * band);
           cand = crookPoint(yy, dirs[ci], M, 0.12, 0.60, rnd(i + 11, t + 3), centerOf(ci));
+          cand.y = clampY(cand.y);
           if (wordFits(cand.x, cand.y, placed, 'relaxed')) got = cand;
         }
       }
-      if (!got) {   // 兜底：只要不压水线就放下（窄屏也保证 13 条都在，内容不丢）
+      if (!got) {   // 兜底：只要不压水线就放下
         for (t = 0; t < 70 && !got; t++) {
-          yy = y + (rnd(i + 13, t + 1) - 0.5) * 420;
+          yy = clampY(yMid + (rnd(i + 13, t + 1) - 0.5) * band * 1.6);
           cand = crookPoint(yy, (t % 2 ? dirs[ci] : -dirs[ci]), M, 0.10, 0.80, rnd(i + 17, t + 5), centerOf(ci));
+          cand.y = clampY(cand.y);
           if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
         }
       }
-      if (!got) {   // 最后兜底：整幅随机找空位（只保证不压水线、不压苗、不与别的词牌叠上）
+      if (!got) {   // 最后兜底：在自己的带里整幅随机找空位（窄屏也保证 13 条都在，内容不丢）
         var halfW = wordHalf(), lo = halfW + 14, span = W - 2 * lo;
-        for (t = 0; t < 140 && !got; t++) {
-          yy = y + (rnd(i + 21, t + 1) - 0.5) * 520;
-          yy = Math.max(TOP + 30, Math.min(H - BOT - 30, yy));
+        for (t = 0; t < 160 && !got; t++) {
+          yy = clampY(yMid + (rnd(i + 21, t + 1) - 0.5) * band * 1.8);
           cand = { x: lo + rnd(i + 23, t + 3) * span, y: yy };
-          if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
+          if (wordFits(cand.x, cand.y, placed, 'free')) got = cand;
         }
       }
       if (!got) { words[i].style.display = 'none'; continue; }
       words[i].style.display = '';
       words[i].style.left = got.x + 'px';
       words[i].style.top = got.y + 'px';
-      placed.push(got);
+      placed.push({ x: got.x, y: got.y, b: bandOf(got.y) });
     }
   }
 
