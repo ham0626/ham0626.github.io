@@ -1,7 +1,7 @@
 /* 成长日志 · 花圃小溪（Flower-bed Creek）
    一条竖直蜿蜒的小溪随滚动自绘延伸。溪水的每一个拐弯都是一段时光的节点，
-   拐弯内侧的苗与花成簇生长，点开即弹出那段成长日记；空白处点缀萤火虫、
-   蝴蝶与散落的小花。无 JS 时 .creek 不带 .is-live，退化为竖排卡片。 */
+   拐弯内侧的凹处（crook）里错落生长着苗与花（不挤成一列），点开即弹出那段成长日记；
+   空白处点缀萤火虫、蝴蝶与散落的小花。无 JS 时 .creek 不带 .is-live，退化为竖排卡片。 */
 (function () {
   var creek = document.getElementById('creek');
   if (!creek) return;
@@ -15,13 +15,21 @@
 
   var TOP = 120, BOT = 140;     // 上下留白
   var BUD_GAP = 104;            // 同一簇内，苗/花之间的纵向间距
-  var CLUSTER_GAP = 240;       // 相邻时间节点（拐弯）之间的纵向间距
-  var INNER = 0.52;             // 苗/花相对拐弯点的内收比例（0=溪心，1=贴在拐弯上）
+  var CLUSTER_GAP = 520;       // 相邻时间节点（拐弯）之间的纵向间距（太密会让水线极陡，内侧就没地方放苗了）
   var SEG = 200;                // 路径采样段数
-  var W = 0, H = 0;
+  var W = 0, H = 0, LABEL_M = 98; // LABEL_M：苗/花中心到水线的安全留白（保证文字不压到水线）
+  var creekPts = [];            // 溪流折线采样点，用于算「到水线的真实距离」
 
   // 窄屏振幅收一点，避免花被边缘裁掉
   function ampNow() { return W < 560 ? 0.30 : (W < 820 ? 0.36 : 0.42); }
+  // 小确定性的伪随机（同一次加载内稳定，不每次刷新乱跳）
+  function rnd(a, b) { var s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return s - Math.floor(s); }
+  // 簇内第 j 朵（共 n 朵）的横向单位偏移：
+  // 相邻两朵一内一外拉开 ~128px，既错落铺开，也避免上一朵的花压到下一朵的字
+  function budUnit(j, n) {
+    if (n <= 1) return 0;
+    return (j % 2 === 0) ? -0.7 : 1;
+  }
 
   /* ---------- 把苗/花按 data-cluster 分簇（每簇对应一个拐弯 / 时间节点） ---------- */
   var clusters = {};
@@ -64,13 +72,74 @@
   }
   function buildPath() {
     var d = '', i, t, y, x;
+    creekPts = [];
     for (i = 0; i <= SEG; i++) {
       t = i / SEG; y = t * H; x = creekX(y);
+      creekPts.push([x, y]);
       d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
     }
     d = d.trim();
     path.setAttribute('d', d);
     if (flow) flow.setAttribute('d', d);
+  }
+
+  // 到溪流折线的最近点：返回 {d 距离, px, py}
+  function nearest(x, y) {
+    var best = 1e9, bx = x, by = y, i, ax, ay, dx, dy, l2, t2, qx, qy, d2;
+    if (!creekPts.length) return { d: 1e9, px: x, py: y };
+    for (i = 0; i < creekPts.length - 1; i++) {
+      ax = creekPts[i][0]; ay = creekPts[i][1];
+      dx = creekPts[i + 1][0] - ax; dy = creekPts[i + 1][1] - ay;
+      l2 = dx * dx + dy * dy;
+      t2 = l2 ? ((x - ax) * dx + (y - ay) * dy) / l2 : 0;
+      t2 = t2 < 0 ? 0 : (t2 > 1 ? 1 : t2);
+      qx = ax + t2 * dx; qy = ay + t2 * dy;
+      d2 = (x - qx) * (x - qx) + (y - qy) * (y - qy);
+      if (d2 < best) { best = d2; bx = qx; by = qy; }
+    }
+    return { d: Math.sqrt(best), px: bx, py: by };
+  }
+
+  // 在 y 高度上，该拐弯内侧可用的最大「内外比例」t：t=0 在溪心，t=1 在拐弯极点。
+  // 水线是斜的，横向让开 Δ 只换来 Δ/√(1+s²) 的垂直距离（s=dx/dy），所以余量要按斜率放大。
+  function safeTMax(y, dir, margin) {
+    var ampW = W * ampNow();
+    if (!ampW) return 0.3;
+    var s = (creekX(Math.min(H, y + 2)) - creekX(Math.max(0, y - 2))) / 4;  // dx/dy
+    var need = margin * Math.sqrt(1 + s * s) / ampW;
+    var tSigned = (creekX(y) - W * 0.5) / (dir * ampW);
+    if (tSigned <= 0) return 1;   // 水线在另一侧：这一侧的内侧整个是空的
+    return tSigned - need;
+  }
+
+  // 在拐弯内侧的凹处取一个点：保证离水线 >= margin。
+  // 若该高度这一侧放不下，就把点朝拐弯中心 cy 收，直到放得下。
+  function crookPoint(y, dir, margin, tLo, tHi, r, cy) {
+    var ampW = W * ampNow(), guard = 0, tMax;
+    y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
+    tMax = safeTMax(y, dir, margin);
+    while (tMax < 0.09 && cy != null && guard < 50) {
+      y += (cy > y ? 6 : -6);
+      y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
+      tMax = safeTMax(y, dir, margin);
+      guard++;
+      if (Math.abs(y - cy) < 3) break;
+    }
+    var hi = Math.min(tHi, Math.max(0.08, tMax));
+    var lo = Math.min(tLo, hi);
+    var t = lo + r * (hi - lo);
+    var x = W * 0.5 + dir * t * ampW;
+    // 收尾保险：真实距离不够就先朝溪心收，收到底了再把点往拐弯中心拉
+    guard = 0;
+    while (nearest(x, y).d < margin * 0.92 && guard < 90) {
+      if (t > 0.05) t -= 0.02;
+      else if (cy != null && Math.abs(y - cy) > 3) y += (cy > y ? 4 : -4);
+      else break;
+      y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
+      x = W * 0.5 + dir * t * ampW;
+      guard++;
+    }
+    return { x: Math.max(24, Math.min(W - 24, x)), y: y };
   }
 
   function size() {
@@ -82,16 +151,17 @@
     svg.setAttribute('height', H);
     buildPath();
 
-    // 每个簇：苗/花成簇地长在拐弯内侧
+    // 每个簇：苗/花错落地长在拐弯内侧的凹处（不再挤成一列）
     clusterKeys.forEach(function (k, ci) {
       var arr = clusters[k], n = arr.length, cy = centerOf(ci);
       arr.forEach(function (b, j) {
         var y = cy + (j - (n - 1) / 2) * BUD_GAP;
         y = Math.max(TOP, Math.min(H - BOT, y));
-        var x = W * 0.5 + (sideX(ci) - W * 0.5) * INNER;
-        b.style.left = x + 'px';
-        b.style.top = y + 'px';
-        b._y = y; b._x = x;
+        var tWant = 0.22 + budUnit(j, n) * 0.15 + (rnd(j + 1, ci + 1) - 0.5) * 0.04;
+        var p = crookPoint(y, dirs[ci], LABEL_M, tWant - 0.02, tWant + 0.02, rnd(j + 1, ci + 1), cy);
+        b.style.left = p.x + 'px';
+        b.style.top = p.y + 'px';
+        b._y = p.y; b._x = p.x;
       });
     });
 
@@ -171,7 +241,7 @@
     });
   }
 
-  /* ---------- 装饰层：萤火虫 / 蝴蝶 / 散落小花 ---------- */
+  /* ---------- 装饰层：萤火虫 / 蝴蝶 / 散落小花（均在拐弯内侧，绝不压水线） ---------- */
   function flowerSVG(c1, c2) {
     return '<svg class="deco-flower" viewBox="0 0 24 24" aria-hidden="true">' +
       '<ellipse cx="12" cy="4.6" rx="3.2" ry="4.4" fill="' + c1 + '"/>' +
@@ -180,7 +250,18 @@
       '<ellipse cx="19.4" cy="12" rx="4.4" ry="3.2" fill="' + c1 + '"/>' +
       '<circle cx="12" cy="12" r="3.4" fill="' + c2 + '"/></svg>';
   }
-  function spawnFlower(xf, y, scale, sway) {
+  // 在拐弯内侧放一朵装饰花：避开苗与节点，放不下则返回 false
+  function spawnFlowerAt(p, scale) {
+    var x = p.x, y = p.y, i;
+    for (i = 0; i < buds.length; i++) {
+      var dx = x - buds[i]._x, dy = y - buds[i]._y;
+      if (dx * dx + dy * dy < 34 * 34) return false;
+    }
+    for (i = 0; i < nodes.length; i++) {
+      var nx = sideX(nodes[i]._ci), ny = centerOf(nodes[i]._ci);
+      var ndx = x - nx, ndy = y - ny;
+      if (ndx * ndx + ndy * ndy < 42 * 42) return false;
+    }
     var colors = [
       ['rgba(246,184,200,.92)', 'rgba(244,213,141,1)'],
       ['rgba(159,240,200,.9)', 'rgba(244,213,141,1)'],
@@ -196,9 +277,10 @@
     fl.style.animationDuration = (5.5 + Math.random() * 4).toFixed(1) + 's';
     fl.style.animationDelay = (-Math.random() * 6).toFixed(1) + 's';
     wrap.style.transform = 'translate(-50%,-50%) scale(' + scale.toFixed(2) + ')';
-    wrap._xf = xf; wrap._y = y;   // xf: 相对溪心(W/2)的偏移，占 W 的比例（可正可负）
+    wrap._x = x; wrap._y = y;
     creek.appendChild(wrap);
     decoFlowers.push(wrap);
+    return true;
   }
   function buildDeco() {
     // 萤火虫
@@ -243,50 +325,30 @@
       }
       creek.appendChild(bf);
     }
-    // 簇内间隙的小花（苗与苗之间堆一点花）
+    // 每个拐弯内侧：苗与苗之间、簇心附近，均匀堆一点花
     clusterKeys.forEach(function (k, ci) {
-      var arr = clusters[k], n = arr.length;
+      var arr = clusters[k], n = arr.length, cy = centerOf(ci);
       for (var m = 0; m < n - 1; m++) {
         var yMid = (arr[m]._y + arr[m + 1]._y) / 2;
-        var xf = dirs[ci] * ampNow() * INNER * 0.78;   // 比苗更靠近溪心一点
-        spawnFlower(xf, yMid, 0.62 + Math.random() * 0.18, true);
+        spawnFlowerAt(crookPoint(yMid, dirs[ci], 54, 0.08, 0.42, Math.random(), cy), 0.6 + Math.random() * 0.2);
+      }
+      for (var f = 0; f < 3; f++) {
+        var fy = cy + (Math.random() - 0.5) * 2 * ((Math.max(1, n - 1) * BUD_GAP * 0.55) + 30);
+        spawnFlowerAt(crookPoint(fy, dirs[ci], 54, 0.08, 0.44, Math.random(), cy), 0.55 + Math.random() * 0.45);
       }
     });
-    // 簇与簇之间的空白：随机撒一些花（避开苗/节点）
-    var gapN = nC * 4;
-    var tries = 0;
-    var target = gapN + countClusterFlowers();
-    while (decoFlowers.length < target && tries < gapN * 14) {
-      tries++;
-      var gy = TOP + Math.random() * (H - TOP - BOT);
-      var gside = Math.random() < 0.5 ? -1 : 1;
-      var gxf = gside * (0.16 + Math.random() * 0.26);
-      var gx = W * 0.5 + gxf * W;
-      if (tooClose(gx, gy)) continue;
-      spawnFlower(gxf, gy, 0.7 + Math.random() * 0.5, true);
+    // 簇与簇之间的空白：在内侧凹处补几朵，铺满空隙
+    for (var ci2 = 0; ci2 < nC - 1; ci2++) {
+      var y0 = centerOf(ci2), y1 = centerOf(ci2 + 1);
+      for (var g = 0; g < 6; g++) {
+        var gy = y0 + (g + 1) * (y1 - y0) / 7;
+        spawnFlowerAt(crookPoint(gy, dirs[ci2], 54, 0.08, 0.40, Math.random(), y0), 0.6 + Math.random() * 0.5);
+      }
     }
-  }
-  function countClusterFlowers() {
-    var c = 0;
-    clusterKeys.forEach(function (k) { c += Math.max(0, clusters[k].length - 1); });
-    return c;
-  }
-  function tooClose(x, y) {
-    for (var i = 0; i < buds.length; i++) {
-      var dx = x - buds[i]._x, dy = y - buds[i]._y;
-      if (dx * dx + dy * dy < 56 * 56) return true;
-    }
-    for (var j = 0; j < nodes.length; j++) {
-      var nx = sideX(nodes[j]._ci), nyy = centerOf(nodes[j]._ci);
-      var ndx = x - nx, ndy = y - nyy;
-      if (ndx * ndx + ndy * ndy < 44 * 44) return true;
-    }
-    return false;
   }
   function layoutDeco() {
     decoFlowers.forEach(function (wrap) {
-      var x = W * 0.5 + wrap._xf * W;
-      wrap.style.left = x + 'px';
+      wrap.style.left = wrap._x + 'px';
       wrap.style.top = wrap._y + 'px';
     });
   }

@@ -691,7 +691,7 @@ footer a{color:var(--green-bright);text-decoration:none}
 .bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;z-index:2;
   transition:transform 720ms cubic-bezier(.2,.7,.2,1),opacity 620ms ease;
   cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;
-  display:flex;flex-direction:column;align-items:center;width:140px}
+  display:flex;flex-direction:column;align-items:center;width:160px}
 .bud.is-grown{transform:translate(-50%,-50%) scale(1);opacity:1}
 .bud:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:14px}
 .bud__stem{width:2px;height:34px;margin:0 auto;
@@ -728,9 +728,9 @@ footer a{color:var(--green-bright);text-decoration:none}
 .bud--sprout .bud__core{background:radial-gradient(circle at 40% 35%,#d6ffe9,var(--mint) 72%);
   box-shadow:0 0 12px rgba(63,174,126,.8);width:12px;height:12px}
 
-.bud__label{margin-top:9px;max-width:200px;text-align:center;
-  font-family:"Noto Serif SC",serif;color:var(--ink);font-size:13.5px;line-height:1.5;
-  text-shadow:0 1px 8px rgba(0,0,0,.6);transition:color var(--dur) var(--ease)}
+.bud__label{margin-top:9px;max-width:220px;text-align:center;
+  font-family:"Noto Serif SC",serif;color:var(--ink);font-size:15.5px;line-height:1.55;font-weight:500;
+  text-shadow:0 1px 3px rgba(0,0,0,.92),0 0 11px rgba(0,0,0,.6);transition:color var(--dur) var(--ease)}
 .bud__era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;
   font-size:11px;letter-spacing:.1em;color:var(--gold);opacity:.82;margin-bottom:2px}
 .bud:hover .bud__label,.bud:focus-visible .bud__label{color:#fff}
@@ -792,8 +792,8 @@ footer a{color:var(--green-bright);text-decoration:none}
 @media(max-width:560px){
   .block--creek::before{background:none}
   .creek{max-width:100%}
-  .bud{width:100px}
-  .bud__label{font-size:12px;max-width:128px}
+  .bud{width:120px}
+  .bud__label{font-size:13.5px;max-width:150px}
   .deco-flower{width:16px;height:16px}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }
