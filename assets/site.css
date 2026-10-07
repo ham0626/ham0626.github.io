@@ -670,6 +670,23 @@ footer a{color:var(--green-bright);text-decoration:none}
   animation:flowerSway 7s ease-in-out infinite}
 @keyframes flowerSway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
+/* 时间节点：溪水拐弯处的时光标记（暖金小珠 + 时代名） */
+.cnode{position:absolute;z-index:2;pointer-events:none;display:flex;align-items:center;gap:9px;
+  transform:translateY(-50%);font-family:"Noto Serif SC",serif;white-space:nowrap;
+  opacity:0;transition:opacity 700ms ease}
+.creek.is-live .cnode{opacity:1}
+.cnode--r{transform:translate(0,-50%)}      /* 右岸拐弯：珠子在左，标签向右延伸 */
+.cnode--l{transform:translate(-100%,-50%)}  /* 左岸拐弯：珠子在右，标签向左延伸 */
+.cnode--l{flex-direction:row-reverse}
+.cnode__knot{position:relative;width:15px;height:15px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 40% 35%,#fff6e0,var(--gold) 70%);
+  box-shadow:0 0 14px rgba(244,213,141,.9),0 0 28px rgba(244,213,141,.45)}
+.cnode__knot::after{content:"";position:absolute;top:50%;left:50%;width:26px;height:26px;border-radius:50%;
+  transform:translate(-50%,-50%);border:1px solid rgba(244,213,141,.5);opacity:.6;animation:cnodePulse 3.4s ease-in-out infinite}
+.cnode__label{font-size:12.5px;letter-spacing:.14em;color:var(--gold);
+  text-shadow:0 1px 8px rgba(0,0,0,.75)}
+@keyframes cnodePulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.55}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+
 /* 一朵苗 / 花：默认缩成 0，进入视野时长出来 */
 .bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;z-index:2;
   transition:transform 720ms cubic-bezier(.2,.7,.2,1),opacity 620ms ease;
