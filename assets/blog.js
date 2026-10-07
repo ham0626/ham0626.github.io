@@ -251,8 +251,8 @@
   function measureWords() {
     var w = 0, h = 0;
     words.forEach(function (el) { w = Math.max(w, el.offsetWidth); h = Math.max(h, el.offsetHeight); });
-    if (w) wHalfW = w / 2 + 2;
-    if (h) wHalfH = h / 2 + 4;
+    if (w) wHalfW = w / 2 + 5;   // +5：卡片带微倾斜，角点会多探出 ~3px
+    if (h) wHalfH = h / 2 + 7;
   }
   function wordHalf() { return wHalfW; }
   function wordHalfH() { return wHalfH; }
@@ -283,11 +283,11 @@
     var i, dx, dy, half = wordHalf(), hh = wordHalfH();
     if (x < half + 12 || x > W - half - 12) return false;
     if (y < hh + 30 || y > H - hh - 30) return false;
-    if (!waterClear(x, y, 14)) return false;
+    if (!waterClear(x, y, W < 560 ? 9 : 14)) return false;
     // 卡片是矩形：只要横向或纵向让开一个身位就不会叠上，比欧氏距离更可靠
-    var bh = (W < 560 ? 60 : 80) + half + 8;   // 与苗/花的横向净距
+    var bh = (W < 560 ? 50 : 80) + half + 8;   // 与苗/花的横向净距
     var ww = half * 2 + 40;                    // 词牌之间的横向净距
-    var vv = hh * 2 + 34;                      // 纵向净距 = 一张卡高 + 一点呼吸
+    var vv = hh * 2 + (W < 560 ? 14 : 34);     // 纵向净距 = 一张卡高 + 一点呼吸（窄屏收紧一点）
     var b = bandOf(y);
     for (i = 0; i < placed.length; i++) {
       // 一条带只放一张 → 13 条沿溪均匀铺开，不会某一段挤两条、另一段落空
@@ -295,7 +295,7 @@
       if (Math.abs(y - placed[i].y) < vv && Math.abs(x - placed[i].x) < ww) return false;
     }
     for (i = 0; i < buds.length; i++) {
-      if (Math.abs(y - buds[i]._y) < hh + 64 && Math.abs(x - buds[i]._x) < bh) return false;
+      if (Math.abs(y - buds[i]._y) < hh + (W < 560 ? 52 : 64) && Math.abs(x - buds[i]._x) < bh) return false;
     }
     if (mode === 'loose' || mode === 'free') return true;   // 兜底时仍不能压苗，只是不再顾及小花/节点
     for (i = 0; i < nodes.length; i++) {
@@ -359,12 +359,29 @@
           if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
         }
       }
-      if (!got) {   // 最后兜底：在自己的带里整幅随机找空位（窄屏也保证 13 条都在，内容不丢）
+      if (!got) {   // 最后兜底：挣脱自己的带，整幅随机找空位（窄屏也保证 13 条都在，内容不丢）
+        // 允许越出自己的带一点，但不能跑远 —— 否则第 13 张会飞到溪首，顺序就乱了。
+        // 这里用确定性网格扫描而不是随机撒点：有空位就一定找得到，不会靠运气漏掉某一条
         var halfW = wordHalf(), lo = halfW + 14, span = W - 2 * lo;
-        for (t = 0; t < 160 && !got; t++) {
-          yy = clampY(yMid + (rnd(i + 21, t + 1) - 0.5) * band * 1.8);
-          cand = { x: lo + rnd(i + 23, t + 3) * span, y: yy };
-          if (wordFits(cand.x, cand.y, placed, 'free')) got = cand;
+        var yTop = Math.max(40, bTop - band * 0.45), yBot = Math.min(H - 40, bBot + band * 0.45);
+        var xs = [], ys = [], gx, gy;
+        for (gx = 0; gx <= 20; gx++) xs.push(lo + span * gx / 20);
+        for (gy = 0; gy <= 16; gy++) ys.push(yTop + (yBot - yTop) * gy / 16);
+        var feas = [];
+        for (gx = 0; gx < xs.length; gx++) {
+          for (gy = 0; gy < ys.length; gy++) {
+            if (wordFits(xs[gx], ys[gy], placed, 'free')) feas.push({ x: xs[gx], y: ys[gy] });
+          }
+        }
+        // 从可行点里挑一个再加抖动：否则全落在网格上，一排卡片都贴着同一个 x，更单调
+        if (feas.length) {
+          var pick = feas[Math.min(feas.length - 1, Math.floor(rnd(i + 51, 7) * feas.length))];
+          for (t = 0; t < 12 && !got; t++) {
+            var jx = pick.x + (rnd(i + 53, t + 1) - 0.5) * 14;
+            var jy = pick.y + (rnd(i + 57, t + 3) - 0.5) * 16;
+            if (wordFits(jx, jy, placed, 'free')) got = { x: jx, y: jy };
+          }
+          if (!got) got = pick;
         }
       }
       if (!got) { words[i].style.display = 'none'; continue; }
@@ -386,6 +403,15 @@
   // 必须在 layoutWords() 之后调用：否则会在 (0,0) 处先降落一次再被挪走
   function armWords() {
     words.forEach(function (w, i) {
+      // 每片一点不同的微倾斜：像被人随手搁在溪畔，而不是排版排出来的
+      var tilt = (rnd(i + 31, 7) - 0.5) * 3.4;
+      w.style.setProperty('--wtilt', tilt.toFixed(2) + 'deg');
+      w.setAttribute('data-s', String((i % 3) + 1));           // 三种卵石形态轮换
+      var card = w.querySelector('.word__card');
+      if (card) {   // 浮动节奏各不相同，不整齐划一
+        card.style.animationDuration = (6.2 + rnd(i + 41, 3) * 3.4).toFixed(2) + 's';
+        card.style.animationDelay = (-rnd(i + 43, 5) * 8).toFixed(2) + 's';
+      }
       w.style.transitionDelay = ((i % 3) * 160) + 'ms';
       if (wio) wio.observe(w); else w.classList.add('is-landed');
     });

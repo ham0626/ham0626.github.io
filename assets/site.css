@@ -735,26 +735,63 @@ footer a{color:var(--green-bright);text-decoration:none}
   font-size:11px;letter-spacing:.1em;color:var(--gold);opacity:.82;margin-bottom:2px}
 .bud:hover .bud__label,.bud:focus-visible .bud__label{color:#fff}
 
-/* 溪畔的词：心理学 / 认知 / 哲学 / 金融。翻到时从上方缓缓降落 */
-.word{position:absolute;left:0;top:0;z-index:2;width:156px;
-  transform:translate(-50%,calc(-50% - 46px)) rotate(-2.5deg);opacity:0;
+/* 溪畔的词：心理学 / 认知 / 哲学 / 金融。翻到时从上方缓缓降落。
+   每片各有微倾斜(--wtilt)、卵石形态(data-s)、浮动节奏(JS 给)，13 张不重样 */
+.word{position:absolute;left:0;top:0;z-index:2;width:156px;--wtilt:0deg;
+  --wk:rgba(244,213,141,.24);--wk2:rgba(244,213,141,.92);--wc:var(--gold);
+  transform:translate(-50%,calc(-50% - 46px)) rotate(calc(var(--wtilt) - 3.6deg));opacity:0;
   transition:transform 1500ms cubic-bezier(.16,.86,.3,1),opacity 1000ms ease;
   pointer-events:none}
-.word.is-landed{transform:translate(-50%,-50%) rotate(0deg);opacity:1}
-.word__card{display:block;padding:11px 14px 12px;border-radius:14px;
-  background:linear-gradient(160deg,rgba(18,42,34,.86),rgba(8,21,18,.78));
-  border:1px solid rgba(244,213,141,.24);
+.word.is-landed{transform:translate(-50%,-50%) rotate(var(--wtilt));opacity:1;pointer-events:auto}
+/* 认知=薄荷；哲学=暖金；金融=更亮一点的金 */
+.word[data-k="cog"]{--wk:rgba(159,240,200,.3);--wk2:rgba(159,240,200,.95);--wc:var(--mint);
+  --wglow:radial-gradient(130% 105% at 14% -8%,rgba(159,240,200,.13),transparent 62%)}
+.word[data-k="phi"]{--wglow:radial-gradient(130% 105% at 88% 108%,rgba(244,213,141,.11),transparent 62%)}
+.word[data-k="fin"]{--wk:rgba(244,213,141,.38);--wk2:rgba(255,231,176,1);--wc:#ffe4ab;
+  --wglow:radial-gradient(125% 105% at 50% 120%,rgba(255,225,160,.14),transparent 60%)}
+.word__card{position:relative;display:block;overflow:hidden;padding:11px 14px 12px;
+  border-radius:18px 16px 20px 14px/14px 20px 16px 18px;
+  background:var(--wglow,none),linear-gradient(var(--wd,158deg),rgba(19,44,35,.88),rgba(7,19,16,.82));
+  border:1px solid var(--wk);
   box-shadow:0 12px 28px rgba(0,0,0,.44),inset 0 1px 0 rgba(255,255,255,.05);
   backdrop-filter:blur(2px);
+  transition:border-color 420ms var(--ease),box-shadow 420ms ease;
   animation:wordFloat 7.5s ease-in-out infinite}
-.word__t{display:block;font-family:"Noto Serif SC",serif;font-size:14.5px;font-weight:600;
-  color:var(--gold);letter-spacing:.04em;line-height:1.4;
-  text-shadow:0 1px 6px rgba(0,0,0,.6)}
+/* 三种形态，形状差得开一点：卵石 / 票根（对角收角）/ 叶尖 */
+.word[data-s="2"] .word__card{border-radius:4px 20px 4px 20px;--wd:206deg}
+.word[data-s="3"] .word__card{border-radius:24px 24px 6px 24px;--wd:112deg}
+/* 顶部一条类别色的细线，像书签织带 */
+.word__card::before{content:"";position:absolute;left:12%;right:12%;top:0;height:1.6px;
+  background:linear-gradient(90deg,transparent,var(--wk2),transparent);opacity:.9}
+/* 右下角一枚极小的类别色点，随卡片呼吸 */
+.word__card::after{content:"";position:absolute;right:9px;bottom:9px;width:3px;height:3px;
+  border-radius:50%;background:var(--wk2);opacity:.5}
+.word__hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.word__t{font-family:"Noto Serif SC",serif;font-size:14.5px;font-weight:600;
+  color:var(--wc);letter-spacing:.04em;line-height:1.4;
+  text-shadow:0 1px 6px rgba(0,0,0,.6);transition:color 420ms ease}
+.word__k{flex:none;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:10px;letter-spacing:.2em;color:var(--wc);opacity:.7}
+.word__k::before{font-style:normal;margin-right:3px;opacity:.85}
+.word[data-k="cog"] .word__k::before{content:"◦"}   /* 认知：一点 */
+.word[data-k="phi"] .word__k::before{content:"△"}   /* 哲学：一个角 */
+.word[data-k="fin"] .word__k::before{content:"↗"}   /* 金融：抬升的线 */
 .word__en{display:block;margin-top:2px;font-family:"Cormorant Garamond",serif;font-style:italic;
   font-size:10.5px;letter-spacing:.1em;color:var(--mint);opacity:.7}
 .word__d{display:block;margin-top:7px;font-family:"Noto Serif SC",serif;font-size:12px;
-  line-height:1.7;color:#cfe0d8;text-shadow:0 1px 4px rgba(0,0,0,.72)}
-@keyframes wordFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  line-height:1.7;color:#cfe0d8;text-shadow:0 1px 4px rgba(0,0,0,.72);
+  transition:color 420ms ease}
+@keyframes wordFloat{0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-6px) rotate(.45deg)}}
+/* 悬停：轻轻亮起来（transform 被浮动动画占着，所以只动光与色） */
+@media(hover:hover){
+  .word.is-landed:hover .word__card{border-color:var(--wk2);
+    box-shadow:0 18px 38px rgba(0,0,0,.5),0 0 24px rgba(244,213,141,.10),
+      inset 0 1px 0 rgba(255,255,255,.07)}
+  .word.is-landed:hover .word__t{color:#fff}
+  .word.is-landed:hover .word__d{color:#e9f3ed}
+  .word.is-landed:hover .word__k{opacity:.85}
+}
 
 /* 点开后的感悟卡片（modal） */
 .petal{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:calc(var(--u)*3)}
@@ -824,9 +861,12 @@ footer a{color:var(--green-bright);text-decoration:none}
   .bud{width:120px}
   .bud__label{font-size:13.5px;max-width:150px}
   .deco-flower{width:16px;height:16px}
-  .word{width:132px}
-  .word__card{padding:9px 11px 10px}
-  .word__t{font-size:13px}
-  .word__d{font-size:11.5px;line-height:1.65}
+  .word{width:110px}
+  .word__card{padding:8px 9px 9px}
+  .word__t{font-size:11.5px}
+  .word__k{font-size:9px;letter-spacing:.12em}
+  .word__k::before{display:none}
+  .word__en{font-size:9.5px;letter-spacing:.06em}
+  .word__d{font-size:10.5px;line-height:1.55}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }
