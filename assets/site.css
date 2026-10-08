@@ -969,3 +969,100 @@ footer a{color:var(--green-bright);text-decoration:none}
   .tk.is-open .tk__backdrop,.tk.is-open .ticket,.tk.is-open .ticket__top,
   .tk.is-open .ticket__bot,.tk.is-open .tk__read{animation:none!important}
 }
+
+/* ==========================================================================
+   书影 · 书页（点书脊 → 摊开一本书；关闭时书页合上、盖回封面）
+   —— 右页 .bk__leaf 绕书脊中线 rotateY：-180° 盖在左页上（此时看到背面＝封面），
+      0° 摊平在右侧（看到正面＝书评）。perspective 给 .bk__book；
+      filter:drop-shadow 只能挂在外层 .bk__bookwrap —— 挂在有 3D 的容器上会 flatten 掉立体。
+   —— 声明值是**摊开**态，动画的 from 才是合拢态；reduced-motion 下直接是可读的摊开书。
+   ========================================================================== */
+.bk{position:fixed;inset:0;z-index:120;display:none}
+.bk.is-open{display:block}
+.bk__backdrop{position:absolute;inset:0;opacity:0;cursor:pointer;
+  background:radial-gradient(120% 90% at 50% 28%,rgba(6,20,16,.62),rgba(2,8,7,.92));
+  backdrop-filter:blur(4px)}
+.bk.is-open .bk__backdrop{animation:bkFade .3s ease forwards}
+@keyframes bkFade{to{opacity:1}}
+/* 显式写 from{opacity:1}：用 reverse + 隐式 from 的话，延迟期间会回落到声明值 opacity:0，
+   遮罩提前消失、背景整页露出来。both 保证延迟期 fill 住 from。 */
+@keyframes bkFadeOut{from{opacity:1}to{opacity:0}}
+.bk.is-closing .bk__backdrop{animation:bkFadeOut .38s .3s ease both}
+
+.bk__stage{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:58px 20px 68px}
+.bk__close{position:fixed;top:16px;right:18px;z-index:3;width:40px;height:40px;border-radius:50%;
+  background:rgba(10,24,20,.72);border:1px solid rgba(159,240,200,.28);color:var(--ink);
+  font-size:21px;line-height:1;cursor:pointer;transition:border-color .2s,background .2s}
+.bk__close:hover{border-color:var(--mint);background:rgba(16,38,30,.88)}
+.bk__close:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+
+.bk__bookwrap{width:min(760px,100%);filter:drop-shadow(0 26px 54px rgba(0,0,0,.62))}
+.bk.is-open .bk__bookwrap{animation:bkIn .32s cubic-bezier(.2,.85,.3,1) both}
+@keyframes bkIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.bk.is-closing .bk__bookwrap{animation:bkOut .34s .3s ease both}
+@keyframes bkOut{to{opacity:0;transform:translateY(10px) scale(.985)}}
+
+.bk__book{position:relative;display:grid;grid-template-columns:1fr 1fr;perspective:1600px;
+  --pa:#dcf1e6;--pb:#c2e5d4;--pc:#a9d9c0;--ink-t:#16362a;--ink-d:#2f5546}
+
+.bk__left{position:relative;display:flex;flex-direction:column;padding:28px 30px 34px;
+  border-radius:10px 0 0 10px;
+  background:linear-gradient(105deg,var(--pa),var(--pb) 62%,var(--pc));color:var(--ink-t)}
+.bk__left::after{content:"";position:absolute;right:0;top:0;bottom:0;width:24px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(18,52,40,.26))}
+
+.bk__leaf{position:relative;transform-origin:left center;transform-style:preserve-3d;
+  transform:rotateY(0)}
+.bk.is-open .bk__leaf{animation:bkOpen .66s .48s cubic-bezier(.33,.86,.28,1) both}
+@keyframes bkOpen{from{transform:rotateY(-180deg)}to{transform:rotateY(0)}}
+.bk.is-closing .bk__leaf{animation:bkShut .46s cubic-bezier(.5,.05,.4,1) both}
+@keyframes bkShut{from{transform:rotateY(0)}to{transform:rotateY(-180deg)}}
+
+.bk__page{position:relative;height:100%;padding:28px 30px 34px;border-radius:0 10px 10px 0;
+  background:linear-gradient(75deg,var(--pc),var(--pb) 38%,var(--pa));color:var(--ink-t);
+  backface-visibility:hidden}
+/* 右页靠书脊一侧也压暗一点，两页夹出 V 形的装订暗角 */
+.bk__page::before{content:"";position:absolute;left:0;top:0;bottom:0;width:26px;pointer-events:none;
+  border-radius:0 0 0 10px;
+  background:linear-gradient(90deg,rgba(18,52,40,.2),transparent)}
+.bk__cover{position:absolute;inset:0;border-radius:10px;transform:rotateY(180deg);
+  backface-visibility:hidden;display:flex;align-items:center;justify-content:center;
+  padding:26px;text-align:center;
+  background:linear-gradient(128deg,#1a4634,#0c271d 62%,#081c15);
+  border:1px solid rgba(244,213,141,.22)}
+
+.bk__hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-family:"Cormorant Garamond",serif;font-size:10.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--ink-d);opacity:.9}
+.bk__no{font-size:11px;letter-spacing:.16em;white-space:nowrap}
+.bk__title{font-family:"Noto Serif SC",serif;font-weight:600;line-height:1.34;
+  font-size:clamp(20px,2.6vw,25px);margin:14px 0 3px;color:var(--ink-t)}
+.bk__en{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13.5px;color:var(--ink-d)}
+.bk__meta{margin-top:12px;font-size:11.5px;line-height:1.7;color:var(--ink-d)}
+.bk__stars{margin-top:14px;font-size:15px;letter-spacing:.14em;color:#1a5c40}
+.bk__rule{margin-top:16px;border-top:1px dashed rgba(22,54,42,.3)}
+.bk__foot{margin-top:auto;padding-top:18px;font-family:"Noto Serif SC",serif;font-style:italic;
+  font-size:11.5px;color:var(--ink-d);opacity:.8}
+
+.bk__text{font-size:14.5px;line-height:2.02;color:#1b3a2c}
+.bk__quote{margin-top:16px;padding:4px 0 4px 16px;border-left:2px solid rgba(22,84,60,.42);
+  font-family:"Noto Serif SC",serif;font-style:italic;color:#21533f;font-size:13px;line-height:1.9}
+.bk__cover-t{font-family:"Noto Serif SC",serif;font-weight:600;letter-spacing:.06em;line-height:1.6;
+  font-size:clamp(17px,2.4vw,21px);color:#f4d58d}
+
+/* 窄屏：并排放不下两页，改成上下叠放，翻页换成淡入 */
+@media(max-width:760px){
+  .bk__stage{padding:54px 14px 52px;justify-content:flex-start}
+  .bk__bookwrap{width:min(430px,100%)}
+  .bk__book{grid-template-columns:1fr;perspective:none}
+  .bk__left{border-radius:10px 10px 0 0;padding:20px 22px 26px}
+  .bk__left::after{display:none}
+  .bk__page{border-radius:0 0 10px 10px;padding:20px 22px 26px}
+  .bk.is-open .bk__leaf,.bk.is-closing .bk__leaf{animation:bkFade .3s ease both}
+}
+@media(prefers-reduced-motion:reduce){
+  .bk.is-open .bk__backdrop,.bk.is-open .bk__bookwrap,.bk.is-open .bk__leaf,
+  .bk.is-closing .bk__backdrop,.bk.is-closing .bk__bookwrap,.bk.is-closing .bk__leaf
+  {animation:none!important}
+}

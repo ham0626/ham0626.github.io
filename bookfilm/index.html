@@ -263,6 +263,34 @@
   <button class="tk__close" id="tkClose" type="button" aria-label="关闭">×</button>
 </div>
 
+<!-- 书本：点书脊 → 摊开一本书（右页从左页上翻开）；关闭时书页合回封面 -->
+<div class="bk" id="bk" aria-hidden="true">
+  <div class="bk__backdrop" id="bkBackdrop"></div>
+  <div class="bk__stage" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+    <div class="bk__bookwrap">
+      <div class="bk__book">
+        <div class="bk__left">
+          <div class="bk__hd"><span>Bookshelf · 书架</span><span class="bk__no" id="bkNo"></span></div>
+          <h3 class="bk__title" id="bkTitle"></h3>
+          <div class="bk__en" id="bkEn"></div>
+          <div class="bk__meta" id="bkMeta"></div>
+          <div class="bk__stars" id="bkStars"></div>
+          <div class="bk__rule"></div>
+          <p class="bk__foot">合上书页，它就回到架子上。</p>
+        </div>
+        <div class="bk__leaf">
+          <div class="bk__cover"><span class="bk__cover-t" id="bkCoverT"></span></div>
+          <div class="bk__page">
+            <p class="bk__text" id="bkText"></p>
+            <p class="bk__quote" id="bkQuote"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="bk__close" id="bkClose" type="button" aria-label="关闭">×</button>
+</div>
+
 <script>
 (function(){
   const DATA = {
@@ -386,21 +414,64 @@
     document.body.style.overflow = '';
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
+  const bk      = document.getElementById('bk');
+  const bkClose = document.getElementById('bkClose');
+  const bkBack  = document.getElementById('bkBackdrop');
+  const softMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
   tkClose.addEventListener('click', closeTicket);
   tkBack.addEventListener('click', closeTicket);
+
+  /* —— 书：摊开一本；关闭时先把书页合上，再退场 —— */
+  function fillBook(d){
+    document.getElementById('bkNo').textContent     = 'NO.' + d.no;
+    document.getElementById('bkTitle').textContent  = d.title;
+    document.getElementById('bkCoverT').textContent = d.title;
+    document.getElementById('bkEn').textContent     = d.en;
+    document.getElementById('bkMeta').textContent   = d.meta;
+    document.getElementById('bkStars').textContent  = starsHTML(d.stars);
+    document.getElementById('bkText').textContent   = d.text;
+    const q = document.getElementById('bkQuote');
+    if(d.quote){ q.textContent = d.quote; q.hidden = false; }
+    else { q.textContent = ''; q.hidden = true; }
+  }
+  function openBook(id){
+    const d = DATA[id]; if(!d) return;
+    lastFocus = document.activeElement;
+    fillBook(d);
+    bk.classList.remove('is-closing');
+    bk.classList.add('is-open');
+    bk.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    bkClose.focus();
+  }
+  function closeBook(){
+    if(!bk.classList.contains('is-open')) return;
+    bk.classList.add('is-closing');
+    bk.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+    setTimeout(function(){ bk.classList.remove('is-open', 'is-closing'); },
+      softMotion.matches ? 0 : 780);
+  }
+  bkClose.addEventListener('click', closeBook);
+  bkBack.addEventListener('click', closeBook);
+
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') closeTicket();
+    if(e.key !== 'Escape') return;
+    if(bk.classList.contains('is-open')) closeBook();
+    else closeTicket();
   });
 
-  /* —— 书架：点书脊，出一张藏书票 —— */
+  /* —— 书架：点书脊，把这本书摊开 —— */
   document.querySelectorAll('.spine[data-id]').forEach(function(sp){
     sp.addEventListener('click', function(){
       const d = DATA[sp.dataset.id]; if(!d) return;
       document.querySelectorAll('.spine.is-on').forEach(function(x){ x.classList.remove('is-on'); });
       sp.classList.add('is-on');
       bookRead.innerHTML = '<div class="read__hint"><span class="em">✦</span>'
-        + '<p>《' + d.title + '》已收进藏书票 · NO.' + d.no + '</p></div>';
-      openTicket(sp.dataset.id);
+        + '<p>《' + d.title + '》刚从架子上取下来 · NO.' + d.no + '</p></div>';
+      openBook(sp.dataset.id);
     });
   });
 
@@ -417,7 +488,9 @@
   /* —— 深链：#inception / #nonethen …（与旧站锚点写法兼容，#bf-review-xxx 亦可）—— */
   (function(){
     const m = (location.hash || '').match(/^#(?:bf-review-)?(\w+)$/);
-    if(m && DATA[m[1]]) openTicket(m[1]);
+    if(!m || !DATA[m[1]]) return;
+    const d = DATA[m[1]];
+    if(d.kind === 'book') openBook(m[1]); else openTicket(m[1]);
   })();
 })();
 </script>
