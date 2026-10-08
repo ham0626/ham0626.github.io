@@ -26,170 +26,146 @@
   <div class="wrap">
     <div class="crumb">Home / Blog</div>
     <h1 class="serif">成长日志</h1>
-    <p>一条在花圃里蜿蜒向下的小溪。沿岸长出的苗与花，每一朵都是一段心事——轻点，听它说。</p>
+    <p>一圈年轮，一段时光。圆心是最早的那粒种子，最外一圈是此刻——每一圈按月份落着花，轻点，听它说。</p>
   </div>
 </header>
 
-<section class="block block--creek">
+<section class="block block--ring">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">Flower-bed Creek</div>
-      <h2 class="serif">沿溪的心事</h2>
-      <p>把那些写在本子上的心事，收进这条小溪。顺着水流向下，每一个拐弯都标着一段时光；轻点沿岸的花与苗，展开那段感悟。</p>
+      <div class="eyebrow">Tree Rings</div>
+      <h2 class="serif">一圈年轮，一段时光</h2>
+      <p>把那些写在本子上的心事，收进这段年轮。悬停一圈，它会亮起来、圆心浮出那段日子的名字；轻点，当年的心事就一段段流出来——过去的我，与现在的我，隔着时间说话。</p>
     </div>
 
-    <div class="creek" id="creek">
-      <span class="creek__pollen" id="creekPollen" aria-hidden="true"></span>
-      <svg class="creek__water" id="creekWater" aria-hidden="true" preserveAspectRatio="none">
+    <div class="ring" id="ring">
+      <span class="ring__leaves" id="ringLeaves" aria-hidden="true"></span>
+      <span class="ring__sky" id="ringSky" data-season="autumn" aria-hidden="true"></span>
+      <span class="ring__dots" id="ringDots" aria-hidden="true"></span>
+
+      <svg class="ring__svg" id="ringSvg" viewBox="-200 -200 400 400" aria-hidden="true">
         <defs>
-          <linearGradient id="creekGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#7fe9c8" />
-            <stop offset="0.45" stop-color="#3fae7e" />
-            <stop offset="1" stop-color="#2a8f6b" />
-          </linearGradient>
+          <radialGradient id="ringSeed" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#fff8e6" />
+            <stop offset="0.46" stop-color="#f4d58d" />
+            <stop offset="1" stop-color="#f4d58d" stop-opacity="0" />
+          </radialGradient>
         </defs>
-        <path id="creekPath" class="creek__path" pathLength="1"></path>
-        <path id="creekFlow" class="creek__flow"></path>
+        <g class="ring__ripples" id="ringRipples"></g>
+        <g class="ring__spokes" id="ringSpokes"></g>
+        <g class="ring__rings" id="ringRings"></g>
+        <g class="ring__nodes" id="ringNodes"></g>
       </svg>
 
-      <!-- 高二 -->
-      <div class="bud bud--sprout" role="button" tabindex="0" data-cluster="0" data-cnode="高二" aria-label="展开感悟：低谷里，只有自己能拉自己一把">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高二上 · 冬</span>低谷里，只有自己能拉自己一把</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高二上 · 冬</span>
-          <span class="bud__p-title serif">低谷里，只有自己能拉自己一把</span>
-          <span class="bud__p-text"><p>从竞赛回到高考那个冬天，我把自己丢进了一条很长的跑道。</p><p>差距没有变小，反而越跑越远。可奇怪的是，越跑，我越清楚一件事——能把我从低谷里拉起来的，从来只有我自己。</p><p>不绕路，也不替自己找借口。那一刻的安静，后来成了我最稳的底气。</p></span>
-          <span class="bud__p-quote">能把我从低谷里拉出来的，只有我自己。</span>
-        </span>
+      <div class="ring__core" id="ringCore">
+        <span class="ring__core-era" id="coreEra">成长年轮</span>
+        <span class="ring__core-sub" id="coreSub">八圈 · 十一段心事</span>
       </div>
 
-      <div class="bud" role="button" tabindex="0" data-cluster="0" data-cnode="高二" aria-label="展开感悟：知识，第一次落回了土地">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高一暑假 · 中国农大</span>知识，第一次落回了土地</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高一暑假 · 中国农大</span>
-          <span class="bud__p-title serif">知识，第一次落回了土地</span>
-          <span class="bud__p-text"><p>科学营里，院士讲智慧农业——传感器、数据，怎么长进土里。</p><p>课本之外的前沿，第一次把「科技」两个字变成了看得见的东西。</p><p>我坐在台下想：原来未来，是个可以伸手够到的词。</p></span>
-          <span class="bud__p-quote">那是我第一次觉得，未来是个可以伸手够到的词。</span>
-        </span>
-      </div>
+      <!-- ——————————————————————————————————————————
+           心事：年轮的数据源。无 JS 时这些就是可读的卡片。
+           data-ring 圈号（由内而外）/ data-era 圈名 / data-when 当时
+           / data-month 月份（决定落在哪一格）/ data-season 季节
+           / data-kind bloom 已开的花 · sprout 还是花苞
+           —————————————————————————————————————————— -->
 
-      <!-- 高三 · 上 -->
-      <div class="bud" role="button" tabindex="0" data-cluster="1" data-cnode="高三 · 上" aria-label="展开感悟：把日子过成一款 RPG">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 停课复习</span>把日子过成一款 RPG</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 停课复习</span>
-          <span class="bud__p-title serif">把日子过成一款 RPG</span>
-          <span class="bud__p-text"><p>停课复习那段日子，我把生活写成了 RPG：起床扣心情，吃饭加体力，做题涨技能。</p><p>页脚那行红笔写着：高高兴兴去上班，高高兴兴把家还。</p><p>把苦日子游戏化，是我给高三写的一行作弊码。</p></span>
-          <span class="bud__p-quote">把日子过成一款 RPG，是我给高三写的作弊码。</span>
-        </span>
-      </div>
+      <!-- 0 · 高一暑假 -->
+      <article class="log" data-ring="0" data-era="高一暑假" data-when="高一暑假 · 中国农大"
+               data-month="7" data-season="summer" data-kind="bloom">
+        <span class="log__era">高一暑假 · 中国农大</span>
+        <h3 class="log__title serif">知识，第一次落回了土地</h3>
+        <div class="log__body"><p>科学营里，院士讲智慧农业——传感器、数据，怎么长进土里。</p><p>课本之外的前沿，第一次把「科技」两个字变成了看得见的东西。</p><p>我坐在台下想：原来未来，是个可以伸手够到的词。</p></div>
+        <p class="log__quote">那是我第一次觉得，未来是个可以伸手够到的词。</p>
+      </article>
 
-      <div class="bud" role="button" tabindex="0" data-cluster="1" data-cnode="高三 · 上" aria-label="展开感悟：人类，我就是在不断折腾">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 三月</span>人类，我就是在不断折腾</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 三月</span>
-          <span class="bud__p-title serif">人类，我就是在不断折腾</span>
-          <span class="bud__p-text"><p>数学是给我出的吗？英语你平时买菜用得上？物理的导体棒缺了一角，能量也缺一块。</p><p>六科轮番上阵，把我折腾得又笑又恼。</p><p>可天气一冷，心情反而好起来——人真是奇怪又可爱的东西。</p></span>
-          <span class="bud__p-quote">人类，我就是在不断折腾。</span>
-        </span>
-      </div>
+      <!-- 1 · 高二上 · 冬 -->
+      <article class="log" data-ring="1" data-era="高二上 · 冬" data-when="高二上 · 冬"
+               data-month="12" data-season="winter" data-kind="sprout">
+        <span class="log__era">高二上 · 冬</span>
+        <h3 class="log__title serif">低谷里，只有自己能拉自己一把</h3>
+        <div class="log__body"><p>从竞赛回到高考那个冬天，我把自己丢进了一条很长的跑道。</p><p>差距没有变小，反而越跑越远。可奇怪的是，越跑，我越清楚一件事——能把我从低谷里拉起来的，从来只有我自己。</p><p>不绕路，也不替自己找借口。那一刻的安静，后来成了我最稳的底气。</p></div>
+        <p class="log__quote">能把我从低谷里拉出来的，只有我自己。</p>
+      </article>
 
-      <div class="bud" role="button" tabindex="0" data-cluster="1" data-cnode="高三 · 上" aria-label="展开感悟：你就是自己故事里的女主角">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 停课复习</span>你就是自己故事里的女主角</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 停课复习</span>
-          <span class="bud__p-title serif">你就是自己故事里的女主角</span>
-          <span class="bud__p-text"><p>黑板上写着「不可熬夜」，底下是一串推论：这科可以写不完，那科也可以。</p><p>可我又想，剧情还在发展，就演好眼前的场景；剧本由我写，精彩用笔尖演绎。</p><p>所以啊，你就是自己故事里的最佳女主角。</p></span>
-          <span class="bud__p-quote">所以，你就是最佳女主角。</span>
-        </span>
-      </div>
+      <!-- 2 · 高三 · 三月 -->
+      <article class="log" data-ring="2" data-era="高三 · 三月" data-when="高三 · 三月"
+               data-month="3" data-season="spring" data-kind="bloom">
+        <span class="log__era">高三 · 三月</span>
+        <h3 class="log__title serif">人类，我就是在不断折腾</h3>
+        <div class="log__body"><p>数学是给我出的吗？英语你平时买菜用得上？物理的导体棒缺了一角，能量也缺一块。</p><p>六科轮番上阵，把我折腾得又笑又恼。</p><p>可天气一冷，心情反而好起来——人真是奇怪又可爱的东西。</p></div>
+        <p class="log__quote">人类，我就是在不断折腾。</p>
+      </article>
 
-      <!-- 高三 · 下 -->
-      <div class="bud" role="button" tabindex="0" data-cluster="2" data-cnode="高三 · 下" aria-label="展开感悟：静置，结晶，重结晶">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 十二月总结</span>静置，结晶，重结晶</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 十二月总结</span>
-          <span class="bud__p-title serif">静置，结晶，重结晶</span>
-          <span class="bud__p-text"><p>数学一靠做，二靠悟，三靠坚持。</p><p>做题是把话说出来，悟是把话说清，坚持是——话还没说完，也不肯放下笔。</p><p>像提纯一份不干净的东西：做多了，杂质沉降；悟透了，晶体成形。</p></span>
-          <span class="bud__p-quote">静置 · 结晶 · 重结晶。</span>
-        </span>
-      </div>
+      <!-- 3 · 高三 · 停课 -->
+      <article class="log" data-ring="3" data-era="高三 · 停课" data-when="高三 · 停课前"
+               data-month="10" data-season="autumn" data-kind="sprout">
+        <span class="log__era">高三 · 停课前</span>
+        <h3 class="log__title serif">进一寸有一寸的欢喜</h3>
+        <div class="log__body"><p>停课复习像打开魔盒，越复习越觉得自己无知。</p><p>但进一寸有一寸的欢喜。能补上几个漏洞，也很好了。</p><p>退前织网，静待鱼来。</p></div>
+        <p class="log__quote">退前织网，静待鱼来。</p>
+      </article>
 
-      <div class="bud" role="button" tabindex="0" data-cluster="2" data-cnode="高三 · 下" aria-label="展开感悟：终会找到自己的节奏">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 一诊停课</span>终会找到自己的节奏</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 一诊停课</span>
-          <span class="bud__p-title serif">终会找到自己的节奏</span>
-          <span class="bud__p-text"><p>一周在忙碌里过完，有教训，也有成长。</p><p>抢号像抢联动周边，奇怪味道的饼干一天试好几种——忙，却看着笔下的成果很自豪。</p><p>第一次那样深地体会到：人终会找到自己的节奏。</p></span>
-          <span class="bud__p-quote">第一次深入体会，终会形成自己的节奏。</span>
-        </span>
-      </div>
+      <article class="log" data-ring="3" data-era="高三 · 停课" data-when="高三 · 停课复习"
+               data-month="11" data-season="autumn" data-kind="bloom">
+        <span class="log__era">高三 · 停课复习</span>
+        <h3 class="log__title serif">把日子过成一款 RPG</h3>
+        <div class="log__body"><p>停课复习那段日子，我把生活写成了 RPG：起床扣心情，吃饭加体力，做题涨技能。</p><p>页脚那行红笔写着：高高兴兴去上班，高高兴兴把家还。</p><p>把苦日子游戏化，是我给高三写的一行作弊码。</p></div>
+        <p class="log__quote">把日子过成一款 RPG，是我给高三写的作弊码。</p>
+      </article>
 
-      <div class="bud bud--sprout" role="button" tabindex="0" data-cluster="2" data-cnode="高三 · 下" aria-label="展开感悟：进一寸有一寸的欢喜">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 停课前</span>进一寸有一寸的欢喜</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 停课前</span>
-          <span class="bud__p-title serif">进一寸有一寸的欢喜</span>
-          <span class="bud__p-text"><p>停课复习像打开魔盒，越复习越觉得自己无知。</p><p>但进一寸有一寸的欢喜。能补上几个漏洞，也很好了。</p><p>退前织网，静待鱼来。</p></span>
-          <span class="bud__p-quote">退前织网，静待鱼来。</span>
-        </span>
-      </div>
+      <article class="log" data-ring="3" data-era="高三 · 停课" data-when="高三 · 停课复习"
+               data-month="11" data-season="autumn" data-kind="bloom">
+        <span class="log__era">高三 · 停课复习</span>
+        <h3 class="log__title serif">你就是自己故事里的女主角</h3>
+        <div class="log__body"><p>黑板上写着「不可熬夜」，底下是一串推论：这科可以写不完，那科也可以。</p><p>可我又想，剧情还在发展，就演好眼前的场景；剧本由我写，精彩用笔尖演绎。</p><p>所以啊，你就是自己故事里的最佳女主角。</p></div>
+        <p class="log__quote">所以，你就是最佳女主角。</p>
+      </article>
 
-      <!-- 高三 · 六月 -->
-      <div class="bud" role="button" tabindex="0" data-cluster="3" data-cnode="高三 · 六月" aria-label="展开感悟：把永远爱你写进诗的结尾">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 六月</span>把永远爱你写进诗的结尾</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 六月</span>
-          <span class="bud__p-title serif">把永远爱你写进诗的结尾</span>
-          <span class="bud__p-text"><p>晚自习偷偷插花，把两朵快凋谢的花夹进书里，不知旁人有没有闻到那点香。</p><p>后来才恍然：已经三年了，大家都长成了大人。</p><p>高三磨出了大爱，也磨出了把温柔写进字里行间的本事。</p></span>
-          <span class="bud__p-quote">把永远爱你，写进诗的结尾。</span>
-        </span>
-      </div>
+      <!-- 4 · 高三 · 十二月 -->
+      <article class="log" data-ring="4" data-era="高三 · 十二月" data-when="高三 · 十二月总结"
+               data-month="12" data-season="winter" data-kind="bloom">
+        <span class="log__era">高三 · 十二月总结</span>
+        <h3 class="log__title serif">静置，结晶，重结晶</h3>
+        <div class="log__body"><p>数学一靠做，二靠悟，三靠坚持。</p><p>做题是把话说出来，悟是把话说清，坚持是——话还没说完，也不肯放下笔。</p><p>像提纯一份不干净的东西：做多了，杂质沉降；悟透了，晶体成形。</p></div>
+        <p class="log__quote">静置 · 结晶 · 重结晶。</p>
+      </article>
 
-      <div class="bud" role="button" tabindex="0" data-cluster="3" data-cnode="高三 · 六月" aria-label="展开感悟：像荒原上的树，唯我独立">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">高三 · 六月</span>像荒原上的树，唯我独立</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">高三 · 六月</span>
-          <span class="bud__p-title serif">像荒原上的树，唯我独立</span>
-          <span class="bud__p-text"><p>数学考场上在草稿纸画小人，感性外露，认了。</p><p>行不行反正都得走一趟；与其不情不愿，不如开开心心。</p><p>自己满意，自己静穆，自己像荒原上的树——它走到憧憬之处，万物无存，唯我独立。</p></span>
-          <span class="bud__p-quote">正视孤独，勇敢地奔赴考场。</span>
-        </span>
-      </div>
+      <!-- 5 · 高三 · 一诊 -->
+      <article class="log" data-ring="5" data-era="高三 · 一诊" data-when="高三 · 一诊停课"
+               data-month="1" data-season="winter" data-kind="bloom">
+        <span class="log__era">高三 · 一诊停课</span>
+        <h3 class="log__title serif">终会找到自己的节奏</h3>
+        <div class="log__body"><p>一周在忙碌里过完，有教训，也有成长。</p><p>抢号像抢联动周边，奇怪味道的饼干一天试好几种——忙，却看着笔下的成果很自豪。</p><p>第一次那样深地体会到：人终会找到自己的节奏。</p></div>
+        <p class="log__quote">第一次深入体会，终会形成自己的节奏。</p>
+      </article>
 
-      <!-- 大一 · 九月 -->
-      <div class="bud" role="button" tabindex="0" data-cluster="4" data-cnode="大一 · 九月" aria-label="展开感悟：第一篇洛谷题解">
-        <span class="bud__stem" aria-hidden="true"></span>
-        <span class="bud__bloom" aria-hidden="true"><span class="bud__core"></span></span>
-        <span class="bud__label"><span class="bud__era">大一 · 九月</span>第一篇洛谷题解</span>
-        <span class="bud__panel">
-          <span class="bud__p-era">大一 · 九月</span>
-          <span class="bud__p-title serif">第一篇洛谷题解</span>
-          <span class="bud__p-text"><p>大学开学没多久，我写下人生第一篇洛谷题解。</p><p>把一道题的思路，从头到尾拆开、写清、讲给也许素不相识的人看——原来我也能把想法完整地交出去。</p><p>小溪又往前淌了一寸：从被题难住，到能回头为后来的人点一盏灯。</p></span>
-          <span class="bud__p-quote">从被题难住，到为后来的人点一盏灯。</span>
-        </span>
-      </div>
+      <!-- 6 · 高三 · 六月 -->
+      <article class="log" data-ring="6" data-era="高三 · 六月" data-when="高三 · 六月"
+               data-month="6" data-season="summer" data-kind="bloom">
+        <span class="log__era">高三 · 六月</span>
+        <h3 class="log__title serif">把永远爱你写进诗的结尾</h3>
+        <div class="log__body"><p>晚自习偷偷插花，把两朵快凋谢的花夹进书里，不知旁人有没有闻到那点香。</p><p>后来才恍然：已经三年了，大家都长成了大人。</p><p>高三磨出了大爱，也磨出了把温柔写进字里行间的本事。</p></div>
+        <p class="log__quote">把永远爱你，写进诗的结尾。</p>
+      </article>
 
-      <!-- 溪畔的词：心理学 / 认知 / 哲学 / 金融。滚动翻到时，缓缓降落在空白处 -->
+      <article class="log" data-ring="6" data-era="高三 · 六月" data-when="高三 · 六月"
+               data-month="6" data-season="summer" data-kind="bloom">
+        <span class="log__era">高三 · 六月</span>
+        <h3 class="log__title serif">像荒原上的树，唯我独立</h3>
+        <div class="log__body"><p>数学考场上在草稿纸画小人，感性外露，认了。</p><p>行不行反正都得走一趟；与其不情不愿，不如开开心心。</p><p>自己满意，自己静穆，自己像荒原上的树——它走到憧憬之处，万物无存，唯我独立。</p></div>
+        <p class="log__quote">正视孤独，勇敢地奔赴考场。</p>
+      </article>
+
+      <!-- 7 · 大一 · 九月 -->
+      <article class="log" data-ring="7" data-era="大一 · 九月" data-when="大一 · 九月"
+               data-month="9" data-season="autumn" data-kind="bloom">
+        <span class="log__era">大一 · 九月</span>
+        <h3 class="log__title serif">第一篇洛谷题解</h3>
+        <div class="log__body"><p>大学开学没多久，我写下人生第一篇洛谷题解。</p><p>把一道题的思路，从头到尾拆开、写清、讲给也许素不相识的人看——原来我也能把想法完整地交出去。</p><p>年轮又往外长了一圈：从被题难住，到能回头为后来的人点一盏灯。</p></div>
+        <p class="log__quote">从被题难住，到为后来的人点一盏灯。</p>
+      </article>
+
+      <!-- 年轮之外的词：心理学 / 认知 / 哲学 / 金融。散落在四周，翻到时缓缓降落 -->
       <span class="word" data-k="cog"><span class="word__card">
         <span class="word__hd"><span class="word__t">稀缺</span><span class="word__k">认知</span></span><span class="word__en">Scarcity</span>
         <span class="word__d">缺的那一刻，世界就只剩下那一件事。</span>
@@ -255,10 +231,10 @@
         <span class="word__d">风会吹灭蜡烛，也会让火更旺。</span>
       </span></span>
 
-    </div><!-- /creek -->
+    </div><!-- /ring -->
 
-    <p class="creek__hint">轻点沿岸的花与苗，展开那段心事 · 顺着小溪向下，拐弯处标着每一段时光
-      <span class="creek__more">溪还长着 · 往后的日子，留给它慢慢淌</span></p>
+    <p class="ring__hint">悬停一圈，看那段日子的名字 · 轻点一圈或一朵花，听它说
+      <span class="ring__more">年轮还会往外长 · 往后的日子，留给它一圈圈添</span></p>
   </div>
 
   <div class="petal" id="petal" aria-hidden="true">
@@ -267,8 +243,8 @@
       <button class="petal__close" id="petalClose" type="button" aria-label="关闭">×</button>
       <div class="petal__era" id="petalEra"></div>
       <h3 class="petal__title serif" id="petalTitle"></h3>
-      <div class="petal__text" id="petalText"></div>
-      <blockquote class="petal__quote" id="petalQuote"></blockquote>
+      <div class="chat" id="chat"></div>
+      <div class="chat__note" id="chatNote">Esc 或轻点别处合上</div>
     </div>
   </div>
 </section>

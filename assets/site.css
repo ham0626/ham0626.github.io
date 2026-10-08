@@ -588,154 +588,189 @@ footer a{color:var(--green-bright);text-decoration:none}
 
 
 /* ============================================================
-   成长日志：「花圃小溪」竖向流淌（Flower-bed Creek）
-   —— 一条在花圃里蜿蜒向下的小溪，随滚动自绘延伸；
-      两岸的苗与花随进入视野而生长，点开即见一段心事。
-      无 JS 时 .creek 不是 .is-live，退化为竖排的卡片列表。
+   成长日志：「年轮」（Tree Rings）
+   —— 一圈年轮 = 一段时光。圆心是最早的那粒种子，最外一圈是此刻；
+      每圈按月份落着花，悬停一圈会亮起、圆心浮出那段日子的名字；
+      轻点，当年的心事就一段段流出来（当时的我 ↔ 现在的我）。
+      背景随季节换：春樱 / 夏萤 / 秋叶 / 冬雪；另有常驻的飘叶、
+      光点，以及一圈圈荡开的水纹。
+      无 JS 时 .ring 不带 .is-live，退化为竖排卡片。
    ============================================================ */
-.block--creek{position:relative;overflow:hidden;
+.block--ring{position:relative;overflow:hidden;
   background:
-    radial-gradient(60% 30% at 50% -4%,rgba(63,174,126,.10),rgba(0,0,0,0) 70%),
+    radial-gradient(58% 30% at 50% -4%,rgba(63,174,126,.10),rgba(0,0,0,0) 70%),
     linear-gradient(180deg,#08120e 0%,#0a1714 42%,#0a1c16 100%)}
-.block--creek::before{content:"";position:absolute;inset:0;pointer-events:none;
+.block--ring::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:
-    radial-gradient(38% 22% at 18% 16%,rgba(244,213,141,.05),rgba(0,0,0,0) 70%),
-    radial-gradient(40% 24% at 84% 62%,rgba(159,240,200,.05),rgba(0,0,0,0) 72%)}
+    radial-gradient(38% 22% at 16% 18%,rgba(244,213,141,.05),rgba(0,0,0,0) 70%),
+    radial-gradient(40% 24% at 86% 66%,rgba(159,240,200,.05),rgba(0,0,0,0) 72%)}
 
-/* 飘浮的花粉 / 萤光点 */
-.creek__pollen{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.creek__pollen i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;
-  background:radial-gradient(circle,rgba(244,213,141,.9),rgba(244,213,141,0) 70%);
-  opacity:0;animation:pollenDrift linear infinite}
-@keyframes pollenDrift{
-  0%{transform:translateY(0) translateX(0);opacity:0}
-  14%{opacity:.7}
-  86%{opacity:.45}
-  100%{transform:translateY(-560px) translateX(22px);opacity:0}}
+/* —— 舞台。--da 年轮直径、--pt 年轮区高度、--fall 粒子飘落距离，均由 JS 量好后写入 —— */
+.ring{position:relative;z-index:1;margin:calc(var(--u)*2) auto 0;padding-top:var(--pt,600px)}
 
-.creek{position:relative;z-index:1;max-width:min(1400px,96vw);margin:calc(var(--u)*2) auto 0}
-.creek__water{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
-.creek__path{fill:none;stroke:url(#creekGrad);stroke-width:7;stroke-linecap:round;
-  filter:drop-shadow(0 0 10px rgba(63,174,126,.5));
-  stroke-dasharray:1;transition:stroke-dashoffset 120ms linear}
-.creek__flow{fill:none;stroke:rgba(214,255,235,.55);stroke-width:1.6;stroke-linecap:round;
-  stroke-dasharray:2 18;animation:creekFlow 5s linear infinite;opacity:.7;pointer-events:none}
-@keyframes creekFlow{to{stroke-dashoffset:-40}}
+/* —— 背景三层：常驻飘叶 / 季节粒子 / 常驻光点 —— */
+.ring__leaves,.ring__sky,.ring__dots{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ring__leaves{z-index:1}
+.ring__sky{z-index:1;transition:opacity 460ms ease}
+.ring__sky.is-swap{opacity:0}
+.ring__dots{z-index:2}
 
-/* —— 空白之处的装饰：萤火虫 / 蝴蝶 / 散落小花 —— */
-.creek__fireflies,.creek__butterflies{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.creek__fireflies{z-index:3}
-.creek__butterflies{z-index:4}
+/* 飘落的叶子：很淡，只是让这块地方像站在一棵树底下 */
+.ring__leaves i{position:absolute;top:-24px;left:var(--x);width:13px;height:8px;opacity:0;
+  background:linear-gradient(120deg,rgba(63,174,126,.5),rgba(22,62,46,.28));
+  border-radius:64% 8% 64% 8%;animation:leafFall var(--d1,22s) linear var(--dl,0s) infinite}
+@keyframes leafFall{
+  0%{transform:translate(0,0) rotate(0deg);opacity:0}
+  9%{opacity:.6}
+  46%{transform:translate(52px,calc(var(--fall) * .48)) rotate(170deg)}
+  91%{opacity:.48}
+  100%{transform:translate(-16px,var(--fall)) rotate(330deg);opacity:0}}
 
-/* 萤火虫：暖金光点，缓缓游移、忽明忽暗 */
-.firefly{position:absolute;width:6px;height:6px;border-radius:50%;
-  background:radial-gradient(circle,#fff6c8 0%,rgba(244,213,141,.95) 32%,rgba(244,213,141,0) 70%);
-  box-shadow:0 0 9px 2px rgba(244,213,141,.6);opacity:0;
-  animation:fireflyWander var(--fdur,18s) ease-in-out infinite,fireflyTwinkle var(--ftw,3.4s) ease-in-out infinite}
-.firefly:nth-child(3n+1){animation-name:fireflyWander1,fireflyTwinkle}
-.firefly:nth-child(3n+2){animation-name:fireflyWander2,fireflyTwinkle}
-@keyframes fireflyWander{
-  0%{transform:translate(0,0)}25%{transform:translate(34px,-26px)}50%{transform:translate(-22px,-58px)}
-  75%{transform:translate(18px,-30px)}100%{transform:translate(0,0)}}
-@keyframes fireflyWander1{
-  0%{transform:translate(0,0)}30%{transform:translate(-30px,-34px)}60%{transform:translate(26px,-64px)}
+/* 光点：暖金，原地游移、忽明忽暗 */
+.ring__dots i{position:absolute;left:var(--x);top:var(--y);width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,#fff6c8 0%,rgba(244,213,141,.9) 34%,rgba(244,213,141,0) 72%);
+  box-shadow:0 0 8px 2px rgba(244,213,141,.42);opacity:0;
+  animation:dotWander var(--d1,17s) ease-in-out var(--dl,0s) infinite,
+            dotTwinkle var(--d2,3.4s) ease-in-out var(--dl,0s) infinite}
+.ring__dots i:nth-child(3n+1){animation-name:dotWander2,dotTwinkle}
+@keyframes dotWander{
+  0%{transform:translate(0,0)}25%{transform:translate(30px,-22px)}50%{transform:translate(-18px,-48px)}
+  75%{transform:translate(16px,-26px)}100%{transform:translate(0,0)}}
+@keyframes dotWander2{
+  0%{transform:translate(0,0)}32%{transform:translate(-26px,-30px)}66%{transform:translate(22px,-56px)}
   100%{transform:translate(0,0)}}
-@keyframes fireflyWander2{
-  0%{transform:translate(0,0)}35%{transform:translate(28px,-20px)}70%{transform:translate(-26px,-52px)}
-  100%{transform:translate(0,0)}}
-@keyframes fireflyTwinkle{0%,100%{opacity:.12}50%{opacity:.95}}
+@keyframes dotTwinkle{0%,100%{opacity:.10}50%{opacity:.85}}
 
-/* 蝴蝶：两翼轻扇，沿小径飘过 */
-.butterfly{position:absolute;width:30px;height:24px;opacity:0;will-change:transform;
-  animation:bflyDrift var(--bdur,24s) linear infinite}
-.butterfly .bf-body{position:absolute;left:50%;top:50%;width:2px;height:15px;margin:-7px 0 0 -1px;
-  background:linear-gradient(180deg,#d9b89a,#7a9c6e);border-radius:2px}
-.butterfly .bf-wing{position:absolute;top:1px;width:14px;height:21px;
-  border-radius:62% 62% 55% 55%/78% 78% 35% 35%;box-shadow:0 0 5px rgba(246,184,200,.35);
-  transform-origin:right center}
-.butterfly .bf-l{left:0;animation:bflyFlap 260ms ease-in-out infinite}
-.butterfly .bf-r{right:0;transform-origin:left center;animation:bflyFlap 260ms ease-in-out infinite reverse}
-@keyframes bflyFlap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.32)}}
-@keyframes bflyDrift{
-  0%{transform:translate(0,0);opacity:0}
-  7%{opacity:.92}
-  50%{transform:translate(calc(var(--bdist,420px) * var(--dir,1)),-54px)}
-  93%{opacity:.92}
-  100%{transform:translate(calc(var(--bdist,420px) * var(--dir,1) * 2),-22px);opacity:0}}
+/* 季节粒子：同一批 <i>，容器换个 data-season 就换一副样子 */
+.ring__sky i{position:absolute;top:-22px;left:var(--x);width:var(--w);height:var(--w);opacity:0;
+  animation:skyFall var(--d1,15s) linear var(--dl,0s) infinite}
+.ring__sky[data-season="spring"] i{border-radius:50% 0 50% 50%;
+  background:linear-gradient(140deg,rgba(246,184,200,.96),rgba(255,216,228,.7));
+  box-shadow:0 0 6px rgba(246,184,200,.32)}
+.ring__sky[data-season="summer"] i{border-radius:50%;
+  background:radial-gradient(circle,#fff9d8 0%,rgba(244,213,141,.95) 32%,rgba(244,213,141,0) 70%);
+  box-shadow:0 0 11px 3px rgba(244,213,141,.5);animation-name:skyFloat}
+.ring__sky[data-season="autumn"] i{width:9px;height:9px;border-radius:0 100% 0 100%;
+  background:linear-gradient(135deg,rgba(240,168,110,.9),rgba(176,106,64,.7));
+  box-shadow:0 0 6px rgba(224,150,90,.28)}
+.ring__sky[data-season="winter"] i{width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,#ffffff 0%,rgba(226,244,255,.9) 45%,rgba(226,244,255,0) 72%);
+  box-shadow:0 0 7px rgba(226,244,255,.42)}
+@keyframes skyFall{
+  0%{transform:translate(0,0) rotate(0deg);opacity:0}
+  8%{opacity:.85}
+  48%{transform:translate(30px,calc(var(--fall) * .5)) rotate(200deg)}
+  92%{opacity:.68}
+  100%{transform:translate(-18px,var(--fall)) rotate(400deg);opacity:0}}
+/* 夏萤不往落，是浮着往上走的 */
+@keyframes skyFloat{
+  0%{transform:translate(0,calc(var(--fall) * .96)) scale(.8);opacity:0}
+  12%{opacity:.95}
+  38%{transform:translate(26px,calc(var(--fall) * .55)) scale(1.06)}
+  66%{transform:translate(-20px,calc(var(--fall) * .3)) scale(.9)}
+  90%{opacity:.82}
+  100%{transform:translate(8px,-20px) scale(.7);opacity:0}}
 
-/* 散落小花：在溪水两侧静静摇曳 */
-.deco-flower-wrap{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
-.deco-flower{display:block;width:20px;height:20px;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));transform-origin:50% 78%;
-  animation:flowerSway 7s ease-in-out infinite}
-@keyframes flowerSway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+/* —— 年轮本体 —— */
+.ring__svg{position:absolute;left:50%;top:calc(var(--pt,600px) / 2);z-index:3;overflow:visible;
+  width:var(--da,600px);height:var(--da,600px);transform:translate(-50%,-50%)}
+/* 12 条月份辐条：极淡，只为让人看出花落在几月 */
+.ring__spoke{stroke:rgba(159,240,200,.10);stroke-width:.7;stroke-dasharray:2.5 5}
+.ring__spoke--q{stroke:rgba(244,213,141,.15);stroke-dasharray:none}
+/* 圈：hit 是加宽的透明命中层（细线太难点中），c 才是看得见的那条 */
+/* pointer-events:stroke —— 透明描边也要能点中（visiblePainted 会放过 transparent） */
+.ring__hit{fill:none;stroke:transparent;stroke-width:19;cursor:pointer;pointer-events:stroke}
+/* 由内而外：深绿（最早）→ 薄荷（渐亮）→ 暖金（此刻） */
+.ring__c{fill:none;stroke:rgba(63,174,126,.42);stroke-width:2.1;pointer-events:none;
+  transition:stroke 280ms ease,stroke-width 280ms ease,opacity 280ms ease}
+.ring__c[data-g="0"]{stroke:rgba(38,104,76,.62)}
+.ring__c[data-g="1"]{stroke:rgba(47,125,91,.62)}
+.ring__c[data-g="2"]{stroke:rgba(56,150,108,.58)}
+.ring__c[data-g="3"]{stroke:rgba(63,174,126,.58)}
+.ring__c[data-g="4"]{stroke:rgba(105,206,163,.55)}
+.ring__c[data-g="5"]{stroke:rgba(140,228,188,.52)}
+.ring__c[data-g="6"]{stroke:rgba(172,240,208,.55)}
+.ring__c[data-g="7"]{stroke:rgba(244,213,141,.55)}   /* 最外一圈：此刻 */
+.ring__c.is-hot{stroke:rgba(214,255,235,.95)!important;stroke-width:3.6}
+/* 圈与圈之间的生长纹：让"靶子"变成年轮 */
+.ring__grain{fill:none;stroke:rgba(159,240,200,.11);stroke-width:.75;pointer-events:none}
+.ring__grain--b{stroke:rgba(159,240,200,.07);stroke-width:.6}
+.ring.is-focus .ring__c{opacity:.38}
+.ring.is-focus .ring__c.is-hot{opacity:1}
+/* 水纹：年轮本来就像一圈圈荡开的水波，圆心一直在往外推 */
+.ring__ripple{fill:none;stroke:rgba(159,240,200,.30);stroke-width:1.2;
+  transform-box:view-box;transform-origin:0 0;
+  animation:rippleOut 8s cubic-bezier(.18,.62,.28,1) infinite}
+.ring__ripple:nth-child(2){animation-delay:-2.7s}
+.ring__ripple:nth-child(3){animation-delay:-5.4s}
+@keyframes rippleOut{
+  0%{transform:scale(.10);opacity:0}
+  14%{opacity:.5}
+  100%{transform:scale(1);opacity:0}}
+/* 轻点处荡开的那一圈 */
+.ring__tap{fill:none;stroke:rgba(214,255,235,.5);stroke-width:1.4;
+  transform-box:view-box;transform-origin:0 0;
+  animation:tapOut 900ms cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes tapOut{0%{transform:scale(.14);opacity:.85}100%{transform:scale(.6);opacity:0}}
 
-/* 时间节点：溪水拐弯处的时光标记（暖金小珠 + 时代名） */
-.cnode{position:absolute;z-index:2;pointer-events:none;display:flex;align-items:center;gap:9px;
-  transform:translateY(-50%);font-family:"Noto Serif SC",serif;white-space:nowrap;
-  opacity:0;transition:opacity 700ms ease}
-.creek.is-live .cnode{opacity:1}
-.cnode--r{transform:translate(0,-50%)}      /* 右岸拐弯：珠子在左，标签向右延伸 */
-.cnode--l{transform:translate(-100%,-50%)}  /* 左岸拐弯：珠子在右，标签向左延伸 */
-.cnode--l{flex-direction:row-reverse}
-.cnode__knot{position:relative;width:15px;height:15px;border-radius:50%;flex:none;
-  background:radial-gradient(circle at 40% 35%,#fff6e0,var(--gold) 70%);
-  box-shadow:0 0 14px rgba(244,213,141,.9),0 0 28px rgba(244,213,141,.45)}
-.cnode__knot::after{content:"";position:absolute;top:50%;left:50%;width:26px;height:26px;border-radius:50%;
-  transform:translate(-50%,-50%);border:1px solid rgba(244,213,141,.5);opacity:.6;animation:cnodePulse 3.4s ease-in-out infinite}
-.cnode__label{font-size:12.5px;letter-spacing:.14em;color:var(--gold);
-  text-shadow:0 1px 8px rgba(0,0,0,.75)}
-@keyframes cnodePulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.55}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+/* —— 圈上的花：一条心事一朵 —— */
+.rnode{cursor:pointer}
+.rnode__halo{fill:rgba(159,240,200,.10);opacity:0;transition:opacity 260ms ease}
+.rnode.is-hot .rnode__halo,.rnode:focus-visible .rnode__halo{opacity:1}
+.rnode:focus-visible{outline:none}
+.rnode__g{transform-box:fill-box;transform-origin:center;
+  transition:transform 300ms cubic-bezier(.2,.8,.3,1)}
+.rnode.is-hot .rnode__g,.rnode:focus-visible .rnode__g{transform:scale(1.5)}
+.rnode__petal{fill:rgba(246,184,200,.95)}
+.rnode__core{fill:#fff6e0}
+.rnode[data-kind="sprout"] .rnode__petal{fill:rgba(63,174,126,.95)}
+.rnode[data-kind="sprout"] .rnode__core{fill:#d6ffe9}
+.rnode[data-kind="sprout"] .rnode__g{transform:scale(.86)}
+.rnode[data-kind="sprout"].is-hot .rnode__g{transform:scale(1.3)}
+/* 描边压在圈线之上，月份才不会被圈划断 */
+.rnode__txt{font-family:"Noto Serif SC",serif;font-size:8px;letter-spacing:.04em;
+  fill:rgba(214,232,224,.66);stroke:#0a1714;stroke-width:3;paint-order:stroke fill;
+  opacity:0;transition:opacity 300ms ease,fill 300ms ease}
+.ring.is-live .rnode__txt{opacity:1}
+.rnode.is-hot .rnode__txt{fill:#fff;opacity:1}
+/* 圈与圈之间的装饰小花（纯装饰） */
+.ring__flora{pointer-events:none}
+.floret{animation:floretSway 6.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes floretSway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
 
-/* 一朵苗 / 花：默认缩成 0，进入视野时长出来 */
-.bud{position:absolute;transform:translate(-50%,-50%) scale(.2);opacity:0;z-index:2;
-  transition:transform 720ms cubic-bezier(.2,.7,.2,1),opacity 620ms ease;
-  cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;
-  display:flex;flex-direction:column;align-items:center;width:160px}
-.bud.is-grown{transform:translate(-50%,-50%) scale(1);opacity:1}
-.bud:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:14px}
-.bud__stem{width:2px;height:34px;margin:0 auto;
-  background:linear-gradient(180deg,rgba(159,240,200,0),rgba(159,240,200,.7));border-radius:2px}
-.bud__bloom{position:relative;width:48px;height:48px;margin-top:-3px;display:grid;place-items:center;
-  filter:drop-shadow(0 5px 11px rgba(0,0,0,.5));transition:transform var(--dur) var(--ease)}
-.bud:hover .bud__bloom,.bud:focus-visible .bud__bloom{transform:scale(1.12) rotate(-3deg)}
-.bud__bloom::before{content:"";position:absolute;inset:0;border-radius:50%;
+/* —— 圆心：那粒种子 + 当前聚焦的名字 —— */
+/* 宽度必须小于最内圈直径，否则圈线会从字上穿过去 */
+.ring__core{position:absolute;left:50%;top:calc(var(--pt,600px) / 2);z-index:4;
+  width:calc(var(--da,600px) * .24);aspect-ratio:1/1;transform:translate(-50%,-50%);
+  display:grid;place-content:center;justify-items:center;gap:6px;text-align:center;
+  pointer-events:none;border-radius:50%}
+/* 底层把圈线柔柔地压暗，上层才是那团金色柔光 ——
+   否则悬停时亮起来的圈会从"高三 · 停课"这几个字上横穿过去 */
+.ring__core::before{content:"";position:absolute;inset:-8%;border-radius:50%;
   background:
-    radial-gradient(circle at 50% 50%,var(--gold) 0 22%,rgba(244,213,141,0) 23%),
-    conic-gradient(from 0deg,
-      rgba(246,184,200,.95) 0 18%,rgba(244,213,141,0) 18% 22%,
-      rgba(246,184,200,.95) 22% 40%,rgba(244,213,141,0) 40% 44%,
-      rgba(246,184,200,.95) 44% 62%,rgba(244,213,141,0) 62% 66%,
-      rgba(246,184,200,.95) 66% 84%,rgba(244,213,141,0) 84% 88%,
-      rgba(246,184,200,.95) 88% 100%);
-  -webkit-mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 62%);
-  mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 62%);
-  transform:scale(.92)}
-.bud__core{position:relative;width:14px;height:14px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#fff6e0,var(--gold) 70%);
-  box-shadow:0 0 12px rgba(244,213,141,.8)}
-/* 苗：用两片嫩叶换下花瓣 */
-.bud--sprout .bud__bloom{width:42px;height:42px}
-.bud--sprout .bud__bloom::before{background:
-    radial-gradient(circle at 50% 78%,rgba(159,240,200,.95) 0 20%,rgba(159,240,200,0) 21%),
-    conic-gradient(from 200deg,
-      rgba(63,174,126,.95) 0 30%,rgba(63,174,126,0) 30% 38%,
-      rgba(63,174,126,.95) 38% 68%,rgba(63,174,126,0) 68% 76%,
-      rgba(63,174,126,.95) 76% 100%);
-  -webkit-mask:radial-gradient(circle at 50% 60%,#000 58%,transparent 60%);
-  mask:radial-gradient(circle at 50% 60%,#000 58%,transparent 60%);
-  transform:scale(1)}
-.bud--sprout .bud__core{background:radial-gradient(circle at 40% 35%,#d6ffe9,var(--mint) 72%);
-  box-shadow:0 0 12px rgba(63,174,126,.8);width:12px;height:12px}
+    radial-gradient(circle at 50% 46%,rgba(9,20,17,.95) 0 46%,rgba(9,20,17,.74) 62%,rgba(9,20,17,0) 80%),
+    radial-gradient(circle at 50% 46%,rgba(244,213,141,.20),rgba(244,213,141,.05) 46%,rgba(244,213,141,0) 70%)}
+.ring__core-era{position:relative;font-family:"Noto Serif SC",serif;font-weight:600;
+  font-size:clamp(12.5px,1.5vw,16px);color:var(--gold);letter-spacing:.06em;line-height:1.35;
+  text-shadow:0 1px 10px rgba(0,0,0,.9)}
+.ring__core-sub{position:relative;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:clamp(10px,1.15vw,12px);letter-spacing:.12em;color:rgba(201,214,207,.72);
+  text-shadow:0 1px 8px rgba(0,0,0,.85)}
+.ring__core.is-flip .ring__core-era,.ring__core.is-flip .ring__core-sub{animation:corePop 340ms ease both}
+@keyframes corePop{0%{opacity:.15;transform:translateY(3px)}100%{opacity:1;transform:none}}
 
-.bud__label{margin-top:9px;max-width:220px;text-align:center;
-  font-family:"Noto Serif SC",serif;color:var(--ink);font-size:15.5px;line-height:1.55;font-weight:500;
-  text-shadow:0 1px 3px rgba(0,0,0,.92),0 0 11px rgba(0,0,0,.6);transition:color var(--dur) var(--ease)}
-.bud__era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;
-  font-size:11px;letter-spacing:.1em;color:var(--gold);opacity:.82;margin-bottom:2px}
-.bud:hover .bud__label,.bud:focus-visible .bud__label{color:#fff}
+/* —— 心事：年轮的数据源。JS 接管后藏起来，内容从 DOM 里读 —— */
+.ring.is-live .log{display:none}
+.log__era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;
+  letter-spacing:.1em;color:var(--gold);opacity:.82}
+.log__title{font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;color:var(--ink);
+  font-size:clamp(17px,2.4vw,21px);line-height:1.45;margin:6px 0 12px}
+.log__body{color:#dbe6e0;font-size:14.5px;line-height:1.95}
+.log__body p + p{margin-top:12px}
+.log__quote{margin-top:14px;padding:4px 0 4px 18px;border-left:2px solid rgba(244,213,141,.5);
+  font-family:"Noto Serif SC",serif;font-style:italic;color:#ecd9a8;font-size:13.5px;line-height:1.9}
 
-/* 溪畔的词：心理学 / 认知 / 哲学 / 金融。翻到时从上方缓缓降落。
+/* 年轮之外的词：心理学 / 认知 / 哲学 / 金融。翻到时从上方缓缓降落。
    每片各有微倾斜(--wtilt)、卵石形态(data-s)、浮动节奏(JS 给)，13 张不重样 */
 .word{position:absolute;left:0;top:0;z-index:2;width:156px;--wtilt:0deg;
   --wk:rgba(244,213,141,.24);--wk2:rgba(244,213,141,.92);--wc:var(--gold);
@@ -793,74 +828,84 @@ footer a{color:var(--green-bright);text-decoration:none}
   .word.is-landed:hover .word__k{opacity:.85}
 }
 
-/* 点开后的感悟卡片（modal） */
+/* —— 点开后的心事：一段气泡流 —— */
 .petal{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:calc(var(--u)*3)}
 .petal.is-open{display:flex;animation:petalFade 220ms ease both}
 @keyframes petalFade{from{opacity:0}to{opacity:1}}
 .petal__backdrop{position:absolute;inset:0;background:rgba(4,10,8,.72);backdrop-filter:blur(6px)}
-.petal__card{position:relative;z-index:1;width:min(560px,100%);max-height:84vh;overflow:auto;
-  background:linear-gradient(168deg,#10261f,#0a1a15 60%,#081512);
-  border:1px solid rgba(244,213,141,.3);border-radius:22px;
-  padding:calc(var(--u)*5) calc(var(--u)*5) calc(var(--u)*4.5);
-  box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);
-  animation:petalPop 320ms cubic-bezier(.2,.7,.2,1) both}
-@keyframes petalPop{from{transform:translateY(18px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.petal__card{position:relative;z-index:1;width:min(620px,100%);max-height:84vh;overflow:auto;
+  padding:calc(var(--u)*5) calc(var(--u)*5) calc(var(--u)*4);border-radius:22px;
+  background:linear-gradient(160deg,rgba(20,44,36,.96),rgba(8,20,17,.97));
+  border:1px solid rgba(159,240,200,.16);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
+  animation:petalIn 380ms cubic-bezier(.2,.8,.3,1) both}
+@keyframes petalIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
 .petal__close{position:absolute;top:calc(var(--u)*2);right:calc(var(--u)*2.5);
-  width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;color:var(--ink);
-  background:rgba(244,213,141,.10);border:1px solid rgba(244,213,141,.32);
+  width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);color:var(--ink);font-size:19px;line-height:1;cursor:pointer;
   transition:background var(--dur) var(--ease),transform var(--dur) var(--ease)}
 .petal__close:hover{background:rgba(244,213,141,.2);transform:rotate(90deg)}
 .petal__close:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 .petal__era{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;
-  letter-spacing:.12em;color:var(--gold);opacity:.85}
+  letter-spacing:.14em;color:var(--gold);opacity:.85}
 .petal__title{font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;color:var(--ink);
-  font-size:clamp(22px,3.4vw,30px);line-height:1.3;margin:calc(var(--u)*1.5) 0 calc(var(--u)*2.5)}
+  font-size:clamp(19px,2.8vw,25px);line-height:1.45;margin-top:8px}
 .petal__title::after{content:"";display:block;width:54px;height:2px;margin-top:calc(var(--u)*2);
-  background:linear-gradient(90deg,var(--gold),rgba(244,213,141,0))}
-.petal__text{color:#dbe6e0;font-size:15px;line-height:2}
-.petal__text p + p{margin-top:calc(var(--u)*1.75)}
-.petal__quote{margin-top:calc(var(--u)*3);padding:calc(var(--u)*.25) 0 calc(var(--u)*.25) calc(var(--u)*2.5);
-  border-left:2px solid rgba(244,213,141,.5);font-family:"Noto Serif SC",serif;font-style:italic;
-  color:#ecd9a8;font-size:14px;line-height:1.9}
+  background:linear-gradient(90deg,var(--mint),rgba(159,240,200,0))}
 
-.creek__hint{position:relative;z-index:1;text-align:center;margin-top:calc(var(--u)*4);
+.chat{display:flex;flex-direction:column;gap:calc(var(--u)*2.5);margin-top:calc(var(--u)*3)}
+.chat__day{align-self:center;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:11.5px;letter-spacing:.14em;color:rgba(201,214,207,.45);
+  padding:3px 14px;border-radius:999px;background:rgba(255,255,255,.03)}
+.chat__row{display:flex;flex-direction:column;gap:6px;max-width:86%}
+.chat__row--past{align-self:flex-start}
+.chat__row--now{align-self:flex-end;align-items:flex-end}
+.chat__who{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11px;
+  letter-spacing:.14em;color:rgba(201,214,207,.42);padding:0 5px}
+.chat__row--now .chat__who{color:rgba(244,213,141,.6)}
+/* 气泡：滚动到就往上弹一下（is-in 由 IntersectionObserver 加） */
+.chat__bub{position:relative;padding:13px 16px;border-radius:16px;
+  font-size:14.5px;line-height:1.9;color:#dbe6e0;
+  background:linear-gradient(140deg,rgba(47,125,91,.22),rgba(22,62,46,.14));
+  border:1px solid rgba(159,240,200,.18);border-bottom-left-radius:5px;
+  opacity:0;transform:translateY(20px) scale(.97);
+  transition:opacity 560ms cubic-bezier(.2,.8,.3,1),transform 560ms cubic-bezier(.2,.8,.3,1)}
+.chat__bub.is-in{opacity:1;transform:none}
+.chat__bub p + p{margin-top:10px}
+.chat__ttl{display:block;font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;
+  font-size:15px;color:var(--ink);margin-bottom:7px}
+.chat__row--now .chat__bub{
+  background:linear-gradient(140deg,rgba(244,213,141,.15),rgba(246,184,200,.07));
+  border-color:rgba(244,213,141,.26);border-bottom-right-radius:5px;border-bottom-left-radius:16px;
+  color:#f0e2bd;font-family:"Noto Serif SC",serif;font-style:italic}
+.chat__note{margin-top:calc(var(--u)*3);text-align:center;font-size:11px;letter-spacing:.12em;
+  color:rgba(201,214,207,.34)}
+
+.ring__hint{position:relative;z-index:1;text-align:center;margin-top:calc(var(--u)*4);
   font-size:12px;letter-spacing:.06em;color:rgba(201,214,207,.5)}
-/* 溪还长着——后续还有成长，留个话头 */
-.creek__more{display:block;margin-top:10px;color:var(--mint);opacity:.7;
+/* 年轮还会往外长——后续还有成长，留个话头 */
+.ring__more{display:block;margin-top:10px;color:var(--mint);opacity:.7;
   font-family:"Noto Serif SC",serif;font-size:12.5px;letter-spacing:.14em}
 
 /* 无 JS：退化成竖排卡片，内容全可读 */
-.creek:not(.is-live){min-height:0}
-.creek:not(.is-live) .bud{position:static;transform:none;opacity:1;width:100%;
-  align-items:flex-start;margin:calc(var(--u)*2) 0;padding:calc(var(--u)*2.5);
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;
-  flex-direction:row;flex-wrap:wrap;gap:calc(var(--u)*2.5)}
-.creek:not(.is-live) .bud__stem,.creek:not(.is-live) .bud__bloom{display:none}
-.creek:not(.is-live) .bud__label{text-align:left;margin-top:0}
-.creek__pollen{display:none}
-/* 无 JS：词牌也退化成竖排小卡，内容照旧可读。
+.ring:not(.is-live){padding-top:0}
+.ring:not(.is-live) .log{margin:calc(var(--u)*2.5) 0;padding:calc(var(--u)*2.5);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px}
+/* 无 JS：词牌也退化成流式小卡，内容照旧可读。
    注意别写 width:100% —— JS 要在 is-live 之前量卡片真实尺寸来算避让，撑满会量错 */
-.creek:not(.is-live) .word{position:static;transform:none;opacity:1;display:inline-block;
+.ring:not(.is-live) .word{position:static;transform:none;opacity:1;display:inline-block;
   vertical-align:top;margin:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 0}
-.creek:not(.is-live) .word__card{animation:none}
+.ring:not(.is-live) .word__card{animation:none}
 
-.bud__panel{display:none}
-.creek:not(.is-live) .bud__panel{display:block;width:100%}
-.bud__p-era{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;
-  letter-spacing:.1em;color:var(--gold);opacity:.82}
-.bud__p-title{display:block;font-family:"Noto Serif SC",serif;font-style:italic;font-weight:600;
-  color:var(--ink);font-size:clamp(18px,2.6vw,22px);line-height:1.4;margin:6px 0 12px}
-.bud__p-text{display:block;color:#dbe6e0;font-size:14.5px;line-height:1.95}
-.bud__p-text p + p{margin-top:12px}
-.bud__p-quote{display:block;margin-top:14px;padding:4px 0 4px 18px;border-left:2px solid rgba(244,213,141,.5);
-  font-family:"Noto Serif SC",serif;font-style:italic;color:#ecd9a8;font-size:13.5px;line-height:1.9}
-
+/* 窄屏：年轮缩到满宽，词牌回到流式排布排在年轮下方（四角没地方撒了） */
+@media(max-width:820px){
+  .ring__core{width:calc(var(--da,600px) * .25)}
+  .rnode__txt{display:none}
+  .ring .word{position:static;transform:none;opacity:1;display:inline-block;vertical-align:top;
+    margin:calc(var(--u)*1.5) calc(var(--u)*1.25) 0 0}
+}
 @media(max-width:560px){
-  .block--creek::before{background:none}
-  .creek{max-width:100%}
-  .bud{width:120px}
-  .bud__label{font-size:13.5px;max-width:150px}
-  .deco-flower{width:16px;height:16px}
+  .block--ring::before{background:none}
   .word{width:110px}
   .word__card{padding:8px 9px 9px}
   .word__t{font-size:11.5px}
@@ -869,6 +914,7 @@ footer a{color:var(--green-bright);text-decoration:none}
   .word__en{font-size:9.5px;letter-spacing:.06em}
   .word__d{font-size:10.5px;line-height:1.55}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
+  .chat__row{max-width:94%}
 }
 
 /* ==========================================================================

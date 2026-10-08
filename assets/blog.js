@@ -1,398 +1,553 @@
-/* 成长日志 · 花圃小溪（Flower-bed Creek）
-   一条竖直蜿蜒的小溪随滚动自绘延伸。溪水的每一个拐弯都是一段时光的节点，
-   拐弯内侧的凹处（crook）里错落生长着苗与花（不挤成一列），点开即弹出那段成长日记；
-   空白处点缀萤火虫、蝴蝶与散落的小花。无 JS 时 .creek 不带 .is-live，退化为竖排卡片。 */
+/* 成长日志 · 年轮（Tree Rings）
+   —— 一圈年轮 = 一段时光。圆心是最早的那粒种子，最外一圈是此刻；
+      每圈按月份落着花，悬停一圈会亮起、圆心浮出那段日子的名字，
+      轻点就展开当年的心事（当时的我 ↔ 现在的我，一段气泡流）。
+      背景随季节换（春樱 / 夏萤 / 秋叶 / 冬雪），另有飘叶、光点与水纹。
+      无 JS 时 .ring 不带 .is-live，退化为竖排卡片。 */
 (function () {
-  var creek = document.getElementById('creek');
-  if (!creek) return;
+  var ring = document.getElementById('ring');
+  if (!ring) return;
 
-  var svg = document.getElementById('creekWater');
-  var path = document.getElementById('creekPath');
-  var flow = document.getElementById('creekFlow');
-  var pollenBox = document.getElementById('creekPollen');
-  var buds = Array.prototype.slice.call(creek.querySelectorAll('.bud'));
-  var words = Array.prototype.slice.call(creek.querySelectorAll('.word'));
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var svg      = document.getElementById('ringSvg');
+  var gRipples = document.getElementById('ringRipples');
+  var gSpokes  = document.getElementById('ringSpokes');
+  var gRings   = document.getElementById('ringRings');
+  var gNodes   = document.getElementById('ringNodes');
+  var skyBox   = document.getElementById('ringSky');
+  var dotBox   = document.getElementById('ringDots');
+  var leafBox  = document.getElementById('ringLeaves');
+  var core     = document.getElementById('ringCore');
+  var coreEra  = document.getElementById('coreEra');
+  var coreSub  = document.getElementById('coreSub');
+  var logs     = Array.prototype.slice.call(ring.querySelectorAll('.log'));
+  var words    = Array.prototype.slice.call(ring.querySelectorAll('.word'));
+  var reduce   = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS       = 'http://www.w3.org/2000/svg';
 
-  var TOP = 120, BOT = 140;     // 上下留白
-  var BUD_GAP = 104;            // 同一簇内，苗/花之间的纵向间距
-  var CLUSTER_GAP = 470;       // 相邻时间节点（拐弯）之间的纵向间距（太密会让水线极陡，内侧就没地方放苗了）
-  var SEG = 200;                // 路径采样段数
-  var W = 0, H = 0, LABEL_M = 98; // LABEL_M：苗/花中心到水线的安全留白（保证文字不压到水线）
-  var creekPts = [];            // 溪流折线采样点，用于算「到水线的真实距离」
-  var ffBox = null, bfBox = null; // 萤火虫 / 蝴蝶容器（resize 时整块重建）
+  var NB = 200;      // viewBox 半宽，所有坐标归一化到 -200..200
+  var R_CORE = 38;   // 圆心留给文字的半径（要明显大于圆心文字块的半径，否则最内圈会贴着字走）
+  var R_EDGE = 15;   // 最外圈到边界的余量（给月份标签）
+  var SEP = 15;      // 同一圈上相邻两朵花至少隔开的角度
+  var SEASON_CN = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
 
-  // 窄屏振幅收一点，避免花被边缘裁掉
-  function ampNow() { return W < 560 ? 0.30 : (W < 820 ? 0.36 : 0.42); }
-  // 小确定性的伪随机（同一次加载内稳定，不每次刷新乱跳）
+  var groups = [];   // 一圈一组：[{i, era, season, items:[el...]}]
+  var nodes = [];    // 圈上的花（SVG <g>）
+  var flora = [];    // 圈与圈之间的装饰小花
+  var W = 0, DA = 0, RAD = 0, PT = 0, CY = 0;
+  var wHalfW = 82, wHalfH = 70;
+
+  /* ---------- 小工具 ---------- */
+  // 同一次加载内稳定的伪随机：刷新不会乱跳
   function rnd(a, b) { var s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return s - Math.floor(s); }
-  // 簇内第 j 朵（共 n 朵）的横向单位偏移：
-  // 相邻两朵一内一外拉开 ~128px，既错落铺开，也避免上一朵的花压到下一朵的字
-  function budUnit(j, n) {
-    if (n <= 1) return 0;
-    return (j % 2 === 0) ? -0.7 : 1;
+  function rad(d) { return d * Math.PI / 180; }
+  function monthAngle(m) { return -90 + (m - 1) * 30; }   // 1 月在正上方，顺时针一格一月
+  // 圈数、段数、月份都写成中文，跟「高三 · 停课」这样的时代名保持一致
+  var CN = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  function cnNum(n) {
+    if (n <= 10) return CN[n];
+    if (n < 20) return '十' + CN[n - 10];
+    if (n % 10 === 0) return CN[n / 10] + '十';
+    return CN[Math.floor(n / 10)] + '十' + CN[n % 10];
   }
-
-  /* ---------- 把苗/花按 data-cluster 分簇（每簇对应一个拐弯 / 时间节点） ---------- */
-  var clusters = {};
-  buds.forEach(function (b) {
-    var c = b.getAttribute('data-cluster') || '0';
-    (clusters[c] = clusters[c] || []).push(b);
-  });
-  var clusterKeys = Object.keys(clusters).sort(function (a, b) { return (+a) - (+b); });
-  var nC = clusterKeys.length;
-  var dirs = clusterKeys.map(function (_, i) { return (i % 2) ? -1 : 1; });  // 拐弯左右交替
-  var nodes = [];     // 时间节点元素
-  var decoFlowers = []; // 散落 / 间隙的小花（含定位元数据）
-
-  function maxSpan() {
-    var m = 0;
-    clusterKeys.forEach(function (k) { m = Math.max(m, (clusters[k].length - 1) * BUD_GAP); });
-    return m;
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS(NS, tag), k;
+    for (k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) e.setAttribute(k, attrs[k]);
+    return e;
   }
-  function clusterHalf() { return maxSpan() / 2 + 80; }
-  function centerOf(i) { return TOP + clusterHalf() + i * CLUSTER_GAP; }
-  function sideX(i) { return W * 0.5 + dirs[i] * W * ampNow(); }
+  function txt(el, sel) { var n = el.querySelector(sel); return n ? n.textContent : ''; }
+  function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
 
-  /* ---------- 溪水路径：穿过「起点→各拐弯→终点」的锚点，余弦插值成平滑的拐弯 ---------- */
-  function anchors() {
-    var a = [{ y: 0, x: W * 0.5 }];
-    for (var i = 0; i < nC; i++) a.push({ y: centerOf(i), x: sideX(i) });
-    a.push({ y: H, x: W * 0.5 });
-    return a;
-  }
-  function creekX(y) {
-    var A = anchors(), i;
-    for (i = 0; i < A.length - 1; i++) {
-      if (y >= A[i].y && y <= A[i + 1].y) {
-        var t = (y - A[i].y) / (A[i + 1].y - A[i].y);
-        var c = 0.5 - 0.5 * Math.cos(Math.PI * t);   // 余弦插值：锚点处斜率为 0 → 正是一个拐弯
-        return A[i].x + (A[i + 1].x - A[i].x) * c;
-      }
-    }
-    return W * 0.5;
-  }
-  function buildPath() {
-    var d = '', i, t, y, x;
-    creekPts = [];
-    for (i = 0; i <= SEG; i++) {
-      t = i / SEG; y = t * H; x = creekX(y);
-      creekPts.push([x, y]);
-      d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
-    }
-    d = d.trim();
-    path.setAttribute('d', d);
-    if (flow) flow.setAttribute('d', d);
-  }
-
-  // 到溪流折线的最近点：返回 {d 距离, px, py}
-  function nearest(x, y) {
-    var best = 1e9, bx = x, by = y, i, ax, ay, dx, dy, l2, t2, qx, qy, d2;
-    if (!creekPts.length) return { d: 1e9, px: x, py: y };
-    for (i = 0; i < creekPts.length - 1; i++) {
-      ax = creekPts[i][0]; ay = creekPts[i][1];
-      dx = creekPts[i + 1][0] - ax; dy = creekPts[i + 1][1] - ay;
-      l2 = dx * dx + dy * dy;
-      t2 = l2 ? ((x - ax) * dx + (y - ay) * dy) / l2 : 0;
-      t2 = t2 < 0 ? 0 : (t2 > 1 ? 1 : t2);
-      qx = ax + t2 * dx; qy = ay + t2 * dy;
-      d2 = (x - qx) * (x - qx) + (y - qy) * (y - qy);
-      if (d2 < best) { best = d2; bx = qx; by = qy; }
-    }
-    return { d: Math.sqrt(best), px: bx, py: by };
-  }
-
-  // 在 y 高度上，该拐弯内侧可用的最大「内外比例」t：t=0 在溪心，t=1 在拐弯极点。
-  // 水线是斜的，横向让开 Δ 只换来 Δ/√(1+s²) 的垂直距离（s=dx/dy），所以余量要按斜率放大。
-  function safeTMax(y, dir, margin) {
-    var ampW = W * ampNow();
-    if (!ampW) return 0.3;
-    var s = (creekX(Math.min(H, y + 2)) - creekX(Math.max(0, y - 2))) / 4;  // dx/dy
-    var need = margin * Math.sqrt(1 + s * s) / ampW;
-    var tSigned = (creekX(y) - W * 0.5) / (dir * ampW);
-    if (tSigned <= 0) return 1;   // 水线在另一侧：这一侧的内侧整个是空的
-    return tSigned - need;
-  }
-
-  // 在拐弯内侧的凹处取一个点：保证离水线 >= margin。
-  // 若该高度这一侧放不下，就把点朝拐弯中心 cy 收，直到放得下。
-  function crookPoint(y, dir, margin, tLo, tHi, r, cy) {
-    var ampW = W * ampNow(), guard = 0, tMax;
-    y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
-    tMax = safeTMax(y, dir, margin);
-    while (tMax < 0.09 && cy != null && guard < 50) {
-      y += (cy > y ? 6 : -6);
-      y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
-      tMax = safeTMax(y, dir, margin);
-      guard++;
-      if (Math.abs(y - cy) < 3) break;
-    }
-    var hi = Math.min(tHi, Math.max(0.08, tMax));
-    var lo = Math.min(tLo, hi);
-    var t = lo + r * (hi - lo);
-    var x = W * 0.5 + dir * t * ampW;
-    // 收尾保险：真实距离不够就先朝溪心收，收到底了再把点往拐弯中心拉
-    guard = 0;
-    while (nearest(x, y).d < margin * 0.92 && guard < 90) {
-      if (t > 0.05) t -= 0.02;
-      else if (cy != null && Math.abs(y - cy) > 3) y += (cy > y ? 4 : -4);
-      else break;
-      y = Math.max(TOP + 8, Math.min(H - BOT - 8, y));
-      x = W * 0.5 + dir * t * ampW;
-      guard++;
-    }
-    return { x: Math.max(24, Math.min(W - 24, x)), y: y };
-  }
-
-  function size() {
-    W = creek.clientWidth;
-    H = TOP + clusterHalf() + (nC > 1 ? (nC - 1) * CLUSTER_GAP : 0) + clusterHalf() + BOT;
-    creek.style.minHeight = H + 'px';
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    svg.setAttribute('width', W);
-    svg.setAttribute('height', H);
-    buildPath();
-
-    // 每个簇：苗/花错落地长在拐弯内侧的凹处（不再挤成一列）
-    clusterKeys.forEach(function (k, ci) {
-      var arr = clusters[k], n = arr.length, cy = centerOf(ci);
-      arr.forEach(function (b, j) {
-        var y = cy + (j - (n - 1) / 2) * BUD_GAP;
-        y = Math.max(TOP, Math.min(H - BOT, y));
-        var tWant = 0.22 + budUnit(j, n) * 0.15 + (rnd(j + 1, ci + 1) - 0.5) * 0.04;
-        var p = crookPoint(y, dirs[ci], LABEL_M, tWant - 0.02, tWant + 0.02, rnd(j + 1, ci + 1), cy);
-        b.style.left = p.x + 'px';
-        b.style.top = p.y + 'px';
-        b._y = p.y; b._x = p.x;
+  /* ---------- 一圈一组 ---------- */
+  function buildGroups() {
+    var by = {}, keys, i;
+    logs.forEach(function (el) {
+      var gi = +(el.getAttribute('data-ring') || 0);
+      (by[gi] = by[gi] || []).push(el);
+    });
+    keys = Object.keys(by).map(Number).sort(function (a, b) { return a - b; });
+    keys.forEach(function (gi) {
+      var arr = by[gi].slice().sort(function (a, b) {
+        return (+a.getAttribute('data-month')) - (+b.getAttribute('data-month'));
+      });
+      groups.push({
+        i: gi,
+        era: arr[0].getAttribute('data-era') || '',
+        season: arr[0].getAttribute('data-season') || 'autumn',
+        items: arr
       });
     });
+  }
+  function ringGap() { return (NB - R_EDGE - R_CORE) / Math.max(1, groups.length); }
+  // 一圈上第 i 圈的半径（由内而外）
+  function ringR(i) { return R_CORE + (i + 1) * ringGap(); }
+  function rMax() { return ringR(groups.length - 1); }
 
-    layoutNodes();
-    layoutDeco();
-    paint();
+  /* ---------- 同月的两朵花会叠在一起：按最小间隔推开，再整体居中回原来的方位 ---------- */
+  function spread(list) {
+    var i, n = list.length, shift;
+    if (n <= 1) return;
+    for (i = 1; i < n; i++) if (list[i].a - list[i - 1].a < SEP) list[i].a = list[i - 1].a + SEP;
+    shift = (list[0].base + list[n - 1].base) / 2 - (list[0].a + list[n - 1].a) / 2;
+    for (i = 0; i < n; i++) list[i].a += shift;
   }
 
-  /* ---------- 滚动时，溪水自绘延伸 ---------- */
-  function paint() {
-    var r = creek.getBoundingClientRect();
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var prog = (vh - r.top) / (vh + r.height);
-    prog = Math.max(0, Math.min(1, prog));
-    path.style.strokeDashoffset = reduce ? 0 : (1 - prog).toFixed(3);
+  /* ---------- 画年轮 ---------- */
+  function drawSpokes() {
+    var rOut = rMax() + 7, rIn = R_CORE * 0.5, m, a, i;
+    while (gSpokes.firstChild) gSpokes.removeChild(gSpokes.firstChild);
+    for (m = 1; m <= 12; m++) {
+      a = rad(monthAngle(m));
+      gSpokes.appendChild(svgEl('line', {
+        'class': 'ring__spoke' + (m % 3 === 1 ? ' ring__spoke--q' : ''),
+        x1: (Math.cos(a) * rIn).toFixed(1), y1: (Math.sin(a) * rIn).toFixed(1),
+        x2: (Math.cos(a) * rOut).toFixed(1), y2: (Math.sin(a) * rOut).toFixed(1)
+      }));
+    }
   }
-
-  /* ---------- 进入视野，苗 / 花生长出来 ---------- */
-  var io = ('IntersectionObserver' in window)
-    ? new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-          if (e.isIntersecting) { e.target.classList.add('is-grown'); io.unobserve(e.target); }
+  function drawRings() {
+    var frag = document.createDocumentFragment(), gi, r, rPrev, grainA, grainB;
+    while (gRings.firstChild) gRings.removeChild(gRings.firstChild);
+    groups.forEach(function (g, gi) {
+      r = ringR(gi);
+      // 两圈之间补两条更细更淡的纹理：8 条圈就会读成"年轮"，而不是射击靶
+      if (gi > 0) {
+        rPrev = ringR(gi - 1);
+        grainA = rPrev + (r - rPrev) * 0.34 + (rnd(gi + 91, 1) - 0.5) * 1.6;
+        grainB = rPrev + (r - rPrev) * 0.72 + (rnd(gi + 93, 2) - 0.5) * 1.6;
+        frag.appendChild(svgEl('circle', { 'class': 'ring__grain', r: grainA.toFixed(1) }));
+        frag.appendChild(svgEl('circle', { 'class': 'ring__grain ring__grain--b', r: grainB.toFixed(1) }));
+      }
+      // 命中层在下（细线太难点中），看得见的圈在上且不吃事件
+      frag.appendChild(svgEl('circle', { 'class': 'ring__hit', 'data-g': gi, r: r.toFixed(1) }));
+      frag.appendChild(svgEl('circle', { 'class': 'ring__c', 'data-g': gi, r: r.toFixed(1) }));
+    });
+    gRings.appendChild(frag);
+  }
+  function drawRipples() {
+    var i, r = (rMax() + 4).toFixed(1);
+    while (gRipples.firstChild) gRipples.removeChild(gRipples.firstChild);
+    if (reduce) return;
+    for (i = 0; i < 3; i++) gRipples.appendChild(svgEl('circle', { 'class': 'ring__ripple', r: r }));
+  }
+  function drawNodes() {
+    var frag = document.createDocumentFragment();
+    while (gNodes.firstChild) gNodes.removeChild(gNodes.firstChild);
+    groups.forEach(function (g, gi) {
+      var r = ringR(gi);
+      var list = g.items.map(function (el) {
+        var m = +el.getAttribute('data-month');
+        return { el: el, m: m, base: monthAngle(m), a: monthAngle(m) };
+      });
+      spread(list);
+      list.forEach(function (it, k) {
+        var a = rad(it.a);
+        var x = Math.cos(a) * r, y = Math.sin(a) * r;
+        var idx = logs.indexOf(it.el);
+        var kind = it.el.getAttribute('data-kind') || 'bloom';
+        var anchor = Math.cos(a) > 0.25 ? 'start' : (Math.cos(a) < -0.25 ? 'end' : 'middle');
+        // 标签的径向落点要落在「两圈之间」的空隙里，压在圈线上会被划断；
+        // 同一圈上不止一条时，第二条再往外挪一整格，两行字才不会叠
+        var off = ringGap() * (0.5 + (k % 2) * 1.05);
+        var g = svgEl('g', {
+          'class': 'rnode', 'data-log': idx, 'data-g': gi, 'data-kind': kind,
+          transform: 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')',
+          tabindex: '0', role: 'button', 'aria-label': '展开心事：' + txt(it.el, '.log__title')
         });
-      }, { rootMargin: '0px 0px -12% 0px' })
-    : null;
-  buds.forEach(function (b) { if (io) io.observe(b); else b.classList.add('is-grown'); });
+        g.appendChild(svgEl('circle', { 'class': 'rnode__halo', r: 11 }));
+        var inner = svgEl('g', { 'class': 'rnode__g' });
+        // 四片胖花瓣 + 一颗稍大的花心盖住根部 —— 才像花，不然是个十字
+        inner.appendChild(svgEl('ellipse', { 'class': 'rnode__petal', cx: 0, cy: -3.5, rx: 2.7, ry: 3.6 }));
+        inner.appendChild(svgEl('ellipse', { 'class': 'rnode__petal', cx: 0, cy: 3.5, rx: 2.7, ry: 3.6 }));
+        inner.appendChild(svgEl('ellipse', { 'class': 'rnode__petal', cx: -3.5, cy: 0, rx: 3.6, ry: 2.7 }));
+        inner.appendChild(svgEl('ellipse', { 'class': 'rnode__petal', cx: 3.5, cy: 0, rx: 3.6, ry: 2.7 }));
+        inner.appendChild(svgEl('circle', { 'class': 'rnode__core', r: 2.6 }));
+        g.appendChild(inner);
+        var t = svgEl('text', {
+          'class': 'rnode__txt',
+          x: (Math.cos(a) * off).toFixed(1),
+          y: (Math.sin(a) * off + 3).toFixed(1),
+          'text-anchor': anchor
+        });
+        t.textContent = cnNum(it.m) + '月';
+        g.appendChild(t);
+        frag.appendChild(g);
+        nodes.push({ el: g, x: x, y: y, a: it.a, gi: gi });
+      });
+    });
+    gNodes.appendChild(frag);
+  }
 
-  /* ---------- 点开感悟（成长日记卡片） ---------- */
+  /* ---------- 圈与圈之间的装饰小花（纯装饰，跟着年轮缩放） ---------- */
+  var FLORA_COL = [
+    ['rgba(246,184,200,.9)', 'rgba(244,213,141,.95)'],
+    ['rgba(159,240,200,.85)', 'rgba(244,213,141,.95)'],
+    ['rgba(244,213,141,.9)', 'rgba(255,246,224,.95)']
+  ];
+  function floretSVG(c1, c2) {
+    var g = svgEl('g', { 'class': 'floret' });
+    g.appendChild(svgEl('ellipse', { cx: 0, cy: -3.4, rx: 1.9, ry: 2.8, fill: c1 }));
+    g.appendChild(svgEl('ellipse', { cx: 0, cy: 3.4, rx: 1.9, ry: 2.8, fill: c1 }));
+    g.appendChild(svgEl('ellipse', { cx: -3.2, cy: 0, rx: 2.8, ry: 1.9, fill: c1 }));
+    g.appendChild(svgEl('ellipse', { cx: 3.2, cy: 0, rx: 2.8, ry: 1.9, fill: c1 }));
+    g.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 1.7, fill: c2 }));
+    return g;
+  }
+  function drawFlora() {
+    if (!gFlora) return;
+    while (gFlora.firstChild) gFlora.removeChild(gFlora.firstChild);
+    flora = [];
+    var gap = ringGap();
+    // 从第 1 圈起：最内圈的内侧就是圆心文字区，撒在那儿会糊住字
+    for (var gi = 1; gi < groups.length; gi++) {
+      var rBand = ringR(gi) - gap * 0.5;           // 落在这一圈的内侧一半
+      var per = (gi < 2 ? 2 : 3);
+      for (var k = 0; k < per; k++) {
+        var aDeg = (k + rnd(gi + 3, k + 1)) * (360 / per) + gi * 23;
+        var a = rad(aDeg), x = Math.cos(a) * rBand, y = Math.sin(a) * rBand;
+        var ok = true, i;
+        for (i = 0; i < nodes.length; i++) {
+          var dx = x - nodes[i].x, dy = y - nodes[i].y;
+          if (dx * dx + dy * dy < 12 * 12) { ok = false; break; }
+        }
+        if (!ok) continue;
+        var col = FLORA_COL[flora.length % FLORA_COL.length];
+        var f = floretSVG(col[0], col[1]);
+        f.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')');
+        if (!reduce) {
+          f.style.animationDuration = (5.4 + rnd(gi + 7, k + 2) * 4).toFixed(1) + 's';
+          f.style.animationDelay = (-rnd(gi + 9, k + 4) * 6).toFixed(1) + 's';
+        }
+        gFlora.appendChild(f);
+        flora.push({ x: x, y: y });
+      }
+    }
+  }
+
+  /* ---------- 尺寸：年轮直径、舞台高度 ---------- */
+  function size() {
+    W = ring.clientWidth;
+    var narrow = W < 820;
+    DA = narrow ? Math.min(W, 400) : Math.min(600, W * 0.62);
+    RAD = DA / 2;
+    // 桌面要留出一圈空地给词条：上下各要够放下一整张卡片（含间距），
+    // 否则最远点采样只会把 13 张全推到左右两列去
+    PT = narrow ? DA : Math.max(DA + 40, 2 * (RAD + 2 * wHalfH + 46));
+    CY = PT / 2;
+    ring.style.setProperty('--da', DA.toFixed(0) + 'px');
+    ring.style.setProperty('--pt', PT.toFixed(0) + 'px');
+    // 粒子从 top:-22px 起飘，落点要落在容器底部附近再淡出，飘太远会被裁掉、看着像突然消失
+    ring.style.setProperty('--fall', (PT + 30).toFixed(0) + 'px');
+  }
+
+  /* ---------- 背景：季节粒子 / 光点 / 飘叶 ---------- */
+  function buildSky() {
+    if (!skyBox || reduce) return;
+    while (skyBox.firstChild) skyBox.removeChild(skyBox.firstChild);
+    var n = W < 820 ? 15 : 26, i, s;
+    for (i = 0; i < n; i++) {
+      s = document.createElement('i');
+      s.style.setProperty('--x', (rnd(i + 1, 3) * 100).toFixed(2) + '%');
+      s.style.setProperty('--w', (4 + rnd(i + 5, 7) * 5).toFixed(1) + 'px');
+      s.style.setProperty('--d1', (11 + rnd(i + 7, 11) * 9).toFixed(1) + 's');
+      s.style.setProperty('--dl', (-rnd(i + 9, 13) * 14).toFixed(1) + 's');
+      skyBox.appendChild(s);
+    }
+  }
+  function buildDots() {
+    if (!dotBox || reduce) return;
+    while (dotBox.firstChild) dotBox.removeChild(dotBox.firstChild);
+    var n = 12, i, s;
+    for (i = 0; i < n; i++) {
+      s = document.createElement('i');
+      s.style.setProperty('--x', (rnd(i + 21, 3) * 100).toFixed(2) + '%');
+      s.style.setProperty('--y', (8 + rnd(i + 23, 5) * 84).toFixed(2) + '%');
+      s.style.setProperty('--d1', (13 + rnd(i + 25, 7) * 12).toFixed(1) + 's');
+      s.style.setProperty('--d2', (2.6 + rnd(i + 27, 9) * 2.4).toFixed(1) + 's');
+      s.style.setProperty('--dl', (-rnd(i + 29, 11) * 16).toFixed(1) + 's');
+      dotBox.appendChild(s);
+    }
+  }
+  function buildLeaves() {
+    if (!leafBox || reduce) return;
+    while (leafBox.firstChild) leafBox.removeChild(leafBox.firstChild);
+    var n = 7, i, s;
+    for (i = 0; i < n; i++) {
+      s = document.createElement('i');
+      s.style.setProperty('--x', (rnd(i + 41, 3) * 96).toFixed(2) + '%');
+      s.style.setProperty('--d1', (18 + rnd(i + 43, 5) * 12).toFixed(1) + 's');
+      s.style.setProperty('--dl', (-rnd(i + 45, 7) * 20).toFixed(1) + 's');
+      leafBox.appendChild(s);
+    }
+  }
+
+  /* ---------- 圆心：当前聚焦的那段日子 ---------- */
+  function setCore(era, sub) {
+    if (coreEra.textContent === era && coreSub.textContent === sub) return;
+    coreEra.textContent = era;
+    coreSub.textContent = sub;
+    core.classList.remove('is-flip');
+    void core.offsetWidth;                 // 重启动画
+    core.classList.add('is-flip');
+  }
+  function defaultCore() {
+    // 圆心那块地方窄屏只有八十来像素宽，副标太长会折成两行
+    var sub = cnNum(groups.length) + '圈 · ' + cnNum(logs.length) +
+      (W < 820 ? '段' : '段心事');
+    setCore('成长年轮', sub);
+  }
+
+  /* ---------- 季节：跟着聚焦的那一圈走，切换时先淡出再换 ---------- */
+  var seasonNow = 'autumn', seasonTimer = null;
+  function setSeason(s) {
+    if (!s || s === seasonNow) return;
+    seasonNow = s;
+    if (!skyBox) return;
+    skyBox.classList.add('is-swap');
+    clearTimeout(seasonTimer);
+    seasonTimer = setTimeout(function () {
+      skyBox.setAttribute('data-season', s);
+      skyBox.classList.remove('is-swap');
+    }, 280);
+  }
+
+  function focusRing(gi) {
+    var g = groups[gi];
+    if (!g) return;
+    ring.classList.add('is-focus');
+    Array.prototype.forEach.call(gRings.querySelectorAll('.ring__c'), function (c) {
+      c.classList.toggle('is-hot', +c.getAttribute('data-g') === gi);
+    });
+    setCore(g.era, SEASON_CN[g.season] + ' · ' + cnNum(g.items.length) + '段心事');
+    setSeason(g.season);
+  }
+  function focusNode(rec) {
+    var el = logs[+rec.el.getAttribute('data-log')];
+    focusRing(+rec.el.getAttribute('data-g'));
+    nodes.forEach(function (n) { n.el.classList.toggle('is-hot', n.el === rec.el); });
+    var m = +el.getAttribute('data-month');
+    // 窄屏圆心只放得下两行，长标题会撑出去，退成"几月 · 哪一段"
+    if (W < 820) setCore(cnNum(m) + '月 · ' + txt(el, '.log__era'), '');
+    else setCore(cnNum(m) + '月 · ' + txt(el, '.log__title'), txt(el, '.log__era'));
+  }
+  function blur() {
+    ring.classList.remove('is-focus');
+    Array.prototype.forEach.call(gRings.querySelectorAll('.ring__c'), function (c) { c.classList.remove('is-hot'); });
+    nodes.forEach(function (n) { n.el.classList.remove('is-hot'); });
+    defaultCore();
+    setSeason(groups.length ? groups[groups.length - 1].season : 'autumn');
+  }
+
+  /* ---------- 轻点处荡开一圈水纹 ---------- */
+  function tapRipple(e) {
+    if (reduce || !svg) return;
+    var b = svg.getBoundingClientRect();
+    if (!b.width) return;
+    var nx = (e.clientX - b.left) / b.width * (NB * 2) - NB;
+    var ny = (e.clientY - b.top) / b.height * (NB * 2) - NB;
+    var c = svgEl('circle', { 'class': 'ring__tap', cx: nx.toFixed(1), cy: ny.toFixed(1), r: rMax() + 6 });
+    svg.appendChild(c);
+    setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 950);
+  }
+
+  /* ---------- 点开：一段气泡流（当时的我 ↔ 现在的我） ---------- */
   var petal = document.getElementById('petal');
+  var petalCard = petal ? petal.querySelector('.petal__card') : null;
   var pEra = document.getElementById('petalEra');
   var pTitle = document.getElementById('petalTitle');
-  var pText = document.getElementById('petalText');
-  var pQuote = document.getElementById('petalQuote');
-  function openBud(b) {
-    var panel = b.querySelector('.bud__panel');
-    pEra.textContent = (panel.querySelector('.bud__p-era') || {}).textContent || '';
-    pTitle.textContent = (panel.querySelector('.bud__p-title') || {}).textContent || '';
-    pText.innerHTML = (panel.querySelector('.bud__p-text') || {}).innerHTML || '';
-    pQuote.textContent = (panel.querySelector('.bud__p-quote') || {}).textContent || '';
+  var chat = document.getElementById('chat');
+
+  function div(cls) { var d = document.createElement('div'); d.className = cls; return d; }
+  function bubble(cls, html) {
+    var b = div('chat__bub'); b.className = 'chat__bub ' + cls;
+    if (html) b.innerHTML = html;
+    return b;
+  }
+  function row(side, who, bub) {
+    var r = div('chat__row chat__row--' + side);
+    var w = document.createElement('span'); w.className = 'chat__who'; w.textContent = who;
+    r.appendChild(w); r.appendChild(bub);
+    return r;
+  }
+  function paras(el) {
+    var out = '', ps = el.querySelectorAll('.log__body p');
+    Array.prototype.forEach.call(ps, function (p) { out += '<p>' + esc(p.textContent) + '</p>'; });
+    return out;
+  }
+  function fill(era, title, items, multi) {
+    pEra.textContent = era;
+    pTitle.textContent = title;
+    chat.innerHTML = '';
+    items.forEach(function (el) {
+      if (multi) {
+        var d = div('chat__day');
+        d.textContent = el.getAttribute('data-when') || '';
+        chat.appendChild(d);
+      }
+      var body = paras(el);
+      if (multi) body = '<span class="chat__ttl">' + esc(txt(el, '.log__title')) + '</span>' + body;
+      chat.appendChild(row('past', '当时的我', bubble('', body)));
+      var q = txt(el, '.log__quote');
+      if (q) chat.appendChild(row('now', '现在的我', bubble('', esc(q))));
+    });
     petal.classList.add('is-open');
     petal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    if (petalCard) petalCard.scrollTop = 0;
+    armChat();
   }
-  function closeBud() {
+  function openLog(idx) {
+    var el = logs[idx]; if (!el) return;
+    fill(el.getAttribute('data-era') || '', txt(el, '.log__title'), [el], false);
+  }
+  function openRing(gi) {
+    var g = groups[gi]; if (!g) return;
+    fill(g.era, g.era, g.items, true);
+  }
+  function closePetal() {
+    if (!petal) return;
     petal.classList.remove('is-open');
     petal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
-  buds.forEach(function (b) {
-    b.addEventListener('click', function () { openBud(b); });
-    b.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBud(b); }
-    });
-  });
-  document.getElementById('petalClose').addEventListener('click', closeBud);
-  document.getElementById('petalBackdrop').addEventListener('click', closeBud);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBud(); });
 
-  /* ---------- 时间节点：溪水每个拐弯上的时光标记 ---------- */
-  function buildNodes() {
-    clusterKeys.forEach(function (k, ci) {
-      var era = (clusters[k][0].getAttribute('data-cnode') || '');
-      var el = document.createElement('span');
-      el.className = 'cnode ' + (dirs[ci] > 0 ? 'cnode--r' : 'cnode--l');
-      el.setAttribute('aria-hidden', 'true');
-      el.innerHTML = '<span class="cnode__knot"></span><span class="cnode__label">' + era + '</span>';
-      el._ci = ci;
-      creek.appendChild(el);
-      nodes.push(el);
-    });
-  }
-  function layoutNodes() {
-    nodes.forEach(function (el) {
-      var ci = el._ci;
-      el.style.left = sideX(ci) + 'px';
-      el.style.top = centerOf(ci) + 'px';
+  // 滚动到才弹出来：气泡从下方浮起
+  var cio = ('IntersectionObserver' in window && petalCard)
+    ? new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); cio.unobserve(e.target); }
+        });
+      }, { root: petalCard, rootMargin: '0px 0px -6% 0px' })
+    : null;
+  function armChat() {
+    var bubs = chat.querySelectorAll('.chat__bub');
+    Array.prototype.forEach.call(bubs, function (b, i) {
+      if (cio) { b.style.transitionDelay = Math.min(i, 4) * 70 + 'ms'; cio.observe(b); }
+      else b.classList.add('is-in');
     });
   }
 
-  /* ---------- 溪畔的词：心理学 / 认知 / 哲学 / 金融，翻到时缓缓降落 ---------- */
-  // 词牌是矩形（约 156×126），判定是否压到水线必须量整张卡：
-  // 只量中心点会漏——中心离水线 83px 时，卡片下沿照样盖在水上。
-  // 卡片真实尺寸（is-live 之前就能量准；别用写死的估算，三行/两行差 20px，避让会差一截）
-  var wHalfW = 82, wHalfH = 70;
+  /* ---------- 年轮之外的词：散落在四周，翻到时缓缓降落 ---------- */
+  // 卡片尺寸必须实测（两行/三行差 20px，避让会差一截）；
+  // 但降级规则不能写 width:100%，否则 is-live 之前量到的是撑满宽度
   function measureWords() {
     var w = 0, h = 0;
     words.forEach(function (el) { w = Math.max(w, el.offsetWidth); h = Math.max(h, el.offsetHeight); });
-    if (w) wHalfW = w / 2 + 5;   // +5：卡片带微倾斜，角点会多探出 ~3px
+    if (w) wHalfW = w / 2 + 5;
     if (h) wHalfH = h / 2 + 7;
   }
-  function wordHalf() { return wHalfW; }
-  function wordHalfH() { return wHalfH; }
-  function wordMargin() { return wordHalf() + 10; }
-
-  // 溪长按词条数等分成若干「带」，一条带一张卡 —— 撑起整体的均匀感
-  var wordYA = 0, wordBand = 1;
-  function bandOf(y) { return wordBand ? Math.floor((y - wordYA) / wordBand) : 0; }
-
-  // 沿卡片四边取样，逐个算到水线的真实距离
-  function waterClear(x, y, need) {
-    var hw = wordHalf(), hh = wordHalfH(), i, t, px, py;
-    for (i = 0; i <= 6; i++) {
-      t = i / 6; px = x - hw + 2 * hw * t;
-      if (nearest(px, y - hh).d < need) return false;
-      if (nearest(px, y + hh).d < need) return false;
-    }
-    for (i = 0; i <= 4; i++) {
-      t = i / 4; py = y - hh + 2 * hh * t;
-      if (nearest(x - hw, py).d < need) return false;
-      if (nearest(x + hw, py).d < need) return false;
-    }
-    return true;
+  // 矩形卡片到圆心的真实最近距离（矩形 vs 圆，不是中心点距离）
+  function clearOfWheel(x, y, need) {
+    var dx = Math.max(0, Math.abs(x - W / 2) - wHalfW);
+    var dy = Math.max(0, Math.abs(y - CY) - wHalfH);
+    return Math.sqrt(dx * dx + dy * dy) > RAD + need;
   }
-
-  // 候选点是否可用。mode：'strict' 全避让 / 'relaxed' 允许贴近小花 / 'loose' 只保证不压水线
-  function wordFits(x, y, placed, mode) {
-    var i, dx, dy, half = wordHalf(), hh = wordHalfH();
-    if (x < half + 12 || x > W - half - 12) return false;
-    if (y < hh + 30 || y > H - hh - 30) return false;
-    if (!waterClear(x, y, W < 560 ? 9 : 14)) return false;
-    // 卡片是矩形：只要横向或纵向让开一个身位就不会叠上，比欧氏距离更可靠
-    var bh = (W < 560 ? 50 : 80) + half + 8;   // 与苗/花的横向净距
-    var ww = half * 2 + 40;                    // 词牌之间的横向净距
-    var vv = hh * 2 + (W < 560 ? 14 : 34);     // 纵向净距 = 一张卡高 + 一点呼吸（窄屏收紧一点）
-    var b = bandOf(y);
+  // clearNeed：矩形到年轮的最小净空；vv / ww：两张卡之间横竖至少要离开的身位
+  // 矩形卡片：横向或纵向让开一个身位就不会叠上，比欧氏距离可靠
+  function wordFits(x, y, placed, clearNeed, vv, ww) {
+    var i, hw = wHalfW, hh = wHalfH;
+    if (x < hw + 10 || x > W - hw - 10) return false;
+    if (y < hh + 8 || y > PT - hh - 8) return false;
+    if (!clearOfWheel(x, y, clearNeed)) return false;
     for (i = 0; i < placed.length; i++) {
-      // 一条带只放一张 → 13 条沿溪均匀铺开，不会某一段挤两条、另一段落空
-      if (mode !== 'free' && b === placed[i].b) return false;
       if (Math.abs(y - placed[i].y) < vv && Math.abs(x - placed[i].x) < ww) return false;
     }
-    for (i = 0; i < buds.length; i++) {
-      if (Math.abs(y - buds[i]._y) < hh + (W < 560 ? 52 : 64) && Math.abs(x - buds[i]._x) < bh) return false;
-    }
-    if (mode === 'loose' || mode === 'free') return true;   // 兜底时仍不能压苗，只是不再顾及小花/节点
-    for (i = 0; i < nodes.length; i++) {
-      dx = x - sideX(nodes[i]._ci); dy = y - centerOf(nodes[i]._ci);
-      if (dx * dx + dy * dy < 86 * 86) return false;
-    }
-    if (mode === 'strict') {
-      for (i = 0; i < decoFlowers.length; i++) {
-        dx = x - decoFlowers[i]._x; dy = y - decoFlowers[i]._y;
-        if (dx * dx + dy * dy < 60 * 60) return false;
-      }
-    }
     return true;
   }
-
-  function layoutWords() {
-    if (!words.length) return;
-    measureWords();
-    var M = wordMargin(), placed = [], i, t, ci, bd, k, dir, cand, yy, got;
-    var n = words.length;
-    // 把溪长等分成 n 条带，每条带放一张卡 —— 这样不会某一块挤一堆、另一块空着
-    var yA = TOP + 30, yB = H - BOT - 30;
-    var band = (yB - yA) / n;
-    wordYA = yA; wordBand = band;
-    var slack = band * 0.30;   // 在自己的带里最多能挪多远（大了就会两条挤进同一带，看着就不均了）
-    for (i = 0; i < n; i++) {
-      var bTop = yA + i * band, bBot = bTop + band;
-      var yMid = (bTop + bBot) / 2;
-      var yLo = Math.max(40, bTop + 14 - slack), yHi = Math.min(H - 40, bBot - 14 + slack);
-      var clampY = function (v) { return Math.max(yLo, Math.min(yHi, v)); };
-      // 离它最近的那一个拐弯：决定它落在「内侧」还是「外侧」
-      ci = 0; bd = 1e9;
-      for (k = 0; k < nC; k++) { var dd = Math.abs(centerOf(k) - yMid); if (dd < bd) { bd = dd; ci = k; } }
-      got = null;
-      // 先试外侧（拐弯背面，空得最多），再试内侧；上下挪几格找位子
-      var order = [(i % 2 === 0) ? -dirs[ci] : dirs[ci], (i % 2 === 0) ? dirs[ci] : -dirs[ci]];
-      for (var s = 0; s < order.length && !got; s++) {
-        dir = order[s];
-        // 拐弯背面（外侧）空得最多，允许它落到更远的地方，把大片空白用起来
-        var hi = (dir === -dirs[ci]) ? 0.80 : 0.62;
-        for (t = 0; t < 26 && !got; t++) {
-          yy = clampY(yMid + (((t % 2) ? 1 : -1) * Math.ceil(t / 2) * 34) + (rnd(i + 1, t + 1) - 0.5) * 40);
-          cand = crookPoint(yy, dir, M, 0.14, hi, rnd(i + 3, t + 7), centerOf(ci));
-          cand.y = clampY(cand.y);
-          if (wordFits(cand.x, cand.y, placed, 'strict')) got = cand;
-        }
-      }
-      if (!got) {   // 放宽：允许贴近小花
-        for (t = 0; t < 22 && !got; t++) {
-          yy = clampY(yMid + (rnd(i + 9, t + 1) - 0.5) * band);
-          cand = crookPoint(yy, dirs[ci], M, 0.12, 0.60, rnd(i + 11, t + 3), centerOf(ci));
-          cand.y = clampY(cand.y);
-          if (wordFits(cand.x, cand.y, placed, 'relaxed')) got = cand;
-        }
-      }
-      if (!got) {   // 兜底：只要不压水线就放下
-        for (t = 0; t < 70 && !got; t++) {
-          yy = clampY(yMid + (rnd(i + 13, t + 1) - 0.5) * band * 1.6);
-          cand = crookPoint(yy, (t % 2 ? dirs[ci] : -dirs[ci]), M, 0.10, 0.80, rnd(i + 17, t + 5), centerOf(ci));
-          cand.y = clampY(cand.y);
-          if (wordFits(cand.x, cand.y, placed, 'loose')) got = cand;
-        }
-      }
-      if (!got) {   // 最后兜底：挣脱自己的带，整幅随机找空位（窄屏也保证 13 条都在，内容不丢）
-        // 允许越出自己的带一点，但不能跑远 —— 否则第 13 张会飞到溪首，顺序就乱了。
-        // 这里用确定性网格扫描而不是随机撒点：有空位就一定找得到，不会靠运气漏掉某一条
-        var halfW = wordHalf(), lo = halfW + 14, span = W - 2 * lo;
-        var yTop = Math.max(40, bTop - band * 0.45), yBot = Math.min(H - 40, bBot + band * 0.45);
-        var xs = [], ys = [], gx, gy;
-        for (gx = 0; gx <= 20; gx++) xs.push(lo + span * gx / 20);
-        for (gy = 0; gy <= 16; gy++) ys.push(yTop + (yBot - yTop) * gy / 16);
-        var feas = [];
-        for (gx = 0; gx < xs.length; gx++) {
-          for (gy = 0; gy < ys.length; gy++) {
-            if (wordFits(xs[gx], ys[gy], placed, 'free')) feas.push({ x: xs[gx], y: ys[gy] });
-          }
-        }
-        // 从可行点里挑一个再加抖动：否则全落在网格上，一排卡片都贴着同一个 x，更单调
-        if (feas.length) {
-          var pick = feas[Math.min(feas.length - 1, Math.floor(rnd(i + 51, 7) * feas.length))];
-          for (t = 0; t < 12 && !got; t++) {
-            var jx = pick.x + (rnd(i + 53, t + 1) - 0.5) * 14;
-            var jy = pick.y + (rnd(i + 57, t + 3) - 0.5) * 16;
-            if (wordFits(jx, jy, placed, 'free')) got = { x: jx, y: jy };
-          }
-          if (!got) got = pick;
-        }
-      }
-      if (!got) { words[i].style.display = 'none'; continue; }
-      words[i].style.display = '';
-      words[i].style.left = got.x + 'px';
-      words[i].style.top = got.y + 'px';
-      placed.push({ x: got.x, y: got.y, b: bandOf(got.y) });
-    }
+  // 逐轮收紧：先按舒服的间距铺；铺不下就一级级贴近，宁可挨紧一点，也绝不丢内容
+  function gapTries() {
+    var hw = wHalfW, hh = wHalfH, wide = W >= 820;
+    return [
+      { clear: 16, vv: hh * 2 + (wide ? 34 : 14), ww: hw * 2 + (wide ? 40 : 26) },
+      { clear: 14, vv: hh * 2 + 18, ww: hw * 2 + 24 },
+      { clear: 10, vv: hh * 2 + 8, ww: hw * 2 + 10 },
+      { clear: 6, vv: hh * 2 + 2, ww: hw * 2 + 2 }
+    ];
   }
-
-  // 进入视野 → 缓缓降落（错开一点先后，像叶子依次落定）
+  // 一圈均匀铺开。先用「最远点采样」在可行网格里挑 13 个彼此最散的点 ——
+  // 比"每张按方位角找位子"靠得住：方位法在上下空间窄的时候会全挤到左右两侧
+  function layoutWords() {
+    words.forEach(function (w) { w.style.left = ''; w.style.top = ''; w.style.display = ''; });
+    if (!words.length) return;
+    if (W < 820) return;                 // 窄屏：CSS 已把它们排成流式，不需要坐标
+    // 环带是细长的，"最远点采样"只会挑散点、填不满它（实测只能落下 12 张）。
+    // 改成货架式：按行横切，每一行里扫出连续可行的区段，段内按卡宽均分。
+    // 行距 = 卡高 + 呼吸，所以行与行天然不撞，只需管行内。
+    function shelfPack(clearNeed, vv, ww) {
+      var hw = wHalfW, hh = wHalfH, slots = [], r, x, s, k;
+      var yTop = hh + 8, yBot = PT - hh - 8;
+      var rowsN = Math.max(1, Math.floor((yBot - yTop) / vv) + 1);
+      var gapY = rowsN > 1 ? (yBot - yTop) / (rowsN - 1) : 0;
+      var xLo = hw + 10, xHi = W - hw - 10;
+      for (r = 0; r < rowsN; r++) {
+        var y = yTop + gapY * r, segs = [], segStart = null;
+        for (x = xLo; x <= xHi; x += 8) {
+          var ok = clearOfWheel(x, y, clearNeed);
+          if (ok && segStart === null) segStart = x;
+          else if (!ok && segStart !== null) { segs.push([segStart, x - 8]); segStart = null; }
+        }
+        if (segStart !== null) segs.push([segStart, xHi]);
+        for (s = 0; s < segs.length; s++) {
+          var len = segs[s][1] - segs[s][0];
+          if (len < 0) continue;
+          var cnt = Math.floor(len / ww) + 1;
+          for (k = 0; k < cnt; k++) {
+            slots.push({
+              x: cnt === 1 ? (segs[s][0] + segs[s][1]) / 2 : segs[s][0] + len * k / (cnt - 1),
+              y: y
+            });
+          }
+        }
+      }
+      return slots;
+    }
+    var n = words.length, picked = [];
+    var plans = gapTries(), t;
+    for (t = 0; t < plans.length && picked.length < n; t++) {
+      picked = shelfPack(plans[t].clear, plans[t].vv, plans[t].ww);
+    }
+    // 按行分桶。行内改成「两端→中间」的顺序，再逐行轮转着取够 13 张 ——
+    // 这样少取几张时是左右对称地空出来，而不是从右边一路缺过去
+    picked.sort(function (a, b) { return (a.y - b.y) || (a.x - b.x); });
+    var buckets = [];
+    picked.forEach(function (p) {
+      var b = buckets[buckets.length - 1];
+      if (!b || Math.abs(b.y - p.y) > 1) { b = { y: p.y, arr: [] }; buckets.push(b); }
+      b.arr.push(p);
+    });
+    var ordered = [], idx = 0, more = true, r, a, c;
+    for (r = 0; r < buckets.length; r++) {
+      a = buckets[r].arr; c = a.length;
+      var s = [], i;
+      for (i = 0; i < c; i++) s.push((i % 2) ? a[c - 1 - (i >> 1)] : a[i >> 1]);
+      buckets[r].arr = s;
+    }
+    while (more) {
+      more = false;
+      for (r = 0; r < buckets.length; r++) {
+        if (buckets[r].arr[idx]) { ordered.push(buckets[r].arr[idx]); more = true; }
+      }
+      idx++;
+    }
+    picked = ordered.slice(0, n);
+    ring.setAttribute('data-words', picked.length + '/' + n);
+    // 落位。整排钉在同一 y 上太像排版摆的，纵向给一点随机；同行横向已留足身位，不必再抖
+    var op0 = plans[0];
+    words.forEach(function (w, i2) {
+      if (!picked[i2]) { w.style.display = 'none'; return; }
+      var p = picked[i2], k, jx = p.x, jy = p.y;
+      for (k = 0; k < 14; k++) {
+        var ty2 = p.y + (rnd(i2 + 83, k + 3) - 0.5) * 26;
+        if (ty2 < wHalfH + 8 || ty2 > PT - wHalfH - 8) continue;
+        jy = ty2; break;
+      }
+      for (k = 0; k < 10; k++) {
+        var tx2 = p.x + (rnd(i2 + 81, k + 1) - 0.5) * 16;
+        if (tx2 > wHalfW + 10 && tx2 < W - wHalfW - 10) { jx = tx2; break; }
+      }
+      w.style.left = jx.toFixed(1) + 'px';
+      w.style.top = jy.toFixed(1) + 'px';
+    });
+  }
   var wio = ('IntersectionObserver' in window)
     ? new IntersectionObserver(function (es) {
         es.forEach(function (e) {
@@ -400,185 +555,98 @@
         });
       }, { rootMargin: '0px 0px -10% 0px' })
     : null;
-  // 必须在 layoutWords() 之后调用：否则会在 (0,0) 处先降落一次再被挪走
   function armWords() {
     words.forEach(function (w, i) {
-      // 每片一点不同的微倾斜：像被人随手搁在溪畔，而不是排版排出来的
-      var tilt = (rnd(i + 31, 7) - 0.5) * 3.4;
-      w.style.setProperty('--wtilt', tilt.toFixed(2) + 'deg');
-      w.setAttribute('data-s', String((i % 3) + 1));           // 三种卵石形态轮换
+      w.style.setProperty('--wtilt', ((rnd(i + 71, 7) - 0.5) * 3.4).toFixed(2) + 'deg');
+      w.setAttribute('data-s', String((i % 3) + 1));
       var card = w.querySelector('.word__card');
-      if (card) {   // 浮动节奏各不相同，不整齐划一
-        card.style.animationDuration = (6.2 + rnd(i + 41, 3) * 3.4).toFixed(2) + 's';
-        card.style.animationDelay = (-rnd(i + 43, 5) * 8).toFixed(2) + 's';
+      if (card) {
+        card.style.animationDuration = (6.2 + rnd(i + 73, 3) * 3.4).toFixed(2) + 's';
+        card.style.animationDelay = (-rnd(i + 75, 5) * 8).toFixed(2) + 's';
       }
       w.style.transitionDelay = ((i % 3) * 160) + 'ms';
       if (wio) wio.observe(w); else w.classList.add('is-landed');
     });
   }
 
-  /* ---------- 装饰层：萤火虫 / 蝴蝶 / 散落小花（均在拐弯内侧，绝不压水线） ---------- */
-  function flowerSVG(c1, c2) {
-    return '<svg class="deco-flower" viewBox="0 0 24 24" aria-hidden="true">' +
-      '<ellipse cx="12" cy="4.6" rx="3.2" ry="4.4" fill="' + c1 + '"/>' +
-      '<ellipse cx="12" cy="19.4" rx="3.2" ry="4.4" fill="' + c1 + '"/>' +
-      '<ellipse cx="4.6" cy="12" rx="4.4" ry="3.2" fill="' + c1 + '"/>' +
-      '<ellipse cx="19.4" cy="12" rx="4.4" ry="3.2" fill="' + c1 + '"/>' +
-      '<circle cx="12" cy="12" r="3.4" fill="' + c2 + '"/></svg>';
+  /* ---------- 事件 ---------- */
+  // 悬停统一挂在 svg 上：SVG 的 <g> 自身不吃事件，只有子元素吃，
+  // 所以 mouseleave 挂在 g 上并不可靠，得用 mouseout 看指针去哪了
+  function onOver(e) {
+    var n = e.target.closest ? e.target.closest('.rnode') : null;
+    if (n) {
+      var rec = null;
+      nodes.forEach(function (x) { if (x.el === n) rec = x; });
+      if (rec) { focusNode(rec); return; }
+    }
+    var hit = e.target.closest ? e.target.closest('.ring__hit') : null;
+    if (hit) focusRing(+hit.getAttribute('data-g'));
   }
-  // 在拐弯内侧放一朵装饰花：避开苗与节点，放不下则返回 false
-  function spawnFlowerAt(p, scale) {
-    var x = p.x, y = p.y, i;
-    for (i = 0; i < buds.length; i++) {
-      var dx = x - buds[i]._x, dy = y - buds[i]._y;
-      if (dx * dx + dy * dy < 34 * 34) return false;
-    }
-    for (i = 0; i < nodes.length; i++) {
-      var nx = sideX(nodes[i]._ci), ny = centerOf(nodes[i]._ci);
-      var ndx = x - nx, ndy = y - ny;
-      if (ndx * ndx + ndy * ndy < 42 * 42) return false;
-    }
-    var colors = [
-      ['rgba(246,184,200,.92)', 'rgba(244,213,141,1)'],
-      ['rgba(159,240,200,.9)', 'rgba(244,213,141,1)'],
-      ['rgba(244,213,141,.92)', 'rgba(255,246,224,1)'],
-      ['rgba(246,184,200,.85)', 'rgba(159,240,200,1)']
-    ];
-    var col = colors[decoFlowers.length % colors.length];
-    var wrap = document.createElement('span');
-    wrap.className = 'deco-flower-wrap';
-    wrap.setAttribute('aria-hidden', 'true');
-    wrap.innerHTML = flowerSVG(col[0], col[1]);
-    var fl = wrap.firstChild;
-    fl.style.animationDuration = (5.5 + Math.random() * 4).toFixed(1) + 's';
-    fl.style.animationDelay = (-Math.random() * 6).toFixed(1) + 's';
-    wrap.style.transform = 'translate(-50%,-50%) scale(' + scale.toFixed(2) + ')';
-    wrap._x = x; wrap._y = y;
-    creek.appendChild(wrap);
-    decoFlowers.push(wrap);
-    return true;
+  function onOut(e) {
+    var to = e.relatedTarget;
+    if (to && svg.contains(to) && to.closest && (to.closest('.rnode') || to.closest('.ring__hit'))) return;
+    blur();
   }
-  function buildDeco() {
-    // 萤火虫
-    if (!reduce) {
-      var ff = document.createElement('div');
-      ff.className = 'creek__fireflies'; ff.setAttribute('aria-hidden', 'true');
-      for (var i = 0; i < 16; i++) {
-        var f = document.createElement('i');
-        f.className = 'firefly';
-        f.style.left = (Math.random() * 100).toFixed(2) + '%';
-        f.style.top = (Math.random() * 100).toFixed(2) + '%';
-        f.style.setProperty('--fdur', (14 + Math.random() * 14).toFixed(1) + 's');
-        f.style.setProperty('--ftw', (2.6 + Math.random() * 2.6).toFixed(1) + 's');
-        f.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's, ' + (-Math.random() * 4).toFixed(1) + 's';
-        ff.appendChild(f);
-      }
-      creek.appendChild(ff);
-      ffBox = ff;
-    }
-    // 蝴蝶
-    if (!reduce) {
-      var bf = document.createElement('div');
-      bf.className = 'creek__butterflies'; bf.setAttribute('aria-hidden', 'true');
-      var palette = [
-        'rgba(246,184,200,.92)', 'rgba(244,213,141,.85)',
-        'rgba(246,184,200,.85)', 'rgba(159,240,200,.8)', 'rgba(244,213,141,.9)'
-      ];
-      for (var j = 0; j < 5; j++) {
-        var b2 = document.createElement('div');
-        b2.className = 'butterfly';
-        var dir = j % 2 ? -1 : 1;
-        b2.style.left = (dir > 0 ? Math.random() * 35 : 55 + Math.random() * 35).toFixed(1) + '%';
-        b2.style.top = (8 + Math.random() * 82).toFixed(1) + '%';
-        b2.style.setProperty('--bdur', (20 + Math.random() * 14).toFixed(1) + 's');
-        b2.style.setProperty('--bdist', (340 + Math.random() * 220).toFixed(0) + 'px');
-        b2.style.setProperty('--dir', dir);
-        b2.style.animationDelay = (-Math.random() * 18).toFixed(1) + 's';
-        var c = palette[j % palette.length];
-        b2.innerHTML = '<span class="bf-wing bf-l" style="background:linear-gradient(140deg,' + c + ',rgba(244,213,141,.7))"></span>' +
-          '<span class="bf-wing bf-r" style="background:linear-gradient(140deg,' + c + ',rgba(244,213,141,.7))"></span>' +
-          '<span class="bf-body"></span>';
-        bf.appendChild(b2);
-      }
-      creek.appendChild(bf);
-      bfBox = bf;
-    }
-    // 每个拐弯内侧：苗与苗之间、簇心附近，均匀堆一点花
-    clusterKeys.forEach(function (k, ci) {
-      var arr = clusters[k], n = arr.length, cy = centerOf(ci);
-      for (var m = 0; m < n - 1; m++) {
-        var yMid = (arr[m]._y + arr[m + 1]._y) / 2;
-        spawnFlowerAt(crookPoint(yMid, dirs[ci], 54, 0.08, 0.42, Math.random(), cy), 0.6 + Math.random() * 0.2);
-      }
-      for (var f = 0; f < 3; f++) {
-        var fy = cy + (Math.random() - 0.5) * 2 * ((Math.max(1, n - 1) * BUD_GAP * 0.55) + 30);
-        spawnFlowerAt(crookPoint(fy, dirs[ci], 54, 0.08, 0.44, Math.random(), cy), 0.55 + Math.random() * 0.45);
-      }
+  function bind() {
+    svg.addEventListener('mouseover', onOver);
+    svg.addEventListener('mouseout', onOut);
+    svg.addEventListener('click', function (e) {
+      var n = e.target.closest ? e.target.closest('.rnode') : null;
+      if (n) { tapRipple(e); openLog(+n.getAttribute('data-log')); return; }
+      var hit = e.target.closest ? e.target.closest('.ring__hit') : null;
+      if (hit) { tapRipple(e); openRing(+hit.getAttribute('data-g')); }
     });
-    // 簇与簇之间的空白：在内侧凹处补几朵，铺满空隙
-    for (var ci2 = 0; ci2 < nC - 1; ci2++) {
-      var y0 = centerOf(ci2), y1 = centerOf(ci2 + 1);
-      for (var g = 0; g < 6; g++) {
-        var gy = y0 + (g + 1) * (y1 - y0) / 7;
-        spawnFlowerAt(crookPoint(gy, dirs[ci2], 54, 0.08, 0.40, Math.random(), y0), 0.6 + Math.random() * 0.5);
-      }
-    }
-  }
-  function layoutDeco() {
-    decoFlowers.forEach(function (wrap) {
-      wrap.style.left = wrap._x + 'px';
-      wrap.style.top = wrap._y + 'px';
+    gNodes.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var n = e.target.closest ? e.target.closest('.rnode') : null;
+      if (!n) return;
+      e.preventDefault();
+      openLog(+n.getAttribute('data-log'));
     });
+
+    if (document.getElementById('petalClose')) {
+      document.getElementById('petalClose').addEventListener('click', closePetal);
+    }
+    if (document.getElementById('petalBackdrop')) {
+      document.getElementById('petalBackdrop').addEventListener('click', closePetal);
+    }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePetal(); });
   }
 
-  // 飘浮的花粉
-  if (pollenBox && !reduce) {
-    for (var p = 0; p < 10; p++) {
-      var s = document.createElement('i');
-      s.style.left = (Math.random() * 100).toFixed(2) + '%';
-      s.style.animationDuration = (11 + Math.random() * 11).toFixed(1) + 's';
-      s.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's';
-      var sc = (0.6 + Math.random() * 0.9).toFixed(2);
-      s.style.transform = 'scale(' + sc + ')';
-      pollenBox.appendChild(s);
-    }
-  }
-
-  var ticking = false;
-  window.addEventListener('scroll', function () {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(function () { paint(); ticking = false; });
-    }
-  }, { passive: true });
+  /* ---------- 换宽度就整块重排：花的坐标是绝对像素，不重建会错位 ---------- */
   var rt;
-  // 换宽度就整块重排：花与词的坐标都是绝对像素，不重建就会错位
-  function clearDeco() {
-    decoFlowers.forEach(function (w) { if (w.parentNode) w.parentNode.removeChild(w); });
-    decoFlowers = [];
-    if (ffBox && ffBox.parentNode) ffBox.parentNode.removeChild(ffBox);
-    if (bfBox && bfBox.parentNode) bfBox.parentNode.removeChild(bfBox);
-    ffBox = bfBox = null;
-  }
   function relayout() {
-    clearDeco();
-    size();                 // 先算出 W / 各定位（苗与节点的位置），再据此布花与词
-    buildDeco();            // 用已算好的苗/节点位置撒花、避开
-    layoutDeco();           // 给新撒的花定位
-    layoutWords();          // 词落在剩下的空白处
-    armWords();
+    measureWords();
+    size();
+    layoutWords();
+    buildSky();
   }
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(relayout, 150); });
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(relayout, 160); });
+
+  var gFlora = svgEl('g', { 'class': 'ring__flora' });
 
   function boot() {
-    buildNodes();
+    buildGroups();
+    if (!groups.length) return;
+    drawSpokes();
+    drawRings();
+    drawRipples();
+    nodes = [];
+    drawNodes();
+    svg.insertBefore(gFlora, gNodes);   // 装饰小花压在心事的花下面
+    drawFlora();
+    measureWords();      // 卡片尺寸要实测，且必须在 is-live 之前量
     size();
-    buildDeco();
-    layoutDeco();
     layoutWords();
-    creek.classList.add('is-live');
+    buildSky();
+    buildDots();
+    buildLeaves();
+    bind();
+    ring.classList.add('is-live');
+    defaultCore();
+    seasonNow = groups[groups.length - 1].season;
+    if (skyBox) skyBox.setAttribute('data-season', seasonNow);
     armWords();
-    paint();
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot);
   else boot();
