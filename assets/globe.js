@@ -1,6 +1,6 @@
 /* globe.js —— 足迹地球仪（three.js + 程序化世界地图，零外部贴图）
    特性：自转 + 拖拽 + 惯性｜按国家主色着色的大陆｜图钉脉冲光环｜点击弹卡片
-        中国点击后取景放大，展开 10 座城市子图钉
+        中国点击后取景放大，展开 10 座城市子图钉｜地表浮着几朵慢慢东移的云
    降级：无 WebGL / prefers-reduced-motion → 静态停止自转（仍可拖拽点击） */
 (function () {
   'use strict';
@@ -242,6 +242,162 @@
     });
   }
   buildCnPins();
+
+  /* ---------------------------------------------------------- 云
+     几朵云贴在球面外一小圈（与地球同心），跟着地球一起转，
+     自己再慢慢往东飘。
+     做法：程序化"云图"贴在与地球同心的球冠上 —— 三排相互叠压的圆丘（每丘过渡只占
+     外侧 14%）叠出实白芯 + 丘状轮廓，底边压灰、切平。过渡给长了就是一坨雾。
+     几何是"球冠"（曲面）而不是平板 —— 平板往内侧延伸时会捅进球体里，在球的
+     轮廓附近被球切开，看着像插进了地球；球冠上每一个点都落在与地球同心、
+     半径 CLOUD_R 的球面上，所以怎么转都严丝合缝地贴着球面。 */
+  function mulberry(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function cloudTexture(seed) {
+    var S = 256, cv = document.createElement('canvas');
+    cv.width = cv.height = S;
+    var g = cv.getContext('2d'), rnd = mulberry(seed);
+    /* 一朵"云"= 一堆相互叠压的圆丘。每个丘自己的过渡很短（外侧 14% 才淡出），
+       叠起来中心就饱和成实白、外轮廓留下一个个丘 —— 过渡给太长就成一团雾了。 */
+    function puff(x, y, r, a) {
+      var cx = x * S, cy = y * S, rr = r * S;
+      var rg = g.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      rg.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
+      rg.addColorStop(0.55, 'rgba(255,255,255,' + (a * 0.92).toFixed(3) + ')');
+      rg.addColorStop(0.86, 'rgba(250,255,253,' + (a * 0.34).toFixed(3) + ')');
+      rg.addColorStop(1, 'rgba(246,254,251,0)');
+      g.fillStyle = rg;
+      g.beginPath(); g.arc(cx, cy, rr, 0, Math.PI * 2); g.fill();
+    }
+    var row = function (y, xs, r0, a) {
+      var jy = (rnd() - 0.5) * 0.035;
+      xs.forEach(function (x) {
+        if (rnd() < 0.14) return;                       // 随机少一丘，免得八朵云一个模子
+        puff(x + (rnd() - 0.5) * 0.07, y + jy + (rnd() - 0.5) * 0.03, r0 + rnd() * 0.06, a);
+      });
+    };
+    row(0.40, [0.33, 0.45, 0.57, 0.68], 0.105, 0.48);   // 顶上的小丘
+    row(0.49, [0.26, 0.38, 0.50, 0.62, 0.74], 0.145, 0.50);
+    row(0.57, [0.20, 0.32, 0.44, 0.56, 0.68, 0.80], 0.170, 0.50);  // 底盘
+    puff(0.33 + rnd() * 0.10, 0.345, 0.062 + rnd() * 0.03, 0.45);
+    puff(0.52 + rnd() * 0.12, 0.355, 0.058 + rnd() * 0.03, 0.45);
+    /* 底边压一点灰：云是上面受光、底下背光，全白会显得是块贴纸 */
+    g.globalCompositeOperation = 'source-atop';
+    var sg = g.createLinearGradient(0, S * 0.40, 0, S * 0.66);
+    sg.addColorStop(0, 'rgba(148,176,170,0)');
+    sg.addColorStop(1, 'rgba(148,176,170,.34)');
+    g.fillStyle = sg; g.fillRect(0, S * 0.40, S, S * 0.26);
+    /* 底边切平：底下扫一条 destination-out 渐变，云才有"底"，不是个椭圆 */
+    g.globalCompositeOperation = 'destination-out';
+    var bg = g.createLinearGradient(0, S * 0.60, 0, S * 0.75);
+    bg.addColorStop(0, 'rgba(0,0,0,0)');
+    bg.addColorStop(1, 'rgba(0,0,0,1)');
+    g.fillStyle = bg; g.fillRect(0, S * 0.60, S, S * 0.40);
+    g.globalCompositeOperation = 'source-over';
+    var tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace || undefined;
+    return tex;
+  }
+
+  /* 云冠几何：正方形贴图 → 与地球同心的球面片。
+     局部坐标里中心轴 = +Z，顶点 = (x, y, √(CLOUD_R² − x² − y²))，
+     平面投影正好是 sx × sy 的方形，uv 线性对应，云图不变形。
+     所有顶点都落在半径 CLOUD_R 的球面上 —— 只要把 +Z 转到地表法线，
+     云就严丝合缝贴在球面上，怎么转都不会切进球体。
+     sx < sy：球面本身会纵向压缩，加上云图里的云是横躺的，几何就得反过来
+     纵向给足，云在屏幕上才不是一根扁扁的棉花棒。 */
+  var CLOUD_R = 1.048;
+  function cloudPatchGeometry(sx, sy, seg) {
+    var N = seg || 22;
+    var n = (N + 1) * (N + 1);
+    var pos = new Float32Array(n * 3), uv = new Float32Array(n * 2);
+    var idx = [], r2 = CLOUD_R * CLOUD_R;
+    for (var iy = 0; iy <= N; iy++) {
+      for (var ix = 0; ix <= N; ix++) {
+        var u = ix / N, v = iy / N, k = iy * (N + 1) + ix;
+        var x = (u - 0.5) * sx, y = (v - 0.5) * sy;
+        pos[k * 3] = x; pos[k * 3 + 1] = y;
+        pos[k * 3 + 2] = Math.sqrt(Math.max(r2 * 0.04, r2 - x * x - y * y));
+        uv[k * 2] = u; uv[k * 2 + 1] = v;
+      }
+    }
+    for (var jy = 0; jy < N; jy++) {
+      for (var jx = 0; jx < N; jx++) {
+        var a = jy * (N + 1) + jx, b = a + 1, c = a + N + 1, d = c + 1;
+        idx.push(a, b, c, b, d, c);       /* 逆时针 = 正面朝外（+Z 一侧） */
+      }
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    return g;
+  }
+
+  /* [经度, 纬度, 大小, 自转角, 东移速度(度/帧)]
+     自转角给得很小：真实的云基本是横躺的，转过 10° 以上就成了斜条。 */
+  var CLOUD_PLAN = [
+    [-16, 46, 0.72, 0.06, 0.013],    // 北大西洋
+    [26, 24, 0.46, -0.11, 0.011],    // 北非 · 地中海
+    [78, 54, 0.58, 0.04, 0.012],     // 西伯利亚
+    [128, 4, 0.42, -0.07, 0.010],    // 西太平洋
+    [168, -24, 0.54, 0.09, 0.009],   // 澳大利亚以东
+    [214, 40, 0.64, -0.04, 0.012],   // 北美
+    [292, 6, 0.48, 0.10, 0.010],     // 赤道大西洋
+    [330, 60, 0.40, -0.08, 0.011]    // 北大西洋高纬
+  ];
+  var AXIS_Z = new THREE.Vector3(0, 0, 1);
+  /* 云冠在球面上的铺开尺寸 = CLOUD_PLAN 的 size × 这两个系数。
+     这组数是照着实拍截图调的：横向 0.46 时云宽约占球径一成二，正好"一朵"；
+     纵向再给到 1.7 倍，抵掉球面的纵向压缩。 */
+  var PATCH_W = 0.46, PATCH_H = 0.78;
+  var clouds = [];
+  CLOUD_PLAN.forEach(function (c, i) {
+    var mat = new THREE.MeshBasicMaterial({
+      map: cloudTexture(1013 + i * 7919),
+      transparent: true, opacity: 0.72, depthWrite: false,
+      color: 0xfbfefd
+    });
+    var m = new THREE.Mesh(cloudPatchGeometry(c[2] * PATCH_W, c[2] * PATCH_H), mat);
+    m.renderOrder = 6;
+    scene.add(m);
+    clouds.push({
+      mesh: m, mat: mat, lon: c[0], lat: c[1], size: c[2], spd: c[4], rot0: c[3],
+      base: 0.68 + (i % 3) * 0.06, ph: i * 1.7
+    });
+  });
+
+  /* 云冠不挂在旋转过的父节点上 —— 那样拿不到世界法线。
+     所以每帧手动把球面坐标按当前 rotY/rotX 转出来（与 globe 的 Euler 合成
+     一致：先绕 Y，再绕 X），再把云冠的 +Z 轴对齐到这条法线。
+     网格自己不动位置（球心在原点，云冠也以原点为心）。 */
+  var AXIS_Y = new THREE.Vector3(0, 1, 0), AXIS_X = new THREE.Vector3(1, 0, 0);
+  var _rollQ = new THREE.Quaternion();
+  function placeClouds(t) {
+    clouds.forEach(function (c) {
+      if (!reduce) c.lon += c.spd;
+      /* 纬度上轻轻摆一下 —— 云不转，是风在推 */
+      var lat = c.lat + (reduce ? 0 : Math.sin(t * 0.045 + c.ph) * 1.6);
+      var n = ll2v(c.lon, lat, 1).normalize();
+      n.applyAxisAngle(AXIS_Y, rotY).applyAxisAngle(AXIS_X, rotX);
+
+      /* 法线对齐 + 自身的横躺角（后乘 = 绕本地 Z 轴转） */
+      _rollQ.setFromAxisAngle(AXIS_Z, c.rot0 + (reduce ? 0 : Math.sin(t * 0.03 + c.ph) * 0.04));
+      c.mesh.quaternion.setFromUnitVectors(AXIS_Z, n).multiply(_rollQ);
+
+      /* 相机在 +Z 轴上，"云中心朝向相机的程度"就是 n.z。
+         转到球的侧后方就淡出；中间过程云被地平线自然地切一半，不用提前抹掉。 */
+      var k = Math.max(0, Math.min(1, (n.z - 0.02) / 0.26));
+      c.mesh.visible = k > 0.02;
+      c.mat.opacity = c.base * k;
+    });
+  }
 
   /* ---------------------------------------------------------- 相机取景 */
   /* 把 (lon,lat) 转到正对相机。three.js Euler 'XYZ' 的合成是 R = Rx·Ry，三处坑：
@@ -504,6 +660,7 @@
     globe.rotation.x = rotX;
     pinGroup.rotation.y = rotY;
     pinGroup.rotation.x = rotX;
+    placeClouds(t);
 
     /* 图钉脉冲 */
     pins.forEach(function (m) {
@@ -559,7 +716,31 @@
       rot: [+rotY.toFixed(3), +rotX.toFixed(3)],
       camZ: +camera.position.z.toFixed(2),
       box: [Math.round(box.left), Math.round(box.top), Math.round(box.width), Math.round(box.height)],
-      pins: out
+      pins: out,
+      clouds: clouds.map(function (c) {
+        var p = ll2v(c.lon, c.lat, 1).applyAxisAngle(AXIS_Y, rotY).applyAxisAngle(AXIS_X, rotX);
+        var sp = p.clone().project(camera);
+        return {
+          lon: +c.lon.toFixed(1),
+          sx: Math.round(box.left + (sp.x * 0.5 + 0.5) * box.width),
+          sy: Math.round(box.top + (-sp.y * 0.5 + 0.5) * box.height),
+          onScreen: p.z > 0.06,
+          op: +c.mat.opacity.toFixed(3)
+        };
+      }),
+      /* 穿模体检：所有云冠顶点在各自当前朝向下到球心的最小距离。
+         球半径是 1，这个值恒 > 1 才说明云一个点都没落进球体里。 */
+      cloudMinR: (function () {
+        var v = new THREE.Vector3(), min = 9;
+        clouds.forEach(function (c) {
+          var pos = c.mesh.geometry.attributes.position;
+          for (var i = 0; i < pos.count; i++) {
+            v.fromBufferAttribute(pos, i).applyQuaternion(c.mesh.quaternion);
+            var r = v.length(); if (r < min) min = r;
+          }
+        });
+        return +min.toFixed(4);
+      })()
     };
   };
 

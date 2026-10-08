@@ -29,10 +29,14 @@ body.page-travel {
   border: 0;
   box-shadow: none;
 }
+/* 柔光必须"在框内淡到 0"：原来半径给到 62%，衰减还没走完就撞上框边，
+   整块 frame 被压暗成一个硬边矩形，跟页面底色接不上。
+   现在把最外 10% 留给全透明，四周都不留边。 */
 .globe__frame::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background: radial-gradient(62% 62% at 50% 47%,
-    rgba(4,22,26,.42) 0%, rgba(4,22,26,.20) 55%, rgba(4,22,26,0) 100%);
+  background: radial-gradient(56% 60% at 50% 49%,
+    rgba(4,22,26,.50) 0%, rgba(4,22,26,.30) 44%,
+    rgba(4,22,26,.10) 70%, rgba(4,22,26,0) 90%);
 }
 .globe__stage { position: relative; z-index: 1; width: 100%; height: 100%; display: block; cursor: grab; }
 .globe__stage:active { cursor: grabbing; }
