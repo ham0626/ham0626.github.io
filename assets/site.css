@@ -870,3 +870,102 @@ footer a{color:var(--green-bright);text-decoration:none}
   .word__d{font-size:10.5px;line-height:1.55}
   .petal__card{padding:calc(var(--u)*4) calc(var(--u)*3.5)}
 }
+
+/* ==========================================================================
+   书影 · 票根（点书脊 / 点海报 → 弹出一张票，沿骑缝撕开，短评从撕口里出来）
+   —— 两片各自 clip-path 成锯齿边 + mask 切出骑缝两端的半圆缺口；
+      合拢时齿尖咬进齿谷，撕开时两片反向错开，锯齿边就露出来了。
+   —— 所有动画都是「增强」：元素的 CSS 声明值本身就是最终可见态，
+      所以 prefers-reduced-motion 下 animation 被禁掉后内容照样完整可读。
+   ========================================================================== */
+.tk{position:fixed;inset:0;z-index:120;display:none}
+.tk.is-open{display:block}
+.tk__backdrop{position:absolute;inset:0;opacity:0;
+  background:radial-gradient(120% 90% at 50% 28%,rgba(6,20,16,.62),rgba(2,8,7,.92));
+  backdrop-filter:blur(4px);cursor:pointer}
+.tk.is-open .tk__backdrop{animation:tkFade .3s ease forwards}
+@keyframes tkFade{to{opacity:1}}
+
+.tk__stage{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:0;padding:58px 20px 68px}
+.tk__close{position:fixed;top:16px;right:18px;z-index:3;width:40px;height:40px;border-radius:50%;
+  background:rgba(10,24,20,.72);border:1px solid rgba(159,240,200,.28);color:var(--ink);
+  font-size:21px;line-height:1;cursor:pointer;transition:border-color .2s,background .2s}
+.tk__close:hover{border-color:var(--mint);background:rgba(16,38,30,.88)}
+.tk__close:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+
+/* —— 票 —— */
+.ticket{position:relative;width:min(432px,100%);
+  --pa:#f9dfa4;--pb:#e8c57f;--pc:#dbb66c;--ink-t:#16362a;--ink-d:#4c4026;--seal:#8a3b2e;
+  filter:drop-shadow(0 22px 46px rgba(0,0,0,.62))}
+.ticket--book{--pa:#dcf1e6;--pb:#bde3d0;--pc:#a9d9c0;--seal:#1a5c40;--ink-d:#2f5546}
+.tk.is-open .ticket{animation:tkIn .34s cubic-bezier(.2,.85,.3,1) both}
+@keyframes tkIn{from{opacity:0;transform:translateY(18px) scale(.955)}to{opacity:1;transform:none}}
+
+.ticket__top,.ticket__bot{position:relative;
+  background:linear-gradient(158deg,var(--pa),var(--pb) 58%,var(--pc));color:var(--ink-t);
+  --notch:11px}
+/* 锯齿只走 5%→95%，两端各留一段平直边——骑缝线两端的半圆缺口才不会被齿尖切碎。
+   两片互补：上片齿尖处＝下片凹口，合拢时严丝合缝像一整张票。 */
+.ticket__top{padding:20px 26px 28px;border-radius:14px 14px 0 0;
+  clip-path:polygon(0 0,100% 0,100% 100%,95% 100%,90% calc(100% - 8px),85% 100%,
+    80% calc(100% - 8px),75% 100%,70% calc(100% - 8px),65% 100%,60% calc(100% - 8px),
+    55% 100%,50% calc(100% - 8px),45% 100%,40% calc(100% - 8px),35% 100%,
+    30% calc(100% - 8px),25% 100%,20% calc(100% - 8px),15% 100%,10% calc(100% - 8px),
+    5% 100%,0 100%);
+  mask:radial-gradient(var(--notch) at 0 100%,#0000 98%,#000),
+       radial-gradient(var(--notch) at 100% 100%,#0000 98%,#000);
+  mask-composite:intersect}
+.ticket__bot{padding:17px 26px 19px;border-radius:0 0 14px 14px;
+  clip-path:polygon(0 8px,5% 8px,10% 0,15% 8px,20% 0,25% 8px,30% 0,35% 8px,40% 0,45% 8px,
+    50% 0,55% 8px,60% 0,65% 8px,70% 0,75% 8px,80% 0,85% 8px,90% 0,95% 8px,100% 8px,
+    100% 100%,0 100%);
+  mask:radial-gradient(var(--notch) at 0 0,#0000 98%,#000),
+       radial-gradient(var(--notch) at 100% 0,#0000 98%,#000);
+  mask-composite:intersect}
+
+/* 撕开：上片微抬左倾，下片下沉右倾，中间错开露出锯齿 */
+.tk.is-open .ticket__top{animation:tkTearT .52s .52s cubic-bezier(.2,.8,.3,1) both}
+.tk.is-open .ticket__bot{animation:tkTearB .52s .52s cubic-bezier(.2,.8,.3,1) both}
+@keyframes tkTearT{from{transform:none}to{transform:translateY(-7px) rotate(-.75deg)}}
+@keyframes tkTearB{from{transform:none}to{transform:translateY(8px) rotate(.85deg)}}
+
+.ticket__hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-family:"Cormorant Garamond",serif;font-size:10.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--ink-d);opacity:.9}
+.ticket__no{font-size:11px;letter-spacing:.16em;white-space:nowrap}
+.ticket__title{font-family:"Noto Serif SC",serif;font-weight:600;line-height:1.34;
+  font-size:clamp(21px,3.4vw,26px);margin:13px 0 3px;color:var(--ink-t)}
+.ticket__en{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13.5px;
+  color:var(--ink-d)}
+.ticket__meta{margin-top:11px;font-size:11.5px;line-height:1.65;color:var(--ink-d)}
+.ticket__rule{margin-top:15px;border-top:1px dashed rgba(22,54,42,.32)}
+
+.ticket__bot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ticket__stars{font-size:15px;letter-spacing:.14em;color:var(--seal)}
+.ticket__seat{font-size:11px;letter-spacing:.1em;color:var(--ink-d)}
+.ticket__stamp{margin-left:auto;flex:0 0 auto;width:58px;height:58px;border-radius:50%;
+  border:2px solid color-mix(in srgb,var(--seal) 55%,transparent);color:var(--seal);
+  display:grid;place-items:center;font-family:"Noto Serif SC",serif;font-size:13px;
+  letter-spacing:.05em;transform:rotate(-11deg);opacity:.82}
+
+/* —— 撕口下展开的短评 —— */
+.tk__read{width:min(432px,100%);margin-top:20px;padding:20px 24px 22px;border-radius:14px;
+  background:rgba(255,255,255,.045);border:1px solid rgba(159,240,200,.16)}
+.tk.is-open .tk__read{animation:tkRead .5s .7s cubic-bezier(.2,.8,.3,1) both}
+@keyframes tkRead{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+.tk__text{color:#dfe9e4;font-size:14.5px;line-height:1.95}
+.tk__quote{margin-top:14px;padding:4px 0 4px 18px;border-left:2px solid rgba(244,213,141,.5);
+  font-family:"Noto Serif SC",serif;font-style:italic;color:#ecd9a8;font-size:13.5px;line-height:1.9}
+
+@media(max-width:560px){
+  .tk__stage{padding:54px 14px 52px;justify-content:flex-start}
+  .ticket__top{padding:16px 18px 24px}
+  .ticket__bot{padding:14px 18px 16px}
+  .ticket__stamp{width:46px;height:46px;font-size:11px}
+  .tk__read{padding:16px 18px 18px;margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .tk.is-open .tk__backdrop,.tk.is-open .ticket,.tk.is-open .ticket__top,
+  .tk.is-open .ticket__bot,.tk.is-open .tk__read{animation:none!important}
+}

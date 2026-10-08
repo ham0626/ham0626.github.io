@@ -237,6 +237,32 @@
   © 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="/">回到首页 ↑</a>
 </footer>
 
+<!-- 票根：点书脊出藏书票，点海报出电影票。撕开后短评从撕口下展开 -->
+<div class="tk" id="tk" aria-hidden="true">
+  <div class="tk__backdrop" id="tkBackdrop"></div>
+  <div class="tk__stage" role="dialog" aria-modal="true" aria-labelledby="tkTitle">
+    <div class="ticket" id="tkTicket">
+      <div class="ticket__top">
+        <div class="ticket__hd"><span id="tkBrand">Admit One</span><span class="ticket__no" id="tkNo"></span></div>
+        <h3 class="ticket__title" id="tkTitle"></h3>
+        <div class="ticket__en" id="tkEn"></div>
+        <div class="ticket__meta" id="tkMeta"></div>
+        <div class="ticket__rule"></div>
+      </div>
+      <div class="ticket__bot">
+        <span class="ticket__stars" id="tkStars"></span>
+        <span class="ticket__seat" id="tkSeat"></span>
+        <span class="ticket__stamp" id="tkStamp"></span>
+      </div>
+    </div>
+    <div class="tk__read">
+      <p class="tk__text" id="tkText"></p>
+      <p class="tk__quote" id="tkQuote"></p>
+    </div>
+  </div>
+  <button class="tk__close" id="tkClose" type="button" aria-label="关闭">×</button>
+</div>
+
 <script>
 (function(){
   const DATA = {
@@ -308,76 +334,90 @@
     }
   };
 
-  const filmView = document.getElementById('filmView');
-  const filmWall = document.getElementById('filmWall');
   const bookRead = document.getElementById('bookRead');
-  const hintHTML = '<div class="read__hint"><span class="em">📖</span><p>选一本书脊，这里会展开我写的书评。</p></div>';
+  const tk       = document.getElementById('tk');
+  const tkTicket = document.getElementById('tkTicket');
+  const tkClose  = document.getElementById('tkClose');
+  const tkBack   = document.getElementById('tkBackdrop');
+  let lastFocus = null;
+
+  /* 票号：书 B01… 影 F01…，按 DATA 顺序各自计数 */
+  (function(){
+    let b = 0, f = 0;
+    Object.keys(DATA).forEach(function(k){
+      const d = DATA[k];
+      d.no = (d.kind === 'book' ? 'B' : 'F') + String(d.kind === 'book' ? ++b : ++f).padStart(2, '0');
+    });
+  })();
 
   function starsHTML(n){ return '★'.repeat(n) + '☆'.repeat(5 - n); }
 
-  function readHTML(d, withBack){
-    const head = withBack
-      ? '<div class="view-head"><span class="read__kind read__kind--film">' + d.tag + '</span>'
-        + '<button class="backlink" id="backToWall">← 返回海报墙</button></div>'
-      : '<span class="read__kind' + (d.kind === 'film' ? ' read__kind--film' : '') + '">' + d.tag + '</span>';
-    return '<div class="read__fadein">'
-      + head
-      + '<h3 class="serif">' + d.title + '</h3>'
-      + '<div class="en">' + d.en + '</div>'
-      + '<div class="read__meta">' + d.meta + '</div>'
-      + '<div class="read__stars">' + starsHTML(d.stars) + '</div>'
-      + '<p class="read__text">' + d.text + '</p>'
-      + (d.quote ? '<p class="read__quote">' + d.quote + '</p>' : '')
-      + '</div>';
+  function fillTicket(d){
+    tkTicket.className = 'ticket' + (d.kind === 'book' ? ' ticket--book' : '');
+    document.getElementById('tkBrand').textContent = d.kind === 'book' ? 'Admit One · 书架' : 'Admit One · 银幕';
+    document.getElementById('tkNo').textContent    = 'NO.' + d.no;
+    document.getElementById('tkTitle').textContent = d.title;
+    document.getElementById('tkEn').textContent    = d.en;
+    document.getElementById('tkMeta').textContent  = d.meta;
+    document.getElementById('tkStars').textContent = starsHTML(d.stars);
+    document.getElementById('tkSeat').textContent  = d.kind === 'book' ? '藏书 · 读完' : '银幕 · 已观';
+    document.getElementById('tkStamp').textContent = d.kind === 'book' ? '藏' : '已观';
+    document.getElementById('tkText').textContent  = d.text;
+    const q = document.getElementById('tkQuote');
+    if(d.quote){ q.textContent = d.quote; q.hidden = false; }
+    else { q.textContent = ''; q.hidden = true; }
   }
 
-  /* —— 书架：点书脊出书评 —— */
+  function openTicket(id){
+    const d = DATA[id]; if(!d) return;
+    lastFocus = document.activeElement;
+    fillTicket(d);
+    tk.classList.remove('is-open');
+    void tk.offsetWidth;              /* 强制重排，让撕票动画每次点开都重新放一遍 */
+    tk.classList.add('is-open');
+    tk.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    tkClose.focus();
+  }
+  function closeTicket(){
+    if(!tk.classList.contains('is-open')) return;
+    tk.classList.remove('is-open');
+    tk.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  tkClose.addEventListener('click', closeTicket);
+  tkBack.addEventListener('click', closeTicket);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeTicket();
+  });
+
+  /* —— 书架：点书脊，出一张藏书票 —— */
   document.querySelectorAll('.spine[data-id]').forEach(function(sp){
     sp.addEventListener('click', function(){
       const d = DATA[sp.dataset.id]; if(!d) return;
       document.querySelectorAll('.spine.is-on').forEach(function(x){ x.classList.remove('is-on'); });
       sp.classList.add('is-on');
-      bookRead.innerHTML = readHTML(d, false);
-      bookRead.scrollTop = 0;
+      bookRead.innerHTML = '<div class="read__hint"><span class="em">✦</span>'
+        + '<p>《' + d.title + '》已收进藏书票 · NO.' + d.no + '</p></div>';
+      openTicket(sp.dataset.id);
     });
   });
 
-  /* —— 银幕：点海报，影评亮在屏幕上 —— */
-  function openFilm(id){
-    const d = DATA[id]; if(!d) return;
-    document.querySelectorAll('.poster.is-on').forEach(function(x){ x.classList.remove('is-on'); });
-    const p = document.querySelector('.poster[data-id="' + id + '"]'); if(p) p.classList.add('is-on');
-    filmView.innerHTML = readHTML(d, true);
-    filmView.classList.add('is-on');
-    filmWall.classList.add('is-off');
-    filmView.scrollTop = 0;
-    const back = document.getElementById('backToWall');
-    if(back) back.addEventListener('click', closeFilm);
-  }
-  function closeFilm(){
-    filmView.classList.remove('is-on');
-    filmWall.classList.remove('is-off');
-    document.querySelectorAll('.poster.is-on').forEach(function(x){ x.classList.remove('is-on'); });
-    setTimeout(function(){ if(!filmView.classList.contains('is-on')) filmView.innerHTML = ''; }, 320);
-  }
+  /* —— 银幕：点海报，出一张电影票 —— */
   document.querySelectorAll('.poster[data-id]').forEach(function(p){
-    p.addEventListener('click', function(){ openFilm(p.dataset.id); });
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && filmView.classList.contains('is-on')) closeFilm();
+    p.addEventListener('click', function(){
+      const d = DATA[p.dataset.id]; if(!d) return;
+      document.querySelectorAll('.poster.is-on').forEach(function(x){ x.classList.remove('is-on'); });
+      p.classList.add('is-on');
+      openTicket(p.dataset.id);
+    });
   });
 
   /* —— 深链：#inception / #nonethen …（与旧站锚点写法兼容，#bf-review-xxx 亦可）—— */
   (function(){
     const m = (location.hash || '').match(/^#(?:bf-review-)?(\w+)$/);
-    if(!m) return;
-    const id = m[1], d = DATA[id];
-    if(!d) return;
-    if(d.kind === 'film'){ openFilm(id); }
-    else {
-      const sp = document.querySelector('.spine[data-id="' + id + '"]');
-      if(sp) sp.click();
-    }
+    if(m && DATA[m[1]]) openTicket(m[1]);
   })();
 })();
 </script>
