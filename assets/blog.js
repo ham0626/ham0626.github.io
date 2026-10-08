@@ -105,21 +105,25 @@
     }
   }
   function drawRings() {
-    var frag = document.createDocumentFragment(), gi, r, rPrev, grainA, grainB;
+    var frag = document.createDocumentFragment(), gi, r, rPrev, grainA, grainB, wrap;
     while (gRings.firstChild) gRings.removeChild(gRings.firstChild);
     groups.forEach(function (g, gi) {
       r = ringR(gi);
+      // 整圈裹进 .ring__reveal：加载时由内向外逐圈从圆心荡开，像水波一圈圈推出去
+      wrap = svgEl('g', { 'class': 'ring__reveal' });
+      wrap.style.animationDelay = (gi * 0.13).toFixed(2) + 's';
       // 两圈之间补两条更细更淡的纹理：8 条圈就会读成"年轮"，而不是射击靶
       if (gi > 0) {
         rPrev = ringR(gi - 1);
         grainA = rPrev + (r - rPrev) * 0.34 + (rnd(gi + 91, 1) - 0.5) * 1.6;
         grainB = rPrev + (r - rPrev) * 0.72 + (rnd(gi + 93, 2) - 0.5) * 1.6;
-        frag.appendChild(svgEl('circle', { 'class': 'ring__grain', r: grainA.toFixed(1) }));
-        frag.appendChild(svgEl('circle', { 'class': 'ring__grain ring__grain--b', r: grainB.toFixed(1) }));
+        wrap.appendChild(svgEl('circle', { 'class': 'ring__grain', r: grainA.toFixed(1) }));
+        wrap.appendChild(svgEl('circle', { 'class': 'ring__grain ring__grain--b', r: grainB.toFixed(1) }));
       }
       // 命中层在下（细线太难点中），看得见的圈在上且不吃事件
-      frag.appendChild(svgEl('circle', { 'class': 'ring__hit', 'data-g': gi, r: r.toFixed(1) }));
-      frag.appendChild(svgEl('circle', { 'class': 'ring__c', 'data-g': gi, r: r.toFixed(1) }));
+      wrap.appendChild(svgEl('circle', { 'class': 'ring__hit', 'data-g': gi, r: r.toFixed(1) }));
+      wrap.appendChild(svgEl('circle', { 'class': 'ring__c', 'data-g': gi, r: r.toFixed(1) }));
+      frag.appendChild(wrap);
     });
     gRings.appendChild(frag);
   }
@@ -127,7 +131,7 @@
     var i, r = (rMax() + 4).toFixed(1);
     while (gRipples.firstChild) gRipples.removeChild(gRipples.firstChild);
     if (reduce) return;
-    for (i = 0; i < 3; i++) gRipples.appendChild(svgEl('circle', { 'class': 'ring__ripple', r: r }));
+    for (i = 0; i < 4; i++) gRipples.appendChild(svgEl('circle', { 'class': 'ring__ripple', r: r }));
   }
   function drawNodes() {
     var frag = document.createDocumentFragment();
@@ -227,11 +231,10 @@
   function size() {
     W = ring.clientWidth;
     var narrow = W < 820;
-    DA = narrow ? Math.min(W, 400) : Math.min(600, W * 0.62);
+    DA = narrow ? Math.min(W, 400) : Math.min(660, W * 0.64);
     RAD = DA / 2;
-    // 桌面要留出一圈空地给词条：上下各要够放下一整张卡片（含间距），
-    // 否则最远点采样只会把 13 张全推到左右两列去
-    PT = narrow ? DA : Math.max(DA + 40, 2 * (RAD + 2 * wHalfH + 46));
+    // 词条已撤下，不再为卡片预留上下空地；桌面只留一点边距让圆盘更聚拢
+    PT = narrow ? DA : DA + 48;
     CY = PT / 2;
     ring.style.setProperty('--da', DA.toFixed(0) + 'px');
     ring.style.setProperty('--pt', PT.toFixed(0) + 'px');

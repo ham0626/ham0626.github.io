@@ -697,16 +697,26 @@ footer a{color:var(--green-bright);text-decoration:none}
 .ring__grain--b{stroke:rgba(159,240,200,.07);stroke-width:.6}
 .ring.is-focus .ring__c{opacity:.38}
 .ring.is-focus .ring__c.is-hot{opacity:1}
-/* 水纹：年轮本来就像一圈圈荡开的水波，圆心一直在往外推 */
-.ring__ripple{fill:none;stroke:rgba(159,240,200,.30);stroke-width:1.2;
+/* 水纹：年轮本来就像一圈圈荡开的水波，圆心一直在往外推。
+   整圈裹在 .ring__reveal 里，加载时由内向外逐圈荡开；
+   常驻的涟漪再从圆心一波波推向岸边（reduced-motion 下 .ring__ripple 基态 opacity:0 自动隐去）。 */
+.ring__reveal{opacity:1;transform-box:view-box;transform-origin:0 0;
+  animation:ringBloom .72s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ringBloom{
+  0%{opacity:0;transform:scale(.5)}
+  60%{opacity:1}
+  100%{opacity:1;transform:scale(1)}}
+.ring__ripple{fill:none;stroke:rgba(159,240,200,.34);stroke-width:1.3;opacity:0;
   transform-box:view-box;transform-origin:0 0;
-  animation:rippleOut 8s cubic-bezier(.18,.62,.28,1) infinite}
-.ring__ripple:nth-child(2){animation-delay:-2.7s}
-.ring__ripple:nth-child(3){animation-delay:-5.4s}
+  animation:rippleOut 9s cubic-bezier(.22,.6,.25,1) infinite}
+.ring__ripple:nth-child(2){animation-delay:-2.25s}
+.ring__ripple:nth-child(3){animation-delay:-4.5s}
+.ring__ripple:nth-child(4){animation-delay:-6.75s}
 @keyframes rippleOut{
-  0%{transform:scale(.10);opacity:0}
-  14%{opacity:.5}
-  100%{transform:scale(1);opacity:0}}
+  0%{transform:scale(.08);opacity:0}
+  12%{opacity:.55}
+  75%{opacity:.18}
+  100%{transform:scale(1.02);opacity:0}}
 /* 轻点处荡开的那一圈 */
 .ring__tap{fill:none;stroke:rgba(214,255,235,.5);stroke-width:1.4;
   transform-box:view-box;transform-origin:0 0;
@@ -743,7 +753,12 @@ footer a{color:var(--green-bright);text-decoration:none}
 .ring__core{position:absolute;left:50%;top:calc(var(--pt,600px) / 2);z-index:4;
   width:calc(var(--da,600px) * .24);aspect-ratio:1/1;transform:translate(-50%,-50%);
   display:grid;place-content:center;justify-items:center;gap:6px;text-align:center;
-  pointer-events:none;border-radius:50%}
+  pointer-events:none;border-radius:50%;
+  animation:coreIn 1s .15s ease both}
+@keyframes coreIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+/* 花与装饰花随年轮一同由水心浮现，整盘像一个涟漪荡开 */
+.ring.is-live .rnode,.ring.is-live .ring__flora{animation:fadeIn .8s .5s ease both}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 /* 底层把圈线柔柔地压暗，上层才是那团金色柔光 ——
    否则悬停时亮起来的圈会从"高三 · 停课"这几个字上横穿过去 */
 .ring__core::before{content:"";position:absolute;inset:-8%;border-radius:50%;
