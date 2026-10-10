@@ -4,27 +4,82 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>学术之路 · 黄安萌 Ham</title>
-<meta name="description" content="从高中信竞到大学算法竞赛，再到以后进组做项目、写论文：一路走来的学术痕迹都收在这里。第一章是信竞这几年敲过的键盘。" />
+<meta name="description" content="从高中信竞到大学算法竞赛，再到以后进组做项目、写论文：一路走来的学术痕迹都收在这里。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Noto+Serif+SC:ital,wght@0,500;1,500;1,600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  /* 本页专属：两处阵地的数据行 + 平台色点缀（其余沿用 site.css） */
-  .ostat{list-style:none;margin:calc(var(--u)*1.5) 0 0;display:grid;gap:9px}
-  .ostat li{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-    padding-bottom:9px;border-bottom:1px dashed rgba(255,255,255,.10);font-size:13.5px}
-  .ostat li:last-child{border-bottom:none;padding-bottom:0}
-  .ostat span{color:var(--ink-dim);letter-spacing:.02em}
-  .ostat b{font-family:"Cormorant Garamond","Noto Serif SC",serif;font-style:italic;font-weight:600;
-    font-size:18px;color:var(--ink);white-space:nowrap}
-  .ostat b small{font-family:"Noto Sans SC",sans-serif;font-style:normal;font-size:11.5px;
-    color:var(--ink-dim);margin-left:4px}
-  .ostat-note{margin-top:calc(var(--u)*1.5);font-size:12px;color:rgba(201,214,207,.6);line-height:1.6}
-  .card--lg .kicker{color:#7fd6a8}
-  .card--cf .kicker{color:#9cc4ff}
-  .card--lg{border-color:rgba(127,214,168,.30)}
-  .card--cf{border-color:rgba(156,196,255,.30)}
-  .tk-note{text-align:center;margin-top:calc(var(--u)*4)}
+  /* 序章：两处阵地的跳转卡（轻量，主要粘链接） */
+  .oi-card{display:flex;flex-direction:column;text-decoration:none;transition:transform .4s, border-color .4s}
+  .oi-card:hover{transform:translateY(-4px);border-color:var(--mint)}
+  .oi-card .card__link{margin-top:auto}
+
+  /* 学术星河 + 来路双螺旋：同一块画布 */
+  .acad__stage{position:relative;height:min(92vh,700px);margin-top:calc(var(--u)*3)}
+  .acad__cv{width:100%;height:100%;display:block}
+  .acad__tip{position:absolute;pointer-events:none;transform:translate(-50%,-130%);
+    background:rgba(8,23,18,.94);border:1px solid rgba(63,174,126,.5);border-radius:12px;
+    padding:8px 12px;font-size:12.5px;color:var(--ink);max-width:248px;line-height:1.5;
+    box-shadow:0 8px 30px rgba(0,0,0,.45);white-space:normal}
+  .acad__tip b{color:var(--mint);font-family:"Noto Serif SC",serif;font-weight:500}
+  .acad__tip .y{color:var(--gold);font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px}
+
+  /* 来路结点（静态文字，绝不随画布晃动） */
+  .mil__list{position:absolute;inset:0;pointer-events:none}
+  .mil{position:absolute;width:39%;transform:translateY(-50%)}
+  .mil.is-l{left:1%;text-align:right}
+  .mil.is-r{right:1%;text-align:left}
+  .mil .n{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;color:var(--gold);letter-spacing:.06em}
+  .mil b{display:block;font-family:"Noto Serif SC",serif;font-weight:500;font-size:13.5px;color:var(--ink);line-height:1.35;margin-top:1px}
+  .mil .s{display:block;font-family:"Noto Sans SC",sans-serif;font-size:11.5px;color:var(--ink-dim);line-height:1.45;margin-top:3px}
+
+  /* 图例 */
+  .legend{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:calc(var(--u)*2);
+    color:var(--ink-dim);font-size:12.5px;letter-spacing:.02em}
+  .legend span{display:inline-flex;align-items:center}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+  .legend .code{background:#9ff0c8}
+  .legend .group{background:#f4d58d}
+  .legend .paper{background:#f4eecd;box-shadow:0 0 0 3px rgba(244,238,205,.22)}
+  .lg-read{background:#3fae7e}
+  .lg-write{background:#f4d58d}
+
+  /* 小注：与书影页一致的「绿点 + 小字」（颜色与间距统一） */
+  .tip-line{display:flex;align-items:center;gap:calc(var(--u)*1);margin-top:calc(var(--u)*2.5);
+    font-size:12.5px;color:var(--ink-dim);letter-spacing:.03em;line-height:1.6}
+  .tip-line::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green-bright);
+    box-shadow:0 0 8px var(--green-bright);flex:0 0 auto}
+  .tip-line--c{justify-content:center;text-align:left}
+
+  /* 论文的六种写法 · 评估卡（已按需求撤下；蓝图点子保留于工作记忆：星河/DNA双螺旋已上线，两棵树/月相/螺旋塔/莫比乌斯为待点亮蓝图） */
+
+  /* 衔接：贯穿全页的「脉络」藤蔓 + 每节结点（连续背景，让各节不再像孤岛） */
+  main.acad{position:relative;background:linear-gradient(180deg,#0d211b,#081712 26%,#0a1c16 56%,#081712 82%,#0c1f1a)}
+  main.acad::before{content:"";position:absolute;top:0;bottom:0;left:12px;width:2px;pointer-events:none;
+    background:linear-gradient(180deg,transparent,var(--green-deep) 4%,var(--green-bright) 45%,var(--green-deep) 92%,transparent);
+    opacity:.26}
+  main.acad .block{position:relative;background:none}
+  main.acad .block::before{content:"";position:absolute;left:8px;top:calc(var(--u)*12 + 40px);width:13px;height:13px;
+    border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(47,125,91,.22),0 0 14px rgba(159,240,200,.5);opacity:.9;pointer-events:none}
+  main.acad .block:first-child::before{top:calc(var(--u)*6)}
+  main.acad .wrap{position:relative}
+
+  /* 窄屏：脉络收细；来路结点改为画布下方的列表 */
+  @media(max-width:760px){
+    main.acad::before{left:6px;opacity:.20}
+    main.acad .block::before{left:2px;width:11px;height:11px}
+    .acad__stage{height:auto;margin-top:calc(var(--u)*2.5)}
+    .acad__cv{height:min(84vh,540px)}
+    .mil__list{position:static;display:flex;flex-direction:column;gap:calc(var(--u)*1.5);
+      margin-top:calc(var(--u)*2.5);pointer-events:auto}
+    .mil{position:static;width:auto;transform:none;text-align:left;left:auto;right:auto;
+      display:grid;grid-template-columns:24px 1fr;gap:0 10px}
+    .mil.is-l,.mil.is-r{text-align:left;left:auto;right:auto}
+    .mil .n{grid-row:1 / span 3;padding-top:2px}
+    .mil b{margin-top:0}
+    .mil .s{margin-top:2px}
+    .acad__tip{display:none}
+  }
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2308212b'/%3E%3Ccircle cx='13' cy='13' r='9' fill='%233fae7e'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%239ff0c8' opacity='.9'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23f6b8c8' stroke-width='1.4' opacity='.7'/%3E%3C/svg%3E" />
 </head>
@@ -45,112 +100,65 @@
   <div class="wrap">
     <div class="crumb">Home / 学术之路</div>
     <h1 class="serif">学术之路</h1>
-    <p>从高中机房的信竞，到大学实验室的算法，再到以后进组做项目、写论文——这一路走来的学术痕迹，都收在这里。眼前的第一章，是信竞这几年敲过的键盘。</p>
+    <p>从高中机房的信竞，到大学实验室的算法，再到以后进组做项目、写论文——这一路走来的学术痕迹，都收在这里。</p>
   </div>
 </header>
 
+<main class="acad">
+<!-- 学术星河：星云的边缘垂下来两条链，就是来路 -->
+<section class="block" id="galaxy">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Galaxy · 学术星河</span>
+      <h2>每一桩事，是一颗星</h2>
+      <p>这片星云里，每颗星是这一段路上的一桩事。按时间从核心铺向外缘——越靠外，越是近事。代码是青绿色的火星，小组作业是暖金圆星，论文则是带光环的亮星。星云的下缘并没有断：两条链从那里垂下来，青绿的是读过的，暖金的是写下的，中间那五枚结点，就是这一路走来的来路。</p>
+    </div>
+    <div class="acad__stage">
+      <canvas class="acad__cv" aria-label="学术星河：每桩事一颗星，星云下缘垂着读与写的双螺旋"></canvas>
+      <div class="acad__tip" hidden></div>
+      <div class="mil__list" aria-label="来路结点"></div>
+    </div>
+    <div class="legend">
+      <span><i class="code"></i>代码</span>
+      <span><i class="group"></i>小组作业</span>
+      <span><i class="paper"></i>论文</span>
+      <span><i class="lg-read"></i>读</span>
+      <span><i class="lg-write"></i>写</span>
+    </div>
+    <p class="tip-line tip-line--c">滚动，星河缓缓转；悬停任意一颗星，它会告诉你那是什么。两条链是读与写，五枚结点是来路。</p>
+  </div>
+</section>
+
+<!-- 序章：跳转链接（文艺化） -->
 <section class="block">
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">序章 · Prologue</span>
-      <h2>两处阵地</h2>
-      <p>一个练了三年，一个刚开张。都不算耀眼，但都是实打实敲过的键盘——这也是学术之路的第一页。</p>
+      <h2>从信竞，到代码</h2>
+      <p>星子落进账号里，便成了日复一日的修习。洛谷与 Codeforces，是我练手的两处阵地——想看实时战绩，点开便是；更多关于 OI、算法与代码的修习，都藏在这两只账号里，慢慢长着。</p>
     </div>
     <div class="grid grid--2">
-      <!-- 洛谷 -->
-      <article class="card card--lg">
+      <a class="card oi-card" href="https://www.luogu.com.cn/user/1241416" target="_blank" rel="noopener">
         <span class="kicker">洛谷 · Luogu</span>
         <h3>little_round_hat</h3>
-        <ul class="ostat">
-          <li><span>通过题目</span><b>187</b></li>
-          <li><span>总提交</span><b>206</b></li>
-          <li><span>比赛等级分</span><b>816<small>分</small></b></li>
-          <li><span>全站排名</span><b>≈22.79k</b></li>
-          <li><span>咕值</span><b>144</b></li>
-          <li><span>注册</span><b>2023.12</b></li>
-        </ul>
-        <p class="ostat-note">等级分来自 LGR-303-Div.2 洛谷 10 月月赛 I &amp;「WWOI」Round 4（2026-10-01）。</p>
-        <div class="card__links">
-          <a class="card__link" href="https://www.luogu.com.cn/user/1241416" target="_blank" rel="noopener">访问洛谷主页 ↗</a>
-        </div>
-      </article>
-      <!-- Codeforces -->
-      <article class="card card--cf">
+        <p>高中三年刷过的题、打过的月赛，都在这。</p>
+        <span class="card__link">访问洛谷主页 ↗</span>
+      </a>
+      <a class="card oi-card" href="https://codeforces.com/profile/Valuri" target="_blank" rel="noopener">
         <span class="kicker">Codeforces</span>
         <h3>Valuri</h3>
-        <ul class="ostat">
-          <li><span>当前 Rating</span><b>—<small>待解锁</small></b></li>
-          <li><span>注册</span><b>2026.10</b></li>
-          <li><span>贡献值</span><b>0</b></li>
-          <li><span>关注者</span><b>0</b></li>
-        </ul>
-        <p class="ostat-note">号是上大学后才开的，还没打过一场 rating 赛。首战在路上。</p>
-        <div class="card__soon"><span class="dot"></span>待首战 · 旅程刚开始</div>
-        <div class="card__links">
-          <a class="card__link" href="https://codeforces.com/profile/Valuri" target="_blank" rel="noopener">访问 CF 主页 ↗</a>
-        </div>
-      </article>
+        <p>上大学新开的号，准备认真打算法竞赛。</p>
+        <span class="card__link">访问 CF 主页 ↗</span>
+      </a>
     </div>
+    <p class="tip-line tip-line--c">两处阵地都在上面，想看实时战绩直接点进去。</p>
   </div>
 </section>
 
-<section class="block" style="background:linear-gradient(180deg,#081712,#0c1f1a)">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">The Path</span>
-      <h2>来路</h2>
-      <p>从信竞起步到大学，一条不长但连续的线。</p>
-    </div>
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="yr">2023 · 冬</div>
-        <h4>在洛谷注册，信竞起步</h4>
-        <p>高一前后开的号，从最基础的题开始刷，等级分从 0 慢慢往上走。</p>
-      </div>
-      <div class="tl-item">
-        <div class="yr">高中 · 机房岁月</div>
-        <h4>刷题为日常</h4>
-        <p>三年下来通过 187 题、提交 206 次，等级分涨到 816，全站排在 22.79k 左右。</p>
-      </div>
-      <div class="tl-item">
-        <div class="yr">2026 · 夏</div>
-        <h4>参加洛谷月赛</h4>
-        <p>LGR-303-Div.2 洛谷 10 月月赛 I &amp;「WWOI」Round 4，等级分定格在 816。</p>
-      </div>
-      <div class="tl-item">
-        <div class="yr">2026 · 秋</div>
-        <h4>上大学，开 Codeforces</h4>
-        <p>进了大学，新开 Valuri 这个号，准备认真打算法竞赛、攒一场场 rating。</p>
-      </div>
-      <div class="tl-item">
-        <div class="yr">现在</div>
-        <h4>两条线并行</h4>
-        <p>洛谷继续磨，CF 刚起步。信竞的修养，是慢慢磨出来的，不急。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="block">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">In the Toolkit</span>
-      <h2>修习录</h2>
-      <p>这几年零星摸过的方向。远未通关——但每一样都亲手敲过、调通过。</p>
-    </div>
-    <div class="grid">
-      <article class="card"><span class="kicker">结构</span><h3>数据结构</h3><p>线段树 · 树状数组 · 并查集 · 堆</p></article>
-      <article class="card"><span class="kicker">规划</span><h3>动态规划</h3><p>区间 DP · 状压 DP · 树形 DP · 背包</p></article>
-      <article class="card"><span class="kicker">图</span><h3>图论</h3><p>最短路 · 最小生成树 · 二分图 · 网络流入门</p></article>
-      <article class="card"><span class="kicker">数</span><h3>数论</h3><p>同余 · gcd / exgcd · 素数筛 · 快速幂</p></article>
-      <article class="card"><span class="kicker">串</span><h3>字符串</h3><p>KMP · 哈希 · Trie · Manacher 浅尝</p></article>
-      <article class="card"><span class="kicker">思</span><h3>思维与构造</h3><p>贪心 · 分治 · 二分答案 · 构造题</p></article>
-    </div>
-    <p class="ostat-note tk-note">列表会随刷题慢慢长——这一页本身也会。</p>
-  </div>
-</section>
+</main>
 
 <footer>© 2026 黄安萌 · Ham &nbsp;·&nbsp; <a href="/">回到首页 ↑</a></footer>
+<script src="/assets/academic.js"></script>
 <script src="/assets/space.js"></script>
 </body>
 </html>
