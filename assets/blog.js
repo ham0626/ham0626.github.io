@@ -27,7 +27,7 @@
   var NB = 200;      // viewBox 半宽，所有坐标归一化到 -200..200
   var R_CORE = 38;   // 圆心留给文字的半径（要明显大于圆心文字块的半径，否则最内圈会贴着字走）
   var R_EDGE = 15;   // 最外圈到边界的余量（给月份标签）
-  var SEP = 15;      // 同一圈上相邻两朵花至少隔开的角度
+  var SEP = 20;      // 同一圈上相邻两朵花至少隔开的角度
   var SEASON_CN = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
 
   var groups = [];   // 一圈一组：[{i, era, season, items:[el...]}]

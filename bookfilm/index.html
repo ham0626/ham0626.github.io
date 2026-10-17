@@ -17,6 +17,37 @@
     font-size:12.5px;color:var(--ink-dim);letter-spacing:.03em}
   .bf-tip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green-bright);
     box-shadow:0 0 8px var(--green-bright);flex:0 0 auto}
+
+  /* ===== 东野圭吾合集：主书架金脊 → read 区两级选择器（系列索引 → 书目）===== */
+  .spine--coll{border-color:rgba(244,213,141,.55)}
+  .spine--coll .spine__title{color:#16281e}
+  .hg__hd{margin-bottom:calc(var(--u)*2)}
+  .hg__eyebrow{font-family:"Cormorant Garamond","Noto Serif SC",serif;font-style:italic;
+    letter-spacing:.16em;font-size:13px;color:var(--mint);text-transform:uppercase}
+  .hg__hd h3{margin-top:calc(var(--u)*.5)}
+  .hg__entry{display:flex;align-items:center;gap:calc(var(--u)*1.5);width:100%;
+    padding:calc(var(--u)*1.75) calc(var(--u)*2);margin-bottom:calc(var(--u)*1.25);
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:12px;
+    color:var(--ink);cursor:pointer;text-align:left;
+    transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+  .hg__entry:hover{transform:translateX(4px);border-color:rgba(159,240,200,.45);background:rgba(63,174,126,.10)}
+  .hg__entry--all{border-color:rgba(244,213,141,.4);background:rgba(244,213,141,.07)}
+  .hg__entry-t{font-family:"Noto Serif SC",serif;font-weight:600;font-size:15.5px;flex:1 1 auto}
+  .hg__entry-m{font-size:12.5px;color:var(--ink-dim);letter-spacing:.04em;flex:0 0 auto}
+  .hg__arrow{color:var(--mint);flex:0 0 auto}
+  .hg__books{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1)}
+  .hg__book{padding:calc(var(--u)*.9) calc(var(--u)*1.4);border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+    color:#dbe6e0;font-size:13px;cursor:pointer;
+    transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+  .hg__book:hover{transform:translateY(-2px);border-color:rgba(159,240,200,.5);background:rgba(63,174,126,.12);color:var(--ink)}
+  .hg__book--pick{border-color:rgba(244,213,141,.55);color:#f4d58d}
+  .hg__book--pick:hover{background:rgba(244,213,141,.12);color:#ffe9b8}
+  .hg__back{margin-top:calc(var(--u)*2);padding:calc(var(--u)*.75) calc(var(--u)*1.5);
+    background:none;border:1px dashed rgba(255,255,255,.2);border-radius:999px;
+    color:var(--ink-dim);font-size:12.5px;cursor:pointer;letter-spacing:.05em;
+    transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+  .hg__back:hover{color:var(--ink);border-color:rgba(159,240,200,.45)}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2308212b'/%3E%3Ccircle cx='13' cy='13' r='9' fill='%233fae7e'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%239ff0c8' opacity='.9'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23f6b8c8' stroke-width='1.4' opacity='.7'/%3E%3C/svg%3E" />
 </head>
@@ -38,7 +69,7 @@
   <div class="wrap">
     <div class="crumb">Home / Books &amp; Films</div>
     <h1 class="serif">书影记录</h1>
-    <p>左边是书架，右边是银幕。点一本书，翻出书评；点一张海报，银幕亮起影评。</p>
+    <p>左边是书架，右边是银幕。点一本书，翻出书评；点一张海报，银幕亮起影评。书架尽头那本金色的，是东野圭吾的 39 本——点开它，按系列一本本翻。</p>
   </div>
 </header>
 
@@ -47,7 +78,7 @@
     <div class="sec-head">
       <span class="eyebrow">Bookshelf &amp; Silver Screen</span>
       <h2 class="serif">近期书影</h2>
-      <p>共 11 篇短评 · 书本 7 · 电影 4。每一篇都是认真写下的，不是随手打的星号。</p>
+      <p>共 20 篇短评 · 书本 46 · 电影 4。每一篇都是认真写下的，不是随手打的星号。</p>
     </div>
 
     <div class="bf-stage">
@@ -56,7 +87,7 @@
       <section class="bf-panel" aria-label="书架">
         <div class="bf-panel__bar">
           <span class="bf-panel__tag">书架 · Books</span>
-          <span class="bf-count">7 本</span>
+          <span class="bf-count">46 本</span>
         </div>
 
         <div class="shelf">
@@ -99,6 +130,9 @@
             <span class="spine spine--deco" style="--c1:#4f4066;--c2:#1e1829;--h:106px" aria-hidden="true"></span>
             <button class="spine" data-id="straitgate" style="--c1:#9a7a63;--c2:#3a2b22;--h:114px" aria-label="窄门 书评">
               <span class="spine__title">窄门</span>
+            </button>
+            <button class="spine spine--coll" data-id="higashino" style="--c1:#f4d58d;--c2:#7a5c22;--h:160px" aria-label="东野圭吾合集 · 39 部 · 点开按系列翻阅">
+              <span class="spine__title">东野圭吾合集</span>
             </button>
             <span class="spine spine--empty"><span>更多在补录</span></span>
             <span class="spine spine--deco" style="--c1:#3a4a40;--c2:#151d18;--h:120px" aria-hidden="true"></span>
@@ -359,6 +393,60 @@
       meta:'新海诚 / CoMix Wave · 2019 · 动画 / 爱情', stars:4,
       text:'帆高离家出走到东京，遇见能让天空放晴的阳菜。到最后一刻，新海诚给了他一个在日式动画里相当少见的答案：不是为了世界牺牲你，而是为了你，让世界继续下雨。很多人的不满也在这里——这场雨淹掉了半座东京，凭什么？可它恰恰是这部电影最诚实的地方：一个还没被教导要顾全大局的少年，只会说「我只是想再见到你」。雨一直下了三年，而那把小伞下的两个人才刚刚开始过日子。',
       quote:'「比起晴天，我更需要你。」'
+    },
+    higashino:{
+      kind:'book', tag:'书本', title:'东野圭吾合集', en:'Keigo Higashino',
+      meta:'1958–2026 · 推理小说 · 藏书 39 部',
+      text:'高一那年，我可以一个二晚都在看东叔，两天刷完一本。加贺警官、草薙警官、内海警官——这些人是陪着我的中学时代一起长大的。2026 年 7 月，东野圭吾因大肠癌去世，68 岁；以后再也不会有新的加贺和汤川学了，想到这一点，还是感觉淡淡的遗憾。但更多的是谢谢：谢谢那些为一个谜底熬到的深夜，谢谢那些合上书之后久久说不出话的瞬间。',
+      quote:'东叔一路走好。你笔下的人，会一直活下去。'
+    },
+    kaga:{
+      kind:'book', tag:'书本', title:'加贺恭一郎系列', en:'Detective Kyoichiro Kaga',
+      meta:'东野圭吾 · 5 部',
+      text:'加贺恭一郎走了三十多年：他破案，也一次次目送案件背后那些回不了头的人。以后不会再有新的加贺了——想到这一点，还是感觉淡淡的遗憾。好在书架还在：想他的时候，就从《毕业》再读一遍。这一层里《恶意》写了短评，其余四部——《毕业》《麒麟之翼》《祈祷落幕时》《希望之线》，一部一部补。',
+      quote:'加贺警官，谢谢，再见。'
+    },
+    galileo:{
+      kind:'book', tag:'书本', title:'伽利略系列', en:'Detective Galileo',
+      meta:'东野圭吾 · 9 部',
+      text:'汤川学、草薙警官、内海警官——这个系列是另一种好看：天才物理学家站在逻辑这边，两个警察负责把人间的问题一个一个捡起来。以后再听到那句「这个案子有点奇怪」，不会有人接了。这一层里《圣女的救济》写了短评，其余八部——《预知梦》《侦探伽利略》《嫌疑人X的献身》《伽利略的苦恼》《虚像小丑》《禁断的魔术》《沉默的巡游》《透明的螺旋》，一部一部补。',
+      quote:'这个案子有点奇怪——以后，不会有人接了。'
+    },
+    solo:{
+      kind:'book', tag:'书本', title:'独立作品', en:'Standalone Novels',
+      meta:'东野圭吾 · 独立作品 · 22 部',
+      text:'不在任何系列里的东野，反而最见功力：没有连续的人物，只有一个个独立成立的世界。这一层 25 部里，《白夜行》《幻夜》《虚无的十字架》三部写了短评；其余的也都在这一层——《白马山庄杀人事件》《布鲁特斯的心脏》《分身》《再见了，忍老师》《从前我死去的家》《空中杀人现场》《秘密》《我杀了他》《单恋》《超·杀人事件》《彷徨之刃》《梦回都灵》《使命与魂的尽头》《黎明之街》《流星之绊》《假面之夜》《解忧杂货店》《梦幻花》《疾风回旋曲》《拉普拉斯的魔女》《祈念守护人》《无名之町》——书架先站满，短评慢慢补。',
+      quote:'没有连续的人物，只有一个个独立成立的世界。'
+    },
+    egui:{
+      kind:'book', tag:'书本', title:'恶意', en:'Akui',
+      meta:'东野圭吾 · 加贺恭一郎系列 · 私心推荐',
+      text:'凶手从头到尾不否认杀了人——他真正想抹掉的，是被害者这个人。当「动机」被一层层剥开，露出来的不是刻骨的仇恨，而是一种日积月累、连他自己都说不清的恶意。合上书最凉的一点：比杀人更彻底的，是让一个人死后还要背一辈子的罪名。',
+      quote:'有些恶意没有来由——它只是不允许你过得比我好。'
+    },
+    baiyexing:{
+      kind:'book', tag:'书本', title:'白夜行', en:'Byakuyako',
+      meta:'东野圭吾 · 长篇 · 私心推荐',
+      text:'没有侦探的推理，只有两个在黑夜里互相取暖的孩子。雪穗朝着亮的方向走，亮司在她身后把黑夜越背越深——他们之间不说爱，可整本书都是。读到最后那句「手牵手在太阳下散步」，才发现东叔把最狠的收尾写成了最温柔的样子。',
+      quote:'「我的天空里没有太阳，总是黑夜，但并不暗，因为有东西代替了太阳。」'
+    },
+    huanye:{
+      kind:'book', tag:'书本', title:'幻夜', en:'Genya',
+      meta:'东野圭吾 · 长篇 · 私心推荐',
+      text:'《白夜行》的姊妹篇，却更冷。白夜行里至少有过真正的相互扶持，幻夜只剩下利用与被利用；美冬是东叔写过最危险的女人——不是没有心，是早就把心换成了活下去的筹码。读完在灯下坐了很久，那种冷是从纸背渗出来的。',
+      quote:'白夜行好歹给过一点真的，幻夜连那一点都是算计。'
+    },
+    shengnv:{
+      kind:'book', tag:'书本', title:'圣女的救济', en:'Seijo no Kyuusai',
+      meta:'东野圭吾 · 伽利略系列 · 私心推荐',
+      text:'一个把自己活成「完美妻子」的女人，和一场理论上不可能的毒杀。汤川学解开了手法，解不开的是手法背后那个问题：一个人要退到多远，才会把「救济」留给自己？这一部里，赢的是逻辑，输的是人心。',
+      quote:'所谓救济，原来是救自己。'
+    },
+    xuwu:{
+      kind:'book', tag:'书本', title:'虚无的十字架', en:'Kyomu no Juuka',
+      meta:'东野圭吾 · 长篇 · 私心推荐',
+      text:'死了女儿的夫妇，一个咬着牙要凶手死，一个只想弄明白「为什么」。东野把死刑放上天平的两端，却不告诉你哪边更重。这本书没有凶手可猜，它逼着你回答：如果死刑都偿还不清，那么什么才能？如果什么都偿不了，活着的人怎么办？',
+      quote:'虚无的十字架，压在每个不得不放下的人身上。'
     }
   };
 
@@ -423,22 +511,23 @@
   tkBack.addEventListener('click', closeTicket);
 
   /* —— 书：摊开一本；关闭时先把书页合上，再退场 —— */
-  function fillBook(d){
+  function fillBook(d, book){
     document.getElementById('bkNo').textContent     = 'NO.' + d.no;
     document.getElementById('bkTitle').textContent  = d.title;
     document.getElementById('bkCoverT').textContent = d.title;
     document.getElementById('bkEn').textContent     = d.en;
-    document.getElementById('bkMeta').textContent   = d.meta;
+    /* 合集书架：meta 前缀标出点开的是哪一本书（系列卡才知道"你是谁家的"） */
+    document.getElementById('bkMeta').textContent   = (book ? '《' + book + '》 · ' : '') + d.meta;
     document.getElementById('bkStars').textContent  = starsHTML(d.stars);
     document.getElementById('bkText').textContent   = d.text;
     const q = document.getElementById('bkQuote');
     if(d.quote){ q.textContent = d.quote; q.hidden = false; }
     else { q.textContent = ''; q.hidden = true; }
   }
-  function openBook(id){
+  function openBook(id, book){
     const d = DATA[id]; if(!d) return;
     lastFocus = document.activeElement;
-    fillBook(d);
+    fillBook(d, book);
     bk.classList.remove('is-closing');
     bk.classList.add('is-open');
     bk.setAttribute('aria-hidden', 'false');
@@ -460,8 +549,66 @@
   document.addEventListener('keydown', function(e){
     if(e.key !== 'Escape') return;
     if(bk.classList.contains('is-open')) closeBook();
-    else closeTicket();
+    else if(tk.classList.contains('is-open')) closeTicket();
+    else {
+      /* 选择器开着时，Esc 逐级返回：书目 → 索引 → 书架 */
+      var back = bookRead.querySelector('[data-hg-back]');
+      if(back) back.click();
+    }
   });
+
+  /* —— 东野圭吾合集：金脊 → read 区两级选择器（系列索引 → 书目 → 书卡）—— */
+  var HG = {
+    kaga:   { name:'加贺恭一郎系列', n:5,
+      books:['毕业','恶意','麒麟之翼','祈祷落幕时','希望之线'] },
+    galileo:{ name:'伽利略系列', n:9,
+      books:['预知梦','侦探伽利略','嫌疑人X的献身','圣女的救济','伽利略的苦恼','虚像小丑','禁断的魔术','沉默的巡游','透明的螺旋'] },
+    solo:   { name:'独立作品', n:25,
+      books:['白马山庄杀人事件','布鲁特斯的心脏','分身','再见了，忍老师','从前我死去的家','空中杀人现场','秘密','白夜行','我杀了他','单恋','超·杀人事件 推理作家的苦恼','幻夜','彷徨之刃','梦回都灵','使命与魂的尽头','黎明之街','流星之绊','假面之夜','解忧杂货店','梦幻花','疾风回旋曲','虚无的十字架','拉普拉斯的魔女','祈念守护人','无名之町'] }
+  };
+  /* 五部私心推荐有自己的短评卡，其余走系列卡（meta 前缀标书名） */
+  var HG_PICK = { '恶意':'egui', '圣女的救济':'shengnv', '白夜行':'baiyexing', '幻夜':'huanye', '虚无的十字架':'xuwu' };
+
+  function hgReset(){
+    bookRead.innerHTML = '<div class="read__hint"><span class="em">📖</span>'
+      + '<p>选一本书脊，这里会展开我写的书评。</p></div>';
+  }
+  function hgIndex(){
+    var rows = '';
+    [['kaga','加贺恭一郎系列'],['galileo','伽利略系列'],['solo','独立作品']].forEach(function(p){
+      rows += '<button class="hg__entry" data-hg="' + p[0] + '">'
+        + '<span class="hg__entry-t">' + p[1] + '</span>'
+        + '<span class="hg__entry-m">' + HG[p[0]].n + ' 部</span>'
+        + '<span class="hg__arrow">→</span></button>';
+    });
+    bookRead.innerHTML =
+      '<div class="hg">'
+      + '<div class="hg__hd"><span class="hg__eyebrow">Keigo Higashino · 39 部</span>'
+      + '<h3 class="serif">东野圭吾合集</h3></div>'
+      + '<button class="hg__entry hg__entry--all" data-hg="all">'
+      + '<span class="hg__entry-t">合集总记</span><span class="hg__entry-m">写在最前面的话</span>'
+      + '<span class="hg__arrow">→</span></button>'
+      + rows
+      + '<button class="hg__back" data-hg-back>← 返回书架</button>'
+      + '</div>';
+  }
+  function hgList(key){
+    var g = HG[key], chips = '';
+    g.books.forEach(function(t){
+      var pick = HG_PICK[t];
+      chips += '<button class="hg__book' + (pick ? ' hg__book--pick' : '') + '"'
+        + ' data-hg-book="' + (pick || key) + '"'
+        + (pick ? ' aria-label="' + t + ' · 推荐"' : ' data-book="' + t + '"')
+        + '>' + (pick ? '★ ' : '') + t + '</button>';
+    });
+    bookRead.innerHTML =
+      '<div class="hg">'
+      + '<div class="hg__hd"><span class="hg__eyebrow">' + g.name + ' · ' + g.n + ' 部</span>'
+      + '<h3 class="serif">' + g.name + '</h3></div>'
+      + '<div class="hg__books">' + chips + '</div>'
+      + '<button class="hg__back" data-hg-back="index">← 返回索引</button>'
+      + '</div>';
+  }
 
   /* —— 书架：点书脊，把这本书摊开 —— */
   document.querySelectorAll('.spine[data-id]').forEach(function(sp){
@@ -469,10 +616,28 @@
       const d = DATA[sp.dataset.id]; if(!d) return;
       document.querySelectorAll('.spine.is-on').forEach(function(x){ x.classList.remove('is-on'); });
       sp.classList.add('is-on');
+      if(sp.dataset.id === 'higashino'){ hgIndex(); return; }   /* 金脊进选择器，不直接开卡 */
       bookRead.innerHTML = '<div class="read__hint"><span class="em">✦</span>'
         + '<p>《' + d.title + '》刚从架子上取下来 · NO.' + d.no + '</p></div>';
-      openBook(sp.dataset.id);
+      openBook(sp.dataset.id, sp.dataset.book);
     });
+  });
+
+  /* —— 选择器：索引 / 书目 / 返回（事件委托，read 区整体重渲染也不丢）—— */
+  bookRead.addEventListener('click', function(e){
+    var back = e.target.closest('[data-hg-back]');
+    if(back){
+      if(back.getAttribute('data-hg-back') === 'index') hgIndex(); else hgReset();
+      return;
+    }
+    var entry = e.target.closest('[data-hg]');
+    if(entry){
+      if(entry.getAttribute('data-hg') === 'all') openBook('higashino');
+      else hgList(entry.getAttribute('data-hg'));
+      return;
+    }
+    var book = e.target.closest('[data-hg-book]');
+    if(book) openBook(book.getAttribute('data-hg-book'), book.getAttribute('data-book'));
   });
 
   /* —— 银幕：点海报，出一张电影票 —— */
