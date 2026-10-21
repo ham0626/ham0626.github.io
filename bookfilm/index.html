@@ -54,6 +54,85 @@
     color:var(--ink-dim);font-size:12.5px;cursor:pointer;letter-spacing:.05em;
     transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
   .hg__back:hover{color:var(--ink);border-color:rgba(159,240,200,.45)}
+
+  /* ===== 唱片墙：书架下的小架（音）===== */
+  .rec-wall{margin-top:calc(var(--u)*4);padding-top:calc(var(--u)*3);border-top:1px solid rgba(255,255,255,.10);
+    font-family:"Noto Serif SC","Cormorant Garamond",serif}
+  .rec-wall__head{margin-bottom:calc(var(--u)*2.5)}
+  .rec-sub{font-family:"Noto Serif SC",serif;font-weight:600;font-size:clamp(19px,3vw,24px);
+    color:var(--ink);margin:0 0 calc(var(--u)*1);line-height:1.2}
+  .rec-wink{font-family:"Noto Serif SC",serif;font-style:italic;font-size:clamp(14px,2.2vw,16px);
+    color:var(--mint);line-height:1.6;margin:0 0 calc(var(--u)*1);text-shadow:0 1px 10px rgba(0,0,0,.35)}
+  .rec-note{font-size:12.5px;color:var(--ink-dim);line-height:1.6;margin:0}
+
+  .rec-crates{display:flex;flex-direction:column;gap:calc(var(--u)*3)}
+  .crate{position:relative;padding:calc(var(--u)*2) calc(var(--u)*2) calc(var(--u)*2.5);border-radius:var(--r-card);
+    background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
+  .crate__bar{display:flex;align-items:baseline;gap:calc(var(--u)*1.5);margin-bottom:calc(var(--u)*2);
+    padding-bottom:calc(var(--u)*1.5);border-bottom:1px solid rgba(255,255,255,.10)}
+  .crate__year{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;
+    font-size:clamp(22px,3.6vw,30px);color:var(--mint);line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+  .crate__theme{font-family:"Noto Serif SC",serif;font-style:italic;font-size:14px;color:rgba(243,246,244,.86);
+    letter-spacing:.1em;align-self:center}
+  .crate__count{margin-left:auto;align-self:center;font-size:11px;color:var(--ink-dim);letter-spacing:.06em}
+  .crate__row{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*2)}
+  .crate__line{position:relative;display:grid;grid-template-columns:repeat(var(--per-row,6),minmax(0,1fr));
+    gap:calc(var(--u)*1.5);align-items:end;padding-bottom:calc(var(--u)*1.75)}
+  .crate__line::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;border-radius:0 0 5px 5px;
+    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03) 32%,rgba(0,0,0,.42));
+    box-shadow:0 7px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
+    pointer-events:none}
+
+  .vinyl{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*.75);cursor:pointer;
+    background:none;border:0;padding:0;text-align:left;color:inherit;
+    transition:transform var(--dur) var(--ease)}
+  .vinyl__sleeve{position:relative;aspect-ratio:1;width:100%;border-radius:6px;overflow:hidden;
+    background:linear-gradient(135deg,var(--c1),var(--c2));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 16px rgba(0,0,0,.4);
+    display:flex;align-items:center;justify-content:center}
+  .vinyl__disc{position:absolute;top:50%;right:0;width:58%;aspect-ratio:1;border-radius:50%;z-index:1;
+    transform:translate(40%,-50%) rotate(0deg);
+    background:repeating-radial-gradient(circle at 50% 50%,#0b0b0b 0 2px,#191919 2px 3.4px);
+    box-shadow:0 8px 18px rgba(0,0,0,.5);
+    transition:transform var(--dur) var(--ease);pointer-events:none}
+  .vinyl__disc::after{content:"";position:absolute;inset:36%;border-radius:50%;
+    background:radial-gradient(circle,var(--c1),var(--c2));box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+  .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(74%,-50%) rotate(22deg)}
+  .vinyl__cap{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .vinyl__name{font-family:"Noto Serif SC",serif;font-size:11.5px;line-height:1.3;color:var(--ink);text-align:center;margin-bottom:calc(var(--u)*.5)}
+  .vinyl__artist{font-size:9.5px;color:var(--ink-dim);letter-spacing:.02em}
+  .vinyl__pill{font-size:9px;letter-spacing:.06em;padding:1px 6px;border-radius:999px;
+    background:rgba(63,174,126,.16);border:1px solid rgba(63,174,126,.34);color:#bfe9d4}
+  .vinyl--album .vinyl__pill{background:rgba(244,213,141,.14);border-color:rgba(244,213,141,.34);color:#ecd9a8}
+  .vinyl__play{font-size:9.5px;color:var(--gold);letter-spacing:.04em}
+  .vinyl.is-on .vinyl__sleeve{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 1px rgba(159,240,200,.5),0 10px 20px rgba(0,0,0,.5)}
+  .vinyl:hover{transform:translateY(-3px)}
+
+  .read--rec{position:relative;background:linear-gradient(160deg,rgba(159,240,200,.08),rgba(255,255,255,.03));
+    border-color:rgba(159,240,200,.22);font-family:"Noto Serif SC",serif}
+  .read--rec .read__close{position:absolute;top:calc(var(--u)*1.5);right:calc(var(--u)*1.5);
+    width:30px;height:30px;border-radius:50%;border:1px solid rgba(159,240,200,.3);
+    background:rgba(255,255,255,.04);color:var(--ink-dim);font-size:17px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .read--rec .read__close:hover{color:var(--ink);border-color:rgba(159,240,200,.6);transform:rotate(90deg)}
+  .read--rec .read__head{display:flex;flex-direction:column;gap:6px;margin-bottom:calc(var(--u)*1.5)}
+  .read--rec .en{font-size:13px;color:var(--ink-dim);font-style:italic;font-family:"Cormorant Garamond",serif}
+  .read__kind--rec{background:rgba(244,213,141,.16);border-color:rgba(244,213,141,.4);color:#ecd9a8}
+  .rec-tracks{margin-top:calc(var(--u)*3);padding-top:calc(var(--u)*2.5);border-top:1px solid rgba(255,255,255,.12)}
+  .rec-tracks__hd{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-bottom:calc(var(--u)*2)}
+  .rec-star{color:var(--gold)}
+  .rec-tracks ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.5) calc(var(--u)*2.5)}
+  .rec-track{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(201,214,207,.8);
+    padding:6px 0;line-height:1.4}
+  .rec-track.is-fav{color:var(--ink)}
+  .rec-track__star{color:rgba(255,255,255,.28);flex:0 0 auto;font-size:13px}
+  .rec-track.is-fav .rec-track__star{color:var(--gold)}
+  @media(max-width:560px){.rec-tracks ol{grid-template-columns:1fr}.vinyl__name{font-size:10.5px}}
+  @media(prefers-reduced-motion:reduce){
+    .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(40%,-50%) rotate(0deg)}
+    .vinyl:hover{transform:none}
+  }
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2308212b'/%3E%3Ccircle cx='13' cy='13' r='9' fill='%233fae7e'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%239ff0c8' opacity='.9'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23f6b8c8' stroke-width='1.4' opacity='.7'/%3E%3C/svg%3E" />
 </head>
@@ -84,7 +163,7 @@
     <div class="sec-head">
       <span class="eyebrow">Bookshelf &amp; Silver Screen</span>
       <h2 class="serif">近期书影</h2>
-      <p>共 27 篇短评 · 书本 53 · 电影 7。每一篇都是认真写下的，不是随手打的星号。</p>
+      <p>共 27 篇短评 · 书本 53 · 电影 10。每一篇都是认真写下的，不是随手打的星号。</p>
     </div>
 
     <div class="bf-stage">
@@ -182,13 +261,29 @@
           </div>
         </div>
         <div class="bf-tip">书脊颜色是随手挑的，不是分类——别多想。</div>
+
+        <!-- ===== 唱片墙：书架下的小架（音）===== -->
+        <div class="rec-wall">
+          <div class="rec-wall__head">
+            <h3 class="rec-sub">唱片墙</h3>
+            <p class="rec-wink">看书看电影，怎么能没有 BGM 呢——上面那些故事，配乐我替自己补上了。</p>
+            <p class="rec-note">按年份排成四道小架，单曲与专辑混着摆；专辑点开看全曲目，★ 是我最爱的那几首。</p>
+          </div>
+          <div class="rec-crates" id="recCrates"></div>
+          <div class="read read--rec" id="recRead">
+            <div class="read__hint">
+              <span class="em">♪</span>
+              <p>点一张唱片，这里会展开我的听感；专辑点开还能看完整曲目。</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ===== 右：银幕 ===== -->
       <section class="bf-panel" aria-label="银幕">
         <div class="bf-panel__bar">
           <span class="bf-panel__tag">银幕 · Films</span>
-          <span class="bf-count">7 部</span>
+          <span class="bf-count">10 部</span>
         </div>
 
         <div class="screen">
@@ -560,6 +655,24 @@
       text:'沙丘是我最爱的电影之一。初看只觉得是黄沙、巨虫与一部宏大的史诗；后来越看越清楚，它真正讲的不是沙漠，而是一场以信仰为名的造神狂热——一个人被推上神坛，连他自己都来不及拒绝。保罗看得见所有的未来，却因此被自己的眼睛囚禁：预知是天赋，也是代价，他替所有人提前活完了那些路。每次重看，那句祷词都会重新在耳边响一遍。',
       quote:'我不能恐惧。恐惧是思维杀手。 恐惧是带来彻底毁灭的死神。我将直面恐惧，任由它穿过我的身体。当恐惧逝去，我会打开心眼，看清它的轨迹。恐惧所过之处，万物无存，唯我独立。'
     },
+    titanic:{
+      kind:'film', tag:'电影', title:'泰坦尼克号', en:'Titanic',
+      meta:'詹姆斯·卡梅隆 · 1997 · 爱情 / 灾难', stars:5,
+      text:'冰海里救上来的幸存者，被挨个问名字。轮到她，答的是「Rose Dawson」。没人知道 Dawson 是那个只活了几天的人——她替自己选了这个姓，把一场来不及长大的爱，写进了一生的名。后来她活得很长，长到杰克连老去的资格都没有；可点她名字的那一声，比整片大西洋都沉。有些爱没能说出口，就先替你改了姓氏。',
+      quote:'「Rose Dawson.」她答得很快，像早就想好了这个姓。'
+    },
+    escape1:{
+      kind:'film', tag:'电影', title:'密室逃生', en:'Escape Room',
+      meta:'亚当·罗比特尔 · 2019 · 惊悚 / 悬疑', stars:4,
+      text:'六个人因为一场「免费」的密室游戏聚到一起，房间却比他们各自的人生还像陷阱——极寒的冷藏室、颠倒的酒吧、下坠的影院，每一关都精准戳中一个人最想忘掉的过去。最妙的是它把「逃出生天」拍成了双关：你以为在破译锁，其实在逃开自己。节奏够快，惊险够狠，看完只想确认一下明天闹钟还响不响。',
+      quote:'「Welcome to the game.」'
+    },
+    escape2:{
+      kind:'film', tag:'电影', title:'密室逃生2：冠军之战', en:'Escape Room: Tournament of Champions',
+      meta:'亚当·罗比特尔 · 2021 · 惊悚 / 悬疑', stars:4,
+      text:'上一场活下来的几个人，以为噩梦结束了，结果被同一家公司再次拽回棋盘。这一部的房间更狠：熔炉、盐滩、矿道，机关一个比一个不讲理。但它真正让人后背发凉的，是那句「你们不是玩家，是商品」——当逃生变成被观看的生意，连尖叫都有了票房。两部连着看，爽是真的很爽，冷也是真的冷。',
+      quote:'「你们不是玩家，是商品。」'
+    },
     higashino:{
       kind:'book', tag:'书本', title:'东野圭吾合集', en:'Keigo Higashino',
       meta:'1958–2026 · 推理小说 · 藏书 39 部',
@@ -831,6 +944,150 @@
     const d = DATA[m[1]];
     if(d.kind === 'book') openBook(m[1]); else openTicket(m[1]);
   })();
+
+  /* —— 唱片墙：书 · 影 · 音（年份三/四架，单曲与专辑混排；专辑点开看全曲目＋★ 标最爱）—— */
+  const CRATE_TONE = {
+    '2023':['#caa45a','#332714'],
+    '2024':['#3f8f78','#0f2c23'],
+    '2025':['#3a5a7a','#0f1f2c'],
+    '2026':['#b87a8a','#361d27']
+  };
+  const RECORDS = {
+    'golden-hour':{type:'single',artist:'JVKE',title:'golden hour',review:'海边黄昏被拉得很长，像借来的假日。刺眼的分不清是太阳的 beam，还是她笑起来那一道。'},
+    'blue':{type:'single',artist:'Troye Sivan',title:'Blue',review:'有你之前世界是黑白的，失去你之后是蓝色的——没有你，我就是色盲。'},
+    'empty-love':{type:'single',artist:'Lulleaux & Kid Princess',title:'Empty Love',review:'爱若只是空壳，不如喊出来。'},
+    'meant-to-be':{type:'single',artist:'Arc North & Krista Marina',title:'Meant To Be',review:'注定也得有人先开口，别让缘分停在「本该」。'},
+    'everything-i-wanted':{type:'single',artist:'Billie Eilish',title:'everything i wanted',review:'她以为能飞，从金门桥一跃而下——无人哭，也无人察觉。结尾那句「他们不配拥有你」，是梦醒后唯一的陆地。'},
+    'chenni':{type:'single',artist:'邹沛沛',title:'沉溺',review:'整首泡在梦里，轮廓都是软的。它不让你清醒，只让你沉进去。'},
+    'wildest-dreams':{type:'single',artist:'Taylor Swift',title:'Wildest Dreams',review:'一遍遍 say you’ll remember me，像非要留下最浓那笔色彩。明明是梦，却忘不掉。'},
+    'chemtrails':{type:'single',artist:'Lana Del Rey',title:'Chemtrails Over The Country Club',review:'夏天听，它是泳池边珠宝的碎光，亮得不像话；冬天再听，是凌晨裹紧毯子、把音量调到刚好压过窗外的风——那点慵懒的甜忽然沉进了被窝。它不挑季节，只挑你当时的心情。'},
+    'dehors':{type:'single',artist:'Jordann',title:'Dehors',review:'咽下那口苦涩的海水，你并不缺勇气，只差一句「那就去吧」。'},
+    'birds':{type:'single',artist:'Billie Eilish',title:'Birds Of A Feather',play:'687 次',review:'六百多次。爱意写得那样轻，像气泡浮在表面，底下才藏着舍不得。'},
+    'yilu-nifeng':{type:'single',artist:'邓紫棋',title:'一路逆风',review:'逆风时总想起这首。生活就像一场繁华里的流浪——四面都是热闹，自己却一直在赶路。四个字像从背后推来一把力气，不温柔，可你停不下来。'},
+    'capital-letters':{type:'single',artist:'Hailee Steinfeld',title:'Capital Letters',review:'绕了一圈，还是得把喜欢喊出声。'},
+    'calm-down':{type:'single',artist:'Rema & Selena Gomez',title:'Calm Down',play:'400 次',review:'热带 afro 节奏却像抒情 R&B。给得起全部，给不了一周后的承诺。'},
+    'eternal-sunshine':{type:'album',artist:'Ariana Grande',title:'eternal sunshine',review:'整张无废曲，写土星回归——人到了要重新审判自己的年纪。可贵的是它不沉溺：把旧伤摊开，慢慢自愈，再往前走。',
+      tracks:[{n:'Intro (End Of The World)'},{n:'Bye',f:1},{n:'Don’t Wanna Break Up Again',f:1},{n:'Saturn Returns Interlude'},{n:'Eternal Sunshine',f:1},{n:'Supernatural'},{n:'True Story'},{n:'The Boy Is Mine'},{n:'Yes, And?'},{n:'We Can’t Be Friends (Wait For Your Love)',f:1},{n:'I Wish I Hated You',f:1},{n:'Imperfect For You'},{n:'Ordinary Things'}]},
+    'hmhas':{type:'album',artist:'Billie Eilish',title:'HIT ME HARD AND SOFT',review:'硬的重击与软的溺水，是同一场下沉。和 everything i wanted 隔年呼应——一个坠桥，一个浮沉，下坠感一模一样。',
+      tracks:[{n:'Skinny'},{n:'Lunch'},{n:'Chihiro',f:1},{n:'Birds Of A Feather',f:1},{n:'Wildflower'},{n:'The Greatest'},{n:'L’Amour De Ma Vie'},{n:'The Diner'},{n:'Bittersuite'},{n:'Blue'}]},
+    'starboy':{type:'album',artist:'The Weeknd',title:'Starboy',review:'Starboy 一开声就是他的冷，像城市熄灯后还剩的霓虹。',
+      tracks:[{n:'Starboy',f:1},{n:'Party Monster'},{n:'False Alarm'},{n:'Reminder'},{n:'Rockin’'},{n:'Secrets',f:1},{n:'True Colors',f:1},{n:'Stargirl Interlude',f:1},{n:'Sidewalks'},{n:'Six Feet Under'},{n:'Love To Lay'},{n:'A Lonely Night'},{n:'Attention'},{n:'Ordinary Life'},{n:'Nothing Without You'},{n:'All I Know'},{n:'Die For You',f:1},{n:'I Feel It Coming'}]},
+    'after-hours':{type:'album',artist:'The Weeknd',title:'After Hours',review:'After Hours 把心碎端得更平，在高速飞驰的梅奔上唱出自己的心碎。旋律越亮，底色越空。越听越觉得，热闹都是别人的，他只在副歌里一个人站着。',
+      tracks:[{n:'Alone Again'},{n:'Too Late'},{n:'Hardest To Love',f:1},{n:'Scared To Live',f:1},{n:'Snowchild'},{n:'Escape From LA',f:1},{n:'Heartless'},{n:'Faith'},{n:'Blinding Lights'},{n:'In Your Eyes'},{n:'Save Your Tears',f:1},{n:'Repeat After Me (Interlude)'},{n:'After Hours'},{n:'Until I Bleed Out'}]},
+    'dawn-fm':{type:'album',artist:'The Weeknd',title:'Dawn FM',review:'每次都从第一首开始，像慢慢驶入黎明——前奏一响，车灯切开夜色，丝滑的衔接让人舍不得停。冬日里他的合成器就是绝对战神，整张听完，天才亮。',
+      tracks:[{n:'Dawn FM'},{n:'Gasoline',f:1},{n:'How Do I Make You Love Me?'},{n:'Take My Breath'},{n:'Sacrifice',f:1},{n:'A Tale By Quincy'},{n:'Out Of Time'},{n:'Here We Go… Again'},{n:'Best Friends'},{n:'Is There Someone Else?'},{n:'Starry Eyes'},{n:'Every Angel Is Terrifying'},{n:'Don’t Break My Heart'},{n:'I Heard You’re Married'},{n:'Less Than Zero',f:1},{n:'Phantom Regret By Jim'}]},
+    'cardigan':{type:'single',artist:'Taylor Swift',title:'cardigan',review:'i knew you 翻来覆去——问的是随手搁下感情的你，还是明知结局仍栽进去的我。'},
+    'guilt-as-sin':{type:'single',artist:'Taylor Swift',title:'Guilty As Sin?',review:'only in my mind，罪只发生在脑海。可 how I long for our trysts 那句，比真做过还烫。'},
+    'petal':{type:'album',artist:'Ariana Grande',title:'petal',review:'今年（2026）的新专辑。合成器碎裂的音符，一枚枚砸在耳膜上，写的是不加掩饰的厌恶；到了 nowhere, nobody，反倒像在安抚自己。比 eternal sunshine 更暗更 raw，从冷硬裂缝里破土的，原来是这点生机。',
+      tracks:[{n:'Kiss Me',f:1},{n:'Hate That I Made You Love Me',f:1},{n:'Petal'},{n:'Stay'},{n:'Oh Well',f:1},{n:'Big Feelings'},{n:'Freak'},{n:'(Warning Signs)'},{n:'Like I Do'},{n:'Never Get Over Me'},{n:'Bad Thing (Bunny Hop)'},{n:'Nowhere, Nobody',f:1}]}
+  };
+  const CRATES = [
+    {year:'2023',theme:'等待',ids:['golden-hour','blue','empty-love','meant-to-be','everything-i-wanted']},
+    {year:'2024',theme:'尽情·自由',ids:['chenni','wildest-dreams','chemtrails','dehors']},
+    {year:'2025',theme:'一直',ids:['birds','yilu-nifeng','capital-letters','calm-down','eternal-sunshine','hmhas','starboy','after-hours','dawn-fm']},
+    {year:'2026',theme:'新声',ids:['cardigan','guilt-as-sin','petal']}
+  ];
+
+  const recCrates = document.getElementById('recCrates');
+  const recRead   = document.getElementById('recRead');
+
+  function vinylHTML(id, tone){
+    const d = RECORDS[id];
+    const cls = 'vinyl' + (d.type === 'album' ? ' vinyl--album' : '');
+    return '<button class="' + cls + '" data-rec="' + id + '" style="--c1:' + tone[0] + ';--c2:' + tone[1] + '" '
+      + 'aria-label="' + d.title + ' · ' + d.artist + ' · ' + (d.type === 'album' ? '专辑' : '单曲') + '">'
+      + '<span class="vinyl__name">' + d.title + '</span>'
+      + '<span class="vinyl__sleeve"><span class="vinyl__disc"></span></span>'
+      + '<span class="vinyl__cap"><span class="vinyl__artist">' + d.artist + '</span>'
+      + '<span class="vinyl__pill">' + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
+      + (d.play ? '<span class="vinyl__play">' + d.play + '</span>' : '')
+      + '</span></button>';
+  }
+
+  function htmlToNode(html){ const t = document.createElement('div'); t.innerHTML = html; return t.firstChild; }
+  function layoutLines(row){
+    row.querySelectorAll('.crate__line').forEach(function(l){ while(l.firstChild) row.appendChild(l.firstChild); l.remove(); });
+    const GAP = 12, MIN = 82;
+    const rw = row.clientWidth;
+    let perRow = Math.max(1, Math.floor((rw + GAP) / (MIN + GAP)));
+    const vinyls = Array.from(row.children);
+    for(let i=0;i<vinyls.length;i+=perRow){
+      const line = document.createElement('div'); line.className = 'crate__line';
+      line.style.setProperty('--per-row', Math.min(perRow, vinyls.length - i));
+      vinyls.slice(i, i+perRow).forEach(function(v){ line.appendChild(v); });
+      row.appendChild(line);
+    }
+  }
+  function buildWall(){
+    recCrates.innerHTML = '';
+    CRATES.forEach(function(cr){
+      const tone = CRATE_TONE[cr.year];
+      const crate = document.createElement('div'); crate.className = 'crate';
+      crate.innerHTML = '<div class="crate__bar">'
+        + '<span class="crate__year">' + cr.year + '</span>'
+        + '<span class="crate__theme">' + cr.theme + '</span>'
+        + '<span class="crate__count">' + cr.ids.length + ' 张</span></div>';
+      const row = document.createElement('div'); row.className = 'crate__row';
+      cr.ids.forEach(function(id){ row.appendChild(htmlToNode(vinylHTML(id, tone))); });
+      crate.appendChild(row);
+      recCrates.appendChild(crate);
+      layoutLines(row);
+    });
+  }
+
+  function renderRec(id){
+    const d = RECORDS[id];
+    let h = '<button class="read__close" type="button" aria-label="收起乐评">×</button>'
+      + '<div class="read__head"><span class="read__kind' + (d.type === 'album' ? ' read__kind--rec' : '') + '">'
+      + (d.type === 'album' ? '专辑' : '单曲') + '</span><h3>' + d.title + '</h3>'
+      + '<span class="en">' + d.artist + (d.play ? ' · ' + d.play : '') + '</span></div>'
+      + '<p class="read__text">' + d.review + '</p>';
+    if(d.type === 'album' && d.tracks){
+      const fav = d.tracks.filter(function(t){ return t.f; }).length;
+      h += '<div class="rec-tracks"><div class="rec-tracks__hd">曲目 · 共 ' + d.tracks.length
+        + ' 首，<span class="rec-star">★</span> 为我最爱（' + fav + '）</div><ol>';
+      d.tracks.forEach(function(t){
+        h += '<li class="rec-track' + (t.f ? ' is-fav' : '') + '"><span class="rec-track__star">'
+          + (t.f ? '★' : '☆') + '</span><span>' + t.n + '</span></li>';
+      });
+      h += '</ol></div>';
+    }
+    recRead.innerHTML = h;
+    recRead.classList.remove('read__fadein');
+    void recRead.offsetWidth;
+    recRead.classList.add('read__fadein');
+  }
+
+  function closeRec(){
+    recCrates.querySelectorAll('.vinyl.is-on').forEach(function(x){ x.classList.remove('is-on'); });
+    recRead.innerHTML = '<div class="read__hint"><span class="em">♪</span>'
+      + '<p>点一张唱片，这里会展开我的听感；专辑点开还能看完整曲目。</p></div>';
+  }
+
+  buildWall();
+
+  recCrates.addEventListener('click', function(e){
+    if(e.target.closest('.read__close')){ closeRec(); return; }
+    const btn = e.target.closest('.vinyl');
+    if(!btn) return;
+    const id = btn.dataset.rec;
+    if(btn.classList.contains('is-on')){ closeRec(); return; }   // 再点已选中的 → 收起
+    recCrates.querySelectorAll('.vinyl.is-on').forEach(function(x){ x.classList.remove('is-on'); });
+    btn.classList.add('is-on');
+    btn.closest('.crate').after(recRead);   // 乐评面板移到被点的那一架下面，点哪看哪
+    renderRec(id);
+    recRead.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  document.addEventListener('click', function(e){
+    if(!recRead.querySelector('.read__close')) return;
+    if(e.target.closest('.vinyl') || e.target.closest('.read--rec')) return;
+    closeRec();
+  });
+  let rzT;
+  window.addEventListener('resize', function(){
+    clearTimeout(rzT);
+    rzT = setTimeout(function(){ recCrates.querySelectorAll('.crate__row').forEach(layoutLines); }, 150);
+  });
 })();
 </script>
 <script src="/assets/space.js"></script>
