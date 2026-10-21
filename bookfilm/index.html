@@ -17,6 +17,9 @@
     font-size:12.5px;color:var(--ink-dim);letter-spacing:.03em}
   .bf-tip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green-bright);
     box-shadow:0 0 8px var(--green-bright);flex:0 0 auto}
+  /* 唱片墙上方那句：与书架/银幕的 tip 同一副长相，只是位置在标题之前 */
+  .bf-tip--rec{margin-top:0;margin-bottom:calc(var(--u)*1.5);
+    font-family:"Noto Sans SC",sans-serif;line-height:1.6}
 
   /* ===== 东野圭吾合集：主书架金脊 → read 区两级选择器（系列索引 → 书目）===== */
   .spine--coll{border-color:rgba(244,213,141,.55)}
@@ -56,41 +59,41 @@
   .hg__back:hover{color:var(--ink);border-color:rgba(159,240,200,.45)}
 
   /* ===== 唱片墙：书架下的小架（音）===== */
-  .rec-wall{margin-top:calc(var(--u)*4);padding-top:calc(var(--u)*3);border-top:1px solid rgba(255,255,255,.10);
+  .rec-wall{margin-top:calc(var(--u)*3);padding-top:calc(var(--u)*2);border-top:1px solid rgba(255,255,255,.10);
     font-family:"Noto Serif SC","Cormorant Garamond",serif}
-  .rec-wall__head{margin-bottom:calc(var(--u)*2.5)}
-  .rec-sub{font-family:"Noto Serif SC",serif;font-weight:600;font-size:clamp(19px,3vw,24px);
-    color:var(--ink);margin:0 0 calc(var(--u)*1);line-height:1.2}
-  .rec-wink{font-family:"Noto Serif SC",serif;font-style:italic;font-size:clamp(14px,2.2vw,16px);
-    color:var(--mint);line-height:1.6;margin:0 0 calc(var(--u)*1);text-shadow:0 1px 10px rgba(0,0,0,.35)}
-  .rec-note{font-size:12.5px;color:var(--ink-dim);line-height:1.6;margin:0}
+  .rec-wall__head{margin-bottom:calc(var(--u)*1.5)}
+  .rec-sub{font-family:"Cormorant Garamond","Noto Serif SC",serif;font-style:italic;font-weight:500;
+    font-size:14px;letter-spacing:.16em;color:var(--mint);text-transform:uppercase;
+    margin:0 0 calc(var(--u)*1);line-height:1.35}
+  .rec-note{font-size:12.5px;color:var(--ink-dim);line-height:1.55;margin:0}
 
-  .rec-crates{display:flex;flex-direction:column;gap:calc(var(--u)*3)}
-  .crate{position:relative;padding:calc(var(--u)*2) calc(var(--u)*2) calc(var(--u)*2.5);border-radius:var(--r-card);
+  .rec-crates{display:flex;flex-direction:column;gap:calc(var(--u)*1.75)}
+  .crate{position:relative;padding:calc(var(--u)*1.5) calc(var(--u)*1.5) calc(var(--u)*1.25);border-radius:var(--r-card);
     background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
-  .crate__bar{display:flex;align-items:baseline;gap:calc(var(--u)*1.5);margin-bottom:calc(var(--u)*2);
-    padding-bottom:calc(var(--u)*1.5);border-bottom:1px solid rgba(255,255,255,.10)}
+  .crate__bar{display:flex;align-items:baseline;gap:calc(var(--u)*1.25);margin-bottom:calc(var(--u)*1.25);
+    padding-bottom:calc(var(--u)*.75);border-bottom:1px solid rgba(255,255,255,.10)}
   .crate__year{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;
     font-size:clamp(22px,3.6vw,30px);color:var(--mint);line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.4)}
   .crate__theme{font-family:"Noto Serif SC",serif;font-style:italic;font-size:14px;color:rgba(243,246,244,.86);
     letter-spacing:.1em;align-self:center}
   .crate__count{margin-left:auto;align-self:center;font-size:11px;color:var(--ink-dim);letter-spacing:.06em}
-  .crate__row{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*2)}
+  .crate__row{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*1.25)}
   .crate__line{position:relative;display:grid;grid-template-columns:repeat(var(--per-row,6),minmax(0,1fr));
-    gap:calc(var(--u)*1.5);align-items:end;padding-bottom:calc(var(--u)*1.75)}
-  .crate__line::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;border-radius:0 0 5px 5px;
+    gap:calc(var(--u)*1.25);align-items:end;padding-bottom:calc(var(--u)*1.25)}
+  .crate__line::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;border-radius:0 0 4px 4px;
     background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03) 32%,rgba(0,0,0,.42));
-    box-shadow:0 7px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
+    box-shadow:0 6px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
     pointer-events:none}
 
-  .vinyl{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*.75);cursor:pointer;
+  .vinyl{position:relative;display:block;cursor:pointer;
     background:none;border:0;padding:0;text-align:left;color:inherit;
     transition:transform var(--dur) var(--ease)}
-  .vinyl__sleeve{position:relative;aspect-ratio:1;width:100%;border-radius:6px;overflow:hidden;
+  .vinyl__sleeve{position:relative;display:block;aspect-ratio:1;width:100%;border-radius:5px;overflow:hidden;
     background:linear-gradient(135deg,var(--c1),var(--c2));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 16px rgba(0,0,0,.4);
-    display:flex;align-items:center;justify-content:center}
-  .vinyl__disc{position:absolute;top:50%;right:0;width:58%;aspect-ratio:1;border-radius:50%;z-index:1;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 7px 14px rgba(0,0,0,.4)}
+  .vinyl__sleeve::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(104deg,rgba(5,17,13,.82) 0%,rgba(5,17,13,.52) 44%,rgba(5,17,13,0) 72%)}
+  .vinyl__disc{position:absolute;top:50%;right:0;width:58%;aspect-ratio:1;border-radius:50%;z-index:2;
     transform:translate(40%,-50%) rotate(0deg);
     background:repeating-radial-gradient(circle at 50% 50%,#0b0b0b 0 2px,#191919 2px 3.4px);
     box-shadow:0 8px 18px rgba(0,0,0,.5);
@@ -98,37 +101,47 @@
   .vinyl__disc::after{content:"";position:absolute;inset:36%;border-radius:50%;
     background:radial-gradient(circle,var(--c1),var(--c2));box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
   .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(74%,-50%) rotate(22deg)}
-  .vinyl__cap{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
-  .vinyl__name{font-family:"Noto Serif SC",serif;font-size:11.5px;line-height:1.3;color:var(--ink);text-align:center;margin-bottom:calc(var(--u)*.5)}
-  .vinyl__artist{font-size:9.5px;color:var(--ink-dim);letter-spacing:.02em}
-  .vinyl__pill{font-size:9px;letter-spacing:.06em;padding:1px 6px;border-radius:999px;
-    background:rgba(63,174,126,.16);border:1px solid rgba(63,174,126,.34);color:#bfe9d4}
-  .vinyl--album .vinyl__pill{background:rgba(244,213,141,.14);border-color:rgba(244,213,141,.34);color:#ecd9a8}
-  .vinyl__play{font-size:9.5px;color:var(--gold);letter-spacing:.04em}
-  .vinyl.is-on .vinyl__sleeve{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 1px rgba(159,240,200,.5),0 10px 20px rgba(0,0,0,.5)}
+  .vinyl__label{position:absolute;inset:0;z-index:3;pointer-events:none;
+    display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;
+    padding:7px 8px;max-width:78%}
+  .vinyl__name{font-family:"Noto Serif SC",serif;font-weight:600;font-size:10.5px;line-height:1.28;
+    color:#f6f8f7;text-shadow:0 1px 4px rgba(0,0,0,.85);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .vinyl__pill{font-size:8.5px;letter-spacing:.06em;padding:1px 6px;border-radius:999px;white-space:nowrap;
+    background:rgba(6,20,15,.55);border:1px solid rgba(159,240,200,.42);color:#cdf3df}
+  .vinyl--album .vinyl__pill{background:rgba(6,20,15,.5);border-color:rgba(244,213,141,.5);color:#f0dcab}
+  .vinyl.is-on .vinyl__sleeve{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 1px rgba(159,240,200,.5),0 9px 18px rgba(0,0,0,.5)}
   .vinyl:hover{transform:translateY(-3px)}
 
-  .read--rec{position:relative;background:linear-gradient(160deg,rgba(159,240,200,.08),rgba(255,255,255,.03));
+  .read--rec{position:relative;margin-top:calc(var(--u)*1.75);
+    padding:calc(var(--u)*2.5) calc(var(--u)*2.5) calc(var(--u)*2.5);
+    background:linear-gradient(160deg,rgba(159,240,200,.08),rgba(255,255,255,.03));
     border-color:rgba(159,240,200,.22);font-family:"Noto Serif SC",serif}
-  .read--rec .read__close{position:absolute;top:calc(var(--u)*1.5);right:calc(var(--u)*1.5);
-    width:30px;height:30px;border-radius:50%;border:1px solid rgba(159,240,200,.3);
-    background:rgba(255,255,255,.04);color:var(--ink-dim);font-size:17px;line-height:1;cursor:pointer;
+  .read--rec .read__top{display:flex;align-items:center;justify-content:space-between;
+    gap:calc(var(--u)*1.5);margin-bottom:calc(var(--u)*1.25)}
+  .read--rec .read__close{flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    border:1px solid rgba(159,240,200,.3);background:rgba(255,255,255,.04);color:var(--ink-dim);
+    font-size:15px;line-height:1;cursor:pointer;
     display:flex;align-items:center;justify-content:center;
     transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease),transform var(--dur) var(--ease)}
   .read--rec .read__close:hover{color:var(--ink);border-color:rgba(159,240,200,.6);transform:rotate(90deg)}
-  .read--rec .read__head{display:flex;flex-direction:column;gap:6px;margin-bottom:calc(var(--u)*1.5)}
+  .read--rec .read__head{display:flex;flex-direction:column;gap:2px;margin-bottom:calc(var(--u)*1.25)}
+  .read--rec .read__head h3{margin-top:calc(var(--u)*.5)}
   .read--rec .en{font-size:13px;color:var(--ink-dim);font-style:italic;font-family:"Cormorant Garamond",serif}
+  .read--rec .read__text{line-height:1.85;font-size:13.5px}
   .read__kind--rec{background:rgba(244,213,141,.16);border-color:rgba(244,213,141,.4);color:#ecd9a8}
-  .rec-tracks{margin-top:calc(var(--u)*3);padding-top:calc(var(--u)*2.5);border-top:1px solid rgba(255,255,255,.12)}
-  .rec-tracks__hd{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-bottom:calc(var(--u)*2)}
+  .rec-tracks{margin-top:calc(var(--u)*2);padding-top:calc(var(--u)*2);border-top:1px solid rgba(255,255,255,.12)}
+  .rec-tracks__hd{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-bottom:calc(var(--u)*1.5)}
   .rec-star{color:var(--gold)}
-  .rec-tracks ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.5) calc(var(--u)*2.5)}
+  .rec-tracks ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:0 calc(var(--u)*2.5)}
   .rec-track{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(201,214,207,.8);
-    padding:6px 0;line-height:1.4}
+    padding:4px 0;line-height:1.4}
   .rec-track.is-fav{color:var(--ink)}
   .rec-track__star{color:rgba(255,255,255,.28);flex:0 0 auto;font-size:13px}
   .rec-track.is-fav .rec-track__star{color:var(--gold)}
-  @media(max-width:560px){.rec-tracks ol{grid-template-columns:1fr}.vinyl__name{font-size:10.5px}}
+  @media(max-width:560px){.rec-tracks ol{grid-template-columns:1fr}
+    .vinyl__label{padding:5px 6px;max-width:84%}.vinyl__name{font-size:9.5px;line-height:1.24}
+    .vinyl__pill{font-size:7.5px;padding:0 5px}}
   @media(prefers-reduced-motion:reduce){
     .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(40%,-50%) rotate(0deg)}
     .vinyl:hover{transform:none}
@@ -264,10 +277,10 @@
 
         <!-- ===== 唱片墙：书架下的小架（音）===== -->
         <div class="rec-wall">
+          <div class="bf-tip bf-tip--rec">看书看电影，怎么能没有 BGM 呢——上面那些故事，配乐我替自己补上了。</div>
           <div class="rec-wall__head">
-            <h3 class="rec-sub">唱片墙</h3>
-            <p class="rec-wink">看书看电影，怎么能没有 BGM 呢——上面那些故事，配乐我替自己补上了。</p>
-            <p class="rec-note">按年份排成四道小架，单曲与专辑混着摆；专辑点开看全曲目，★ 是我最爱的那几首。</p>
+            <h3 class="rec-sub">唱片墙 · Vinyl</h3>
+            <p class="rec-note">四道架子按年份站好，单曲与专辑混着摆。点一张，它就在原地开口；专辑点开是全部曲目，★ 是我反复把唱针放回去的那几首。</p>
           </div>
           <div class="rec-crates" id="recCrates"></div>
           <div class="read read--rec" id="recRead">
@@ -996,18 +1009,15 @@
     const cls = 'vinyl' + (d.type === 'album' ? ' vinyl--album' : '');
     return '<button class="' + cls + '" data-rec="' + id + '" style="--c1:' + tone[0] + ';--c2:' + tone[1] + '" '
       + 'aria-label="' + d.title + ' · ' + d.artist + ' · ' + (d.type === 'album' ? '专辑' : '单曲') + '">'
-      + '<span class="vinyl__name">' + d.title + '</span>'
-      + '<span class="vinyl__sleeve"><span class="vinyl__disc"></span></span>'
-      + '<span class="vinyl__cap"><span class="vinyl__artist">' + d.artist + '</span>'
-      + '<span class="vinyl__pill">' + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
-      + (d.play ? '<span class="vinyl__play">' + d.play + '</span>' : '')
-      + '</span></button>';
+      + '<span class="vinyl__sleeve"><span class="vinyl__disc"></span>'
+      + '<span class="vinyl__label"><span class="vinyl__pill">' + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
+      + '<span class="vinyl__name">' + d.title + '</span></span></span></button>';
   }
 
   function htmlToNode(html){ const t = document.createElement('div'); t.innerHTML = html; return t.firstChild; }
   function layoutLines(row){
     row.querySelectorAll('.crate__line').forEach(function(l){ while(l.firstChild) row.appendChild(l.firstChild); l.remove(); });
-    const GAP = 12, MIN = 82;
+    const GAP = 10, MIN = 78;
     const rw = row.clientWidth;
     let perRow = Math.max(1, Math.floor((rw + GAP) / (MIN + GAP)));
     const vinyls = Array.from(row.children);
@@ -1037,9 +1047,10 @@
 
   function renderRec(id){
     const d = RECORDS[id];
-    let h = '<button class="read__close" type="button" aria-label="收起乐评">×</button>'
-      + '<div class="read__head"><span class="read__kind' + (d.type === 'album' ? ' read__kind--rec' : '') + '">'
-      + (d.type === 'album' ? '专辑' : '单曲') + '</span><h3>' + d.title + '</h3>'
+    let h = '<div class="read__top"><span class="read__kind' + (d.type === 'album' ? ' read__kind--rec' : '') + '">'
+      + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
+      + '<button class="read__close" type="button" aria-label="收起乐评">×</button></div>'
+      + '<div class="read__head"><h3>' + d.title + '</h3>'
       + '<span class="en">' + d.artist + (d.play ? ' · ' + d.play : '') + '</span></div>'
       + '<p class="read__text">' + d.review + '</p>';
     if(d.type === 'album' && d.tracks){
