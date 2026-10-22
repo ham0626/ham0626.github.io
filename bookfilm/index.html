@@ -61,58 +61,28 @@
   /* ===== 唱片墙：书架下的小架（音）===== */
   .rec-wall{margin-top:calc(var(--u)*3.5);
     font-family:"Noto Serif SC","Cormorant Garamond",serif}
-  .rec-note{font-size:12.5px;color:var(--ink-dim);line-height:1.6;
-    margin:0 0 calc(var(--u)*2.5)}
+  .rec-legend{display:flex;flex-wrap:wrap;gap:calc(var(--u)*2.5);margin:0 0 calc(var(--u)*1.25);
+    font-size:11px;letter-spacing:.08em;color:var(--ink-dim)}
+  .rec-legend span{display:inline-flex;align-items:center;gap:7px}
+  .rec-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
-  .rec-crates{display:flex;flex-direction:column;gap:calc(var(--u)*2.5)}
-  .crate{position:relative;padding:0;background:none;border:0}
-  .crate__bar{display:flex;align-items:baseline;gap:calc(var(--u)*1.25);margin-bottom:calc(var(--u)*1.75);
-    padding-bottom:calc(var(--u)*1);border-bottom:1px solid rgba(255,255,255,.07)}
-  .crate__year{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;
-    font-size:clamp(22px,3.6vw,30px);color:var(--mint);line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.4)}
-  .crate__theme{font-family:"Noto Serif SC",serif;font-style:italic;font-size:14px;color:rgba(243,246,244,.86);
-    letter-spacing:.1em;align-self:center}
-  .crate__row{position:relative;display:flex;flex-direction:column;gap:calc(var(--u)*1.25)}
-  .crate__line{position:relative;display:grid;grid-template-columns:repeat(var(--per-row,6),minmax(0,1fr));
-    gap:calc(var(--u)*1.25);align-items:end;padding-bottom:calc(var(--u)*1.25)}
-  .crate__line::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;border-radius:0 0 4px 4px;
-    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03) 32%,rgba(0,0,0,.42));
-    box-shadow:0 6px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
-    pointer-events:none}
+  .rec-now{height:22px;text-align:center;font-size:13.5px;color:var(--ink);letter-spacing:.03em;
+    margin:0 0 calc(var(--u)*1.25);font-style:italic;font-family:"Cormorant Garamond","Noto Serif SC",serif}
 
-  .vinyl{position:relative;display:block;cursor:pointer;
-    background:none;border:0;padding:0;text-align:left;color:inherit;
+  .rec-bars{height:clamp(200px,32vw,300px);display:flex;align-items:center;gap:clamp(3px,.9vw,6px);
+    padding:calc(var(--u)*1) 0}
+  .rec-bar{flex:1;min-width:0;height:100%;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:0;padding:0;color:inherit;
     transition:transform var(--dur) var(--ease)}
-  .vinyl__sleeve{position:relative;display:block;aspect-ratio:1;width:100%;border-radius:7px;overflow:hidden;
-    background:
-      linear-gradient(160deg,rgba(4,14,10,.34),rgba(4,14,10,.74)),
-      radial-gradient(76% 68% at 22% 6%,var(--c1) 0%,transparent 66%),
-      linear-gradient(158deg,var(--c2) 0%,#04100b 92%);
-    box-shadow:inset 0 0 0 1px rgba(240,248,244,.07),0 7px 15px rgba(0,0,0,.42)}
-  .vinyl__sleeve::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(180deg,rgba(4,14,10,0) 44%,rgba(4,14,10,.78) 100%)}
-  .vinyl__disc{position:absolute;top:50%;right:-7%;width:48%;aspect-ratio:1;border-radius:50%;z-index:2;
-    transform:translate(0,-50%) rotate(0deg);
-    background:
-      repeating-radial-gradient(circle at 50% 50%,rgba(240,248,244,.075) 0 .8px,transparent .8px 3.6px),
-      radial-gradient(circle at 42% 36%,#242424 0%,#0b0b0b 70%);
-    box-shadow:inset 0 0 0 1px rgba(240,248,244,.11),0 6px 14px rgba(0,0,0,.55);
-    opacity:.92;transition:transform .45s cubic-bezier(.22,.61,.36,1);pointer-events:none}
-  .vinyl__disc::after{content:"";position:absolute;inset:36%;border-radius:50%;
-    background:radial-gradient(circle at 50% 42%,var(--c1),var(--c2));
-    box-shadow:inset 0 0 0 1px rgba(0,0,0,.32),0 0 0 1px rgba(240,248,244,.13)}
-  .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(-7%,-50%) rotate(7deg)}
-  .vinyl__label{position:absolute;inset:0;z-index:3;pointer-events:none;
-    display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;
-    padding:8px 9px;max-width:74%}
-  .vinyl__name{font-family:"Noto Serif SC",serif;font-weight:600;font-size:12px;line-height:1.34;
-    color:#f4f8f6;text-shadow:0 1px 5px rgba(0,0,0,.9);
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .vinyl__kind{font-size:9px;letter-spacing:.2em;line-height:1;
-    color:rgba(240,248,244,.52);text-shadow:0 1px 3px rgba(0,0,0,.7)}
-  .vinyl--album .vinyl__kind{color:rgba(244,213,141,.82)}
-  .vinyl.is-on .vinyl__sleeve{box-shadow:inset 0 0 0 1px rgba(159,240,200,.5),0 0 0 1px rgba(159,240,200,.35),0 9px 18px rgba(0,0,0,.5)}
-  .vinyl:hover{transform:translateY(-3px)}
+  .rec-bar:focus-visible{outline:2px solid rgba(159,240,200,.55);outline-offset:3px;border-radius:4px}
+  .rec-stem{width:clamp(4px,1vw,7px);border-radius:3px;background:var(--c);
+    transform-origin:center bottom;
+    transition:filter var(--dur) var(--ease),transform var(--dur) var(--ease),opacity var(--dur) var(--ease);
+    animation:breathe 4.5s ease-in-out infinite;box-shadow:0 0 10px -3px var(--c)}
+  @keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.06)}}
+  .rec-bar:hover .rec-stem,.rec-bar:focus-visible .rec-stem,.rec-bar.is-on .rec-stem{filter:brightness(1.5);transform:scaleY(1.09)}
+  .rec-bar.is-on .rec-stem{box-shadow:0 0 0 1px rgba(243,246,244,.5),0 0 14px -2px var(--c)}
+  .rec-bar.dim .rec-stem{opacity:.3}
 
   .read--rec{position:relative;margin-top:calc(var(--u)*1.75);
     padding:calc(var(--u)*2.5) calc(var(--u)*2.5) calc(var(--u)*2.5);
@@ -140,13 +110,8 @@
   .rec-track.is-fav{color:var(--ink)}
   .rec-track__star{color:rgba(255,255,255,.28);flex:0 0 auto;font-size:13px}
   .rec-track.is-fav .rec-track__star{color:var(--gold)}
-  @media(max-width:560px){.rec-tracks ol{grid-template-columns:1fr}
-    .vinyl__label{padding:5px 6px;max-width:86%}.vinyl__name{font-size:10px;line-height:1.26}
-    .vinyl__kind{font-size:8px;letter-spacing:.14em}}
-  @media(prefers-reduced-motion:reduce){
-    .vinyl:hover .vinyl__disc,.vinyl:focus-visible .vinyl__disc{transform:translate(0,-50%) rotate(0deg)}
-    .vinyl:hover{transform:none}
-  }
+  @media(max-width:560px){.rec-tracks ol{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.rec-stem{animation:none}}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%2308212b'/%3E%3Ccircle cx='13' cy='13' r='9' fill='%233fae7e'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%239ff0c8' opacity='.9'/%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23f6b8c8' stroke-width='1.4' opacity='.7'/%3E%3C/svg%3E" />
 </head>
@@ -489,13 +454,11 @@
             <span class="bf-count">21 张</span>
           </div>
           <div class="bf-tip bf-tip--rec">看书看电影，怎么能没有 BGM 呢——上面那些故事，配乐我替自己补上了。</div>
-          <p class="rec-note">四道架子按年份站好，单曲与专辑混着摆。点一张，它就在原地开口；专辑点开是全部曲目，★ 是我反复把唱针放回去的那几首。</p>
-          <div class="rec-crates" id="recCrates"></div>
+          <div class="rec-legend" id="recLegend"></div>
+          <div class="rec-now" id="recNow">悬停看歌名 · 点一根音柱听它说</div>
+          <div class="rec-bars" id="recBars" aria-label="唱片墙，按年份排列的 21 首歌曲"></div>
           <div class="read read--rec" id="recRead">
-            <div class="read__hint">
-              <span class="em">♪</span>
-              <p>点一张唱片，这里会展开我的听感；专辑点开还能看完整曲目。</p>
-            </div>
+            <div class="read__hint"><span class="em">♪</span><p>点一根音柱，乐评从下方浮起；专辑会展开全曲目，★ 是我最爱。</p></div>
           </div>
         </div>
   </div>
@@ -962,10 +925,10 @@
 
   /* —— 唱片墙：书 · 影 · 音（年份三/四架，单曲与专辑混排；专辑点开看全曲目＋★ 标最爱）—— */
   const CRATE_TONE = {
-    '2023':['#caa45a','#332714'],
-    '2024':['#3f8f78','#0f2c23'],
-    '2025':['#3a5a7a','#0f1f2c'],
-    '2026':['#b87a8a','#361d27']
+    '2023':['#b9a681','#332714'],
+    '2024':['#548477','#0f2c23'],
+    '2025':['#44586b','#0f1f2c'],
+    '2026':['#a7828c','#361d27']
   };
   const RECORDS = {
     'golden-hour':{type:'single',artist:'JVKE',title:'golden hour',review:'海边黄昏被拉得很长，像借来的假日。刺眼的分不清是太阳的 beam，还是她笑起来那一道。'},
@@ -1003,52 +966,57 @@
     {year:'2026',theme:'新声',ids:['cardigan','guilt-as-sin','petal']}
   ];
 
-  const recCrates = document.getElementById('recCrates');
+  const recBars   = document.getElementById('recBars');
+  const recNow    = document.getElementById('recNow');
   const recRead   = document.getElementById('recRead');
+  const recLegend = document.getElementById('recLegend');
 
-  function vinylHTML(id, tone){
-    const d = RECORDS[id];
-    const cls = 'vinyl' + (d.type === 'album' ? ' vinyl--album' : '');
-    return '<button class="' + cls + '" data-rec="' + id + '" style="--c1:' + tone[0] + ';--c2:' + tone[1] + '" '
-      + 'aria-label="' + d.title + ' · ' + d.artist + ' · ' + (d.type === 'album' ? '专辑' : '单曲') + '">'
-      + '<span class="vinyl__sleeve"><span class="vinyl__disc"></span>'
-      + '<span class="vinyl__label"><span class="vinyl__kind">' + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
-      + '<span class="vinyl__name">' + d.title + '</span></span></span></button>';
+  // 把四架按年份顺序摊平成一条音柱序列
+  const SEQ = [];
+  CRATES.forEach(function(cr){
+    cr.ids.forEach(function(id){ const d = RECORDS[id]; SEQ.push(Object.assign({id:id, year:cr.year, theme:cr.theme}, d)); });
+  });
+
+  // 图例（年份 + 主题），色值取自 CRATE_TONE
+  if(recLegend){
+    recLegend.innerHTML = CRATES.map(function(cr){
+      return '<span><i style="background:' + CRATE_TONE[cr.year][0] + '"></i>' + cr.year + ' ' + cr.theme + '</span>';
+    }).join('');
   }
 
-  function htmlToNode(html){ const t = document.createElement('div'); t.innerHTML = html; return t.firstChild; }
-  function layoutLines(row){
-    row.querySelectorAll('.crate__line').forEach(function(l){ while(l.firstChild) row.appendChild(l.firstChild); l.remove(); });
-    const narrow = window.matchMedia('(max-width:560px)').matches;
-    const GAP = narrow ? 10 : 14, MIN = narrow ? 62 : 96;
-    const rw = row.clientWidth;
-    let perRow = Math.max(1, Math.floor((rw + GAP) / (MIN + GAP)));
-    const vinyls = Array.from(row.children);
-    for(let i=0;i<vinyls.length;i+=perRow){
-      const line = document.createElement('div'); line.className = 'crate__line';
-      line.style.setProperty('--per-row', Math.min(perRow, vinyls.length - i));
-      vinyls.slice(i, i+perRow).forEach(function(v){ line.appendChild(v); });
-      row.appendChild(line);
-    }
+  // 参差高度：用索引生成稳定的伪随机，刷新不跳动
+  function barHeight(i){
+    const s = Math.sin((i + 1) * 99.13) * 10000;
+    const r = s - Math.floor(s);
+    return 34 + r * 60;   // 34% ~ 94%
   }
-  function buildWall(){
-    recCrates.innerHTML = '';
-    CRATES.forEach(function(cr){
-      const tone = CRATE_TONE[cr.year];
-      const crate = document.createElement('div'); crate.className = 'crate';
-      crate.innerHTML = '<div class="crate__bar">'
-        + '<span class="crate__year">' + cr.year + '</span>'
-        + '<span class="crate__theme">' + cr.theme + '</span></div>';
-      const row = document.createElement('div'); row.className = 'crate__row';
-      cr.ids.forEach(function(id){ row.appendChild(htmlToNode(vinylHTML(id, tone))); });
-      crate.appendChild(row);
-      recCrates.appendChild(crate);
-      layoutLines(row);
+
+  // 构建音柱
+  SEQ.forEach(function(d, i){
+    const bar = document.createElement('button');
+    bar.className = 'rec-bar';
+    bar.type = 'button';
+    bar.dataset.idx = i;
+    bar.setAttribute('aria-label', d.title + ' · ' + d.artist + ' · ' + (d.type === 'album' ? '专辑' : '单曲') + ' · ' + d.year);
+    const stem = document.createElement('span');
+    stem.className = 'rec-stem';
+    stem.style.setProperty('--c', CRATE_TONE[d.year][0]);
+    stem.style.height = barHeight(i) + '%';
+    stem.style.animationDelay = (i * 0.16) + 's';
+    bar.appendChild(stem);
+    bar.addEventListener('mouseenter', function(){ recNow.textContent = d.title + ' · ' + d.year; });
+    bar.addEventListener('focus', function(){ recNow.textContent = d.title + ' · ' + d.year; });
+    bar.addEventListener('click', function(){ recSelect(i); });
+    recBars.appendChild(bar);
+  });
+
+  function recSelect(i){
+    const d = SEQ[i];
+    Array.from(recBars.children).forEach(function(b, j){
+      b.classList.toggle('is-on', j === i);
+      b.classList.toggle('dim', j !== i);
     });
-  }
-
-  function renderRec(id){
-    const d = RECORDS[id];
+    recNow.textContent = d.title + ' · ' + d.year;
     let h = '<div class="read__top"><span class="read__kind' + (d.type === 'album' ? ' read__kind--rec' : '') + '">'
       + (d.type === 'album' ? '专辑' : '单曲') + '</span>'
       + '<button class="read__close" type="button" aria-label="收起乐评">×</button></div>'
@@ -1060,8 +1028,7 @@
       h += '<div class="rec-tracks"><div class="rec-tracks__hd">曲目 · 共 ' + d.tracks.length
         + ' 首，<span class="rec-star">★</span> 为我最爱（' + fav + '）</div><ol>';
       d.tracks.forEach(function(t){
-        h += '<li class="rec-track' + (t.f ? ' is-fav' : '') + '"><span class="rec-track__star">'
-          + (t.f ? '★' : '☆') + '</span><span>' + t.n + '</span></li>';
+        h += '<li class="rec-track' + (t.f ? ' is-fav' : '') + '"><span class="rec-track__star">' + (t.f ? '★' : '☆') + '</span><span>' + t.n + '</span></li>';
       });
       h += '</ol></div>';
     }
@@ -1071,35 +1038,26 @@
     recRead.classList.add('read__fadein');
   }
 
-  function closeRec(){
-    recCrates.querySelectorAll('.vinyl.is-on').forEach(function(x){ x.classList.remove('is-on'); });
-    recRead.innerHTML = '<div class="read__hint"><span class="em">♪</span>'
-      + '<p>点一张唱片，这里会展开我的听感；专辑点开还能看完整曲目。</p></div>';
+  function recClose(){
+    Array.from(recBars.children).forEach(function(b){ b.classList.remove('is-on', 'dim'); });
+    recNow.textContent = '悬停看歌名 · 点一根音柱听它说';
+    recRead.innerHTML = '<div class="read__hint"><span class="em">♪</span><p>点一根音柱，乐评从下方浮起；专辑会展开全曲目，★ 是我最爱。</p></div>';
   }
 
-  buildWall();
-
-  recCrates.addEventListener('click', function(e){
-    if(e.target.closest('.read__close')){ closeRec(); return; }
-    const btn = e.target.closest('.vinyl');
-    if(!btn) return;
-    const id = btn.dataset.rec;
-    if(btn.classList.contains('is-on')){ closeRec(); return; }   // 再点已选中的 → 收起
-    recCrates.querySelectorAll('.vinyl.is-on').forEach(function(x){ x.classList.remove('is-on'); });
-    btn.classList.add('is-on');
-    btn.closest('.crate').after(recRead);   // 乐评面板移到被点的那一架下面，点哪看哪
-    renderRec(id);
-    recRead.scrollIntoView({behavior:'smooth', block:'nearest'});
+  recBars.addEventListener('click', function(e){
+    const bar = e.target.closest('.rec-bar');
+    if(!bar) return;
+    const i = +bar.dataset.idx;
+    if(bar.classList.contains('is-on')){ recClose(); return; }   // 再点已选中的 → 收起
+    recSelect(i);
+  });
+  recRead.addEventListener('click', function(e){
+    if(e.target.closest('.read__close')){ recClose(); }
   });
   document.addEventListener('click', function(e){
     if(!recRead.querySelector('.read__close')) return;
-    if(e.target.closest('.vinyl') || e.target.closest('.read--rec')) return;
-    closeRec();
-  });
-  let rzT;
-  window.addEventListener('resize', function(){
-    clearTimeout(rzT);
-    rzT = setTimeout(function(){ recCrates.querySelectorAll('.crate__row').forEach(layoutLines); }, 150);
+    if(e.target.closest('.rec-bar') || e.target.closest('.read--rec')) return;
+    recClose();
   });
 })();
 </script>
