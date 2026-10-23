@@ -30,6 +30,26 @@
   var SEP = 20;      // 同一圈上相邻两朵花至少隔开的角度
   var SEASON_CN = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
 
+  /* 圆心大标题统一成「年份 + 季节」：学年 9 月起算，高一 2023 → 大一 2026 */
+  var ERA_YEAR = { '高一': 2023, '高二': 2024, '高三': 2025, '大一': 2026 };
+  function eraGrade(era) {
+    era = era || '';
+    if (era.indexOf('高一') >= 0) return '高一';
+    if (era.indexOf('高二') >= 0) return '高二';
+    if (era.indexOf('高三') >= 0) return '高三';
+    if (era.indexOf('大一') >= 0) return '大一';
+    return '';
+  }
+  function yearOf(el) {
+    var g = eraGrade(el.getAttribute('data-era'));
+    if (!g) return 0;
+    var m = +(el.getAttribute('data-month') || 1);
+    return m >= 9 ? ERA_YEAR[g] : ERA_YEAR[g] + 1;
+  }
+  function yearSeason(y, season) {
+    return (y ? y + '年' : '') + (SEASON_CN[season] || '');
+  }
+
   var groups = [];   // 一圈一组：[{i, era, season, items:[el...]}]
   var nodes = [];    // 圈上的花（SVG <g>）
   var flora = [];    // 圈与圈之间的装饰小花
@@ -73,6 +93,7 @@
         i: gi,
         era: arr[0].getAttribute('data-era') || '',
         season: arr[0].getAttribute('data-season') || 'autumn',
+        year: yearOf(arr[0]),
         items: arr
       });
     });
@@ -320,7 +341,7 @@
     Array.prototype.forEach.call(gRings.querySelectorAll('.ring__c'), function (c) {
       c.classList.toggle('is-hot', +c.getAttribute('data-g') === gi);
     });
-    setCore(g.era, SEASON_CN[g.season] + ' · ' + cnNum(g.items.length) + '段心事');
+    setCore(yearSeason(g.year, g.season), SEASON_CN[g.season] + ' · ' + cnNum(g.items.length) + '段心事');
     setSeason(g.season);
   }
   function focusNode(rec) {
@@ -328,9 +349,9 @@
     focusRing(+rec.el.getAttribute('data-g'));
     nodes.forEach(function (n) { n.el.classList.toggle('is-hot', n.el === rec.el); });
     var m = +el.getAttribute('data-month');
-    // 窄屏圆心只放得下两行，长标题会撑出去，退成"几月 · 哪一段"
-    if (W < 820) setCore(cnNum(m) + '月 · ' + txt(el, '.log__era'), '');
-    else setCore(cnNum(m) + '月 · ' + txt(el, '.log__title'), txt(el, '.log__era'));
+    // 大标题统一「年份 + 季节」；小标题统一月份在前（如「九月 · 大一」）
+    setCore(yearSeason(yearOf(el), el.getAttribute('data-season')),
+            cnNum(m) + '月 · ' + txt(el, '.log__era'));
   }
   function blur() {
     ring.classList.remove('is-focus');

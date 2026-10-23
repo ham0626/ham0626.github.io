@@ -601,7 +601,7 @@
       kind:'book', tag:'书本', title:'窄门', en:'La Porte Étroite',
       meta:'安德烈·纪德 · 1909 · 小说', stars:4,
       text:'阿丽莎爱的人就在身边，可她一次次把他推开，因为她相信还有一扇更窄的门、一种更高的爱。她把世俗的幸福当成对手，把克制当成升华，最后把自己活成了一封没有寄出的信。纪德写得极其克制，几乎没有一句激烈的台词，却让整本书都浸着一种安静的、自我选择的痛苦。读完很难不同情她，也很难不害怕自己身上那一点点同样的东西。',
-      quote:'「你要进窄门，因为引到灭亡，那门是宽的，路是大的。」'
+      quote:'「远离你就远离了幸福，靠近你就靠近了痛苦」'
     },
     spirited:{
       kind:'film', tag:'电影', title:'千与千寻', en:'Spirited Away',
@@ -714,12 +714,26 @@
   const tkBack   = document.getElementById('tkBackdrop');
   let lastFocus = null;
 
-  /* 票号：书 B01… 影 F01…，按 DATA 顺序各自计数 */
+  /* 票号：书 B01… 影 F01…，按书架书脊 / 银幕海报的实际排列顺序连续编号 */
   (function(){
     let b = 0, f = 0;
+    const seen = {};
+    const tag = (p, n) => p + String(n).padStart(2, '0');
+    document.querySelectorAll('.shelf .spine[data-id]').forEach(function(el){
+      const id = el.dataset.id, d = DATA[id];
+      if(!d || seen[id]) return;
+      d.no = tag('B', ++b); seen[id] = 1;
+    });
+    document.querySelectorAll('#filmWall .poster[data-id]').forEach(function(el){
+      const id = el.dataset.id, d = DATA[id];
+      if(!d || seen[id]) return;
+      d.no = tag('F', ++f); seen[id] = 1;
+    });
+    /* 没上架的条目兜底，接在各自序列后面 */
     Object.keys(DATA).forEach(function(k){
       const d = DATA[k];
-      d.no = (d.kind === 'book' ? 'B' : 'F') + String(d.kind === 'book' ? ++b : ++f).padStart(2, '0');
+      if(seen[k]) return;
+      d.no = tag(d.kind === 'book' ? 'B' : 'F', d.kind === 'book' ? ++b : ++f);
     });
   })();
 
